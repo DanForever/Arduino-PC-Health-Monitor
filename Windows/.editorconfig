@@ -1,0 +1,9 @@
+﻿[*.{cs,vb}]
+
+# IDE0130: Namespace does not match folder structure
+dotnet_style_namespace_match_folder = false
+indent_style=tab
+
+[*.cs]
+insert_final_newline=true
+charset = utf-8

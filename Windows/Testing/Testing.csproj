@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+<ItemGroup>
+  <Reference Include="PresentationCore">
+    <HintPath>C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\PresentationCore.dll</HintPath>
+  </Reference>
+</ItemGroup>
+
+ <ItemGroup>
+        <FrameworkReference Include="Microsoft.WindowsDesktop.App"/>
+ </ItemGroup>
+ 
+  <ItemGroup>
+    <ProjectReference Include="..\Workhorse\Workhorse.csproj" />
+  </ItemGroup>
+
+</Project>

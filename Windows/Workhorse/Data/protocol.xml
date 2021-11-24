@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Protocol xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<Modules>
+		<Module>
+			<Metrics>
+				<Metric Type="CpuName" Capture="CpuName" NoUpdate="true" />
+				<Metric Type="CpuTotalLoad" Capture="CPUTotalLoad" />
+				<Metric Type="CpuTemperature" Capture="CpuPackageTemp" />
+				<Metric Type="CpuAverageClock" Capture="CpuAverageClock" />
+			</Metrics>
+		</Module>
+		<Module>
+			<Metrics>
+				<Metric Type="GpuName" Capture="GpuName" NoUpdate="true" />
+				<Metric Type="GpuClock" Capture="GpuClock" />
+				<Metric Type="GpuTemperature" Capture="GpuTemp" />
+				<Metric Type="GpuLoad" Capture="GpuLoad" />
+			</Metrics>
+		</Module>
+		<Module>
+			<Metrics>
+				<Metric Type="MemoryTotal" Capture="MemTotal" />
+				<Metric Type="MemoryUsage" Capture="MemUsed" />
+			</Metrics>
+		</Module>
+	</Modules>
+</Protocol>

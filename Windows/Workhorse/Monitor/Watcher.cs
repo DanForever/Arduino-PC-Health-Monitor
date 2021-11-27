@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Libre = LibreHardwareMonitor.Hardware;
@@ -66,10 +68,20 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 	public static class Watcher
 	{
+		private class CompoundSensorData
+		{
+			private List<SensorSample> _samples = new List<SensorSample>();
+
+			public List<SensorSample> Samples => _samples;
+
+			public Config.CompoundSensor Sensor { get; set; }
+		}
+
 		private class PollData
 		{
 			public Config.Computer Config { get; set; }
 			public IEnumerable<Plugin.ISource> Sources { get; set; }
+			public Dictionary<string, CompoundSensorData> CompoundSensors { get; set; }
 			public Snapshot Snapshot { get; set; }
 		}
 
@@ -79,6 +91,7 @@ namespace HardwareMonitor.Monitor.Synchronous
 		{
 			_data.Config = config;
 			_data.Sources = sources;
+			_data.CompoundSensors = new Dictionary<string, CompoundSensorData>();
 			_data.Snapshot = new Snapshot();
 
 			Libre.Computer computer = new Libre.Computer
@@ -100,6 +113,7 @@ namespace HardwareMonitor.Monitor.Synchronous
 			computer.Close();
 
 			PollPlugins(_data);
+			ProcessCompoundSensors(_data);
 
 			return _data.Snapshot;
 		}
@@ -129,15 +143,38 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 			foreach (Libre.ISensor sensor in hardware.Sensors)
 			{
-				Config.Sensor watchedSensor = data.Config.FindSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
-				if (watchedSensor == null)
-					continue;
-
-				data.Snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
-
-				if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
-					data.Snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value ?? 0.0f });
+				CheckSensor(sensor, data);
+				CheckCompoundSensor(sensor, data);
 			}
+		}
+
+		private static void CheckSensor(Libre.ISensor sensor, PollData data)
+		{
+			Config.Sensor watchedSensor = data.Config.FindSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
+			if (watchedSensor == null)
+				return;
+
+			data.Snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
+
+			if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
+				data.Snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value ?? 0.0f });
+		}
+
+		private static void CheckCompoundSensor(Libre.ISensor sensor, PollData data)
+		{
+			Config.CompoundSensor watchedCompoundSensor = data.Config.FindCompoundSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
+			if (watchedCompoundSensor == null)
+				return;
+
+			CompoundSensorData compoundSensorData;
+			if(!data.CompoundSensors.TryGetValue(watchedCompoundSensor.Name, out compoundSensorData))
+			{
+				compoundSensorData = new CompoundSensorData() { Sensor = watchedCompoundSensor };
+				data.CompoundSensors.Add(watchedCompoundSensor.Name, compoundSensorData);
+			}
+
+			Config.Sensor watchedSensor = data.Config.FindSensor(watchedCompoundSensor.Sensors, sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
+			compoundSensorData.Samples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
 		}
 
 		#endregion Libre
@@ -190,5 +227,33 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 
 		#endregion Plugins
+
+		private static void ProcessCompoundSensors(PollData data)
+		{
+			foreach(var compoundSensorData in data.CompoundSensors.Values)
+			{
+				string algorithmName = compoundSensorData.Sensor.Algorithm;
+				string fullTypeName = $"{nameof(HardwareMonitor)}.{nameof(Algorithms)}.{nameof(Algorithms.Compound)}.{algorithmName}";
+
+				Type algorithmType = Type.GetType(fullTypeName);
+
+				// @todo: proper error messaging and handling
+				if (algorithmType == null)
+					continue;
+
+				if (string.IsNullOrWhiteSpace(compoundSensorData.Sensor.CaptureName))
+					continue;
+
+				if (!typeof(Algorithms.Compound.IAlgorithm).IsAssignableFrom(algorithmType))
+					continue;
+
+				// @todo: cache the instances in a dictionary so we're not creating them all the time
+				Algorithms.Compound.IAlgorithm instance = (Algorithms.Compound.IAlgorithm)Activator.CreateInstance(algorithmType);
+
+				float result = instance.Calculate(from sample in compoundSensorData.Samples select sample.Value);
+
+				data.Snapshot.Captures.Add(compoundSensorData.Sensor.CaptureName, new Capture() { Name = compoundSensorData.Sensor.CaptureName, Value = result });
+			}
+		}
 	}
 }

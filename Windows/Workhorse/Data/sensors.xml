@@ -7,17 +7,17 @@
 	</Hardware>
 	<Sensors>
 		<Sensor Name="CPU Total" Component="Cpu" Type="Load" CaptureAs="CPUTotalLoad" />
-		<Sensor Name="Core (Tctl/Tdie)" Component="Cpu" Type="Temperature" CaptureAs="CpuPackageTemp" />
+		<Sensor Name="Core \(Tctl/Tdie\)" Component="Cpu" Type="Temperature" CaptureAs="CpuPackageTemp" />
 
 		<Sensor Name="GPU Core" Component="Gpu" Type="Clock" CaptureAs="GpuClock" />
 		<Sensor Name="GPU Core" Component="Gpu" Type="Temperature" CaptureAs="GpuTemp" />
 		<Sensor Name="GPU Core" Component="Gpu" Type="Load" CaptureAs="GpuLoad" />
 		
-		<Sensor Name="Memory Used" Component="Memory" Type="Data" CaptureAs="MemUsed" />
-		<Sensor Name="Memory Available" Component="Memory" Type="Data" />
+		<Sensor Name="^Memory Used" Component="Memory" Type="Data" CaptureAs="MemUsed" />
+		<Sensor Name="^Memory Available" Component="Memory" Type="Data" />
 	</Sensors>
 	<CompoundSensors>
-		<CompoundSensor Name="Average Core Clock" Algorithm="Average">
+		<CompoundSensor Name="Average Core Clock" Algorithm="Average" CaptureAs="CpuAverageClock">
 			<Sensors>
 				<Sensor Name="Core #(\d+)" Type="Clock" />
 			</Sensors>

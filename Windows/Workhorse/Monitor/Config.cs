@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
 namespace HardwareMonitor.Monitor.Config
@@ -38,15 +39,32 @@ namespace HardwareMonitor.Monitor.Config
 		/// </summary>
 		[XmlAttribute()]
 		public SensorType Type { get; set; }
+
+		private Regex _nameRegex = null;
+
+		[XmlIgnore()]
+		public Regex NameRegex
+		{
+			get
+			{
+				if (_nameRegex == null)
+					_nameRegex = new Regex(Name);
+
+				return _nameRegex;
+			}
+		}
 	}
 
-	public enum Algorithm
+	public class CompoundSensor : CaptureDescriptor
 	{
-		Average,
-	}
+		#region Private fields
 
-	public class CompoundSensor
-	{
+		private List<Sensor> _sensors = new List<Sensor>();
+
+		#endregion Private fields
+
+		#region Public Properties
+
 		/// <summary>
 		/// User defined name
 		/// </summary>
@@ -54,18 +72,17 @@ namespace HardwareMonitor.Monitor.Config
 		/// The compount sensor will appear as a regular sensor in the snapshot, so this is used as the display name
 		/// </remarks>
 		[XmlAttribute()]
-		public string Name;
+		public string Name { get; set; }
 
 		/// <summary>
 		/// How the values of all the sensors will be aggregated
 		/// </summary>
 		[XmlAttribute()]
-		public Algorithm Algorithm;
+		public string Algorithm { get; set; }
 
-		public Sensor Aggregate => new Sensor { Name = Name, Component = Sensors[0].Component, Type = Sensors[0].Type };
-
-		private List<Sensor> _sensors = new List<Sensor>();
 		public List<Sensor> Sensors => _sensors;
+
+		#endregion Public Properties
 	}
 
 	[XmlRoot()]
@@ -99,9 +116,9 @@ namespace HardwareMonitor.Monitor.Config
 			return Hardware.Find((Component component) => component.Type == type);
 		}
 
-		private Sensor FindSensor(List<Sensor> sensors, string name, HardwareType component, SensorType sensorType)
+		public Sensor FindSensor(List<Sensor> sensors, string name, HardwareType component, SensorType sensorType)
 		{
-			return sensors.Find((Sensor sensor) => sensor.Name == name && sensor.Component == component && sensor.Type == sensorType);
+			return sensors.Find((Sensor sensor) => sensor.NameRegex.IsMatch(name) && sensor.Component == component && sensor.Type == sensorType);
 		}
 
 		public Sensor FindSensor(string name, HardwareType component, SensorType sensorType)
@@ -110,11 +127,16 @@ namespace HardwareMonitor.Monitor.Config
 			if (sensor != null)
 				return sensor;
 
+			return null;
+		}
+
+		public CompoundSensor FindCompoundSensor(string name, HardwareType component, SensorType sensorType)
+		{
 			foreach (CompoundSensor compoundSensor in CompoundSensors)
 			{
 				Sensor subSensor = FindSensor(compoundSensor.Sensors, name, component, sensorType);
 				if (subSensor != null)
-					return subSensor;
+					return compoundSensor;
 			}
 
 			return null;
@@ -151,7 +173,7 @@ namespace HardwareMonitor.Monitor.Config
 			config.Sensors.Add(new Sensor() { Name = "CPU Total", Component = HardwareType.Cpu, Type = SensorType.Load });
 			config.Sensors.Add(new Sensor() { Name = "Core (Tctl/Tdie)", Component = HardwareType.Cpu, Type = SensorType.Temperature });
 
-			CompoundSensor clockSensor = new CompoundSensor() { Algorithm = Algorithm.Average };
+			CompoundSensor clockSensor = new CompoundSensor() { Algorithm = "Average" };
 			clockSensor.Sensors.Add(new Sensor() { Name = @"Core #(\d+)", Component = HardwareType.Cpu, Type = SensorType.Clock });
 			config.CompoundSensors.Add(clockSensor);
 

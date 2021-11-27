@@ -1,3 +1,5 @@
 
 Windows/packages/
 .vs/
+bin/
+intermediate/

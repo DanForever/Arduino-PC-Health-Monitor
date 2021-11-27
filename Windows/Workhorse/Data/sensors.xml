@@ -3,7 +3,7 @@
 	<Hardware>
 		<Component Type="Cpu" CaptureAs="CpuName" />
 		<Component Type="Gpu" CaptureAs="GpuName" />
-		<Component Type="Memory" />
+		<Component Type="Memory" CaptureAs="MemoryName" />
 	</Hardware>
 	<Sensors>
 		<Sensor Name="CPU Total" Component="Cpu" Type="Load" CaptureAs="CPUTotalLoad" />

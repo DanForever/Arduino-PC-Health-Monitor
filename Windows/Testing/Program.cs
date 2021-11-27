@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -31,10 +30,11 @@ namespace HardwareMonitor.Testing
 
 		static async Task<int> Main(string[] args)
 		{
-			Protocol.Config.SaveDummy();
-			Monitor.Config.Computer.SaveDummy();
 			var sensorConfig = Monitor.Config.Computer.Load("Data/sensors.xml");
 			var protocolConfig = Protocol.Config.Load("Data/protocol.xml");
+			var pluginConfig = Plugin.Config.Config.Load("Data/plugins.xml");
+
+			var pluginManager = new Plugin.Manager(pluginConfig);
 
 			Console.WriteLine("Waiting for device...");
 			Device device = new Device();
@@ -59,7 +59,7 @@ namespace HardwareMonitor.Testing
 
 			while (device.IsConnected)
 			{
-				Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(sensorConfig);
+				Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(sensorConfig, pluginManager.Sources);
 
 				device.Update(snapshot);
 			}

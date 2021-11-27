@@ -7,9 +7,9 @@ namespace HardwareMonitor.Monitor.Asynchronous
 {
 	public static class Watcher
 	{
-		public static async Task<Snapshot> Poll(Config.Computer config)
+		public static async Task<Snapshot> Poll(Config.Computer config, IEnumerable<Plugin.ISource> sources)
 		{
-			return await Task.Run(() => Synchronous.Watcher.Poll(config));
+			return await Task.Run(() => Synchronous.Watcher.Poll(config, sources));
 		}
 	}
 }
@@ -47,7 +47,7 @@ namespace HardwareMonitor.Monitor.Synchronous
 			//{Libre.SensorType.Control,			SensorType.},
 			//{Libre.SensorType.Level,			 SensorType.},
 			//{Libre.SensorType.Factor,			 SensorType.},
-			{Libre.SensorType.Data,				SensorType.Data},
+			{Libre.SensorType.Data,             SensorType.Data},
 			//{Libre.SensorType.SmallData,		 SensorType.},
 			//{Libre.SensorType.Throughput,		 SensorType.},
 			//{Libre.SensorType.TimeSpan,			SensorType.},
@@ -66,20 +66,29 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 	public static class Watcher
 	{
-		public static Config.Computer Config { get; set; }
-
-		public static Snapshot Poll(Config.Computer config)
+		private class PollData
 		{
-			Config = config;
+			public Config.Computer Config { get; set; }
+			public IEnumerable<Plugin.ISource> Sources { get; set; }
+			public Snapshot Snapshot { get; set; }
+		}
+
+		private static PollData _data = new PollData();
+
+		public static Snapshot Poll(Config.Computer config, IEnumerable<Plugin.ISource> sources)
+		{
+			_data.Config = config;
+			_data.Sources = sources;
+			_data.Snapshot = new Snapshot();
 
 			Libre.Computer computer = new Libre.Computer
 			{
-				IsCpuEnabled = Config.IsHardwareSpecified(HardwareType.Cpu),
-				IsGpuEnabled = Config.IsHardwareSpecified(HardwareType.Gpu),
-				IsMemoryEnabled = Config.IsHardwareSpecified(HardwareType.Memory),
-				IsMotherboardEnabled = Config.IsHardwareSpecified(HardwareType.Motherboard),
-				IsNetworkEnabled = Config.IsHardwareSpecified(HardwareType.Network),
-				IsStorageEnabled = Config.IsHardwareSpecified(HardwareType.Storage),
+				IsCpuEnabled = config.IsHardwareSpecified(HardwareType.Cpu),
+				IsGpuEnabled = config.IsHardwareSpecified(HardwareType.Gpu),
+				IsMemoryEnabled = config.IsHardwareSpecified(HardwareType.Memory),
+				IsMotherboardEnabled = config.IsHardwareSpecified(HardwareType.Motherboard),
+				IsNetworkEnabled = config.IsHardwareSpecified(HardwareType.Network),
+				IsStorageEnabled = config.IsHardwareSpecified(HardwareType.Storage),
 				IsControllerEnabled = false,
 				IsPsuEnabled = false,
 			};
@@ -87,37 +96,87 @@ namespace HardwareMonitor.Monitor.Synchronous
 			computer.Open();
 			computer.Accept(new UpdateVisitor());
 
-			Snapshot snapshot = new Snapshot();
-			PollHardware(computer.Hardware, snapshot);
+			PollHardware(computer.Hardware, _data);
 			computer.Close();
 
-			return snapshot;
+			PollPlugins(_data);
+
+			return _data.Snapshot;
 		}
 
-		private static void PollHardware(IEnumerable<Libre.IHardware> hardware, Snapshot snapshot)
+		#region Libre
+
+		private static void PollHardware(IEnumerable<Libre.IHardware> hardware, PollData data)
 		{
 			foreach (Libre.IHardware hardwareItem in hardware)
 			{
-				Config.Component watchedHardware = Config.FindComponent(hardwareItem.HardwareType.Convert());
+				Config.Component watchedHardware = data.Config.FindComponent(hardwareItem.HardwareType.Convert());
 				if (watchedHardware == null)
 					continue;
 
-				snapshot.HardwareSamples.Add(new HardwareSample() { Component = watchedHardware, Name = hardwareItem.Name });
+				data.Snapshot.HardwareSamples.Add(new HardwareSample() { Component = watchedHardware, Name = hardwareItem.Name });
 
 				if (!string.IsNullOrWhiteSpace(watchedHardware.CaptureName))
-					snapshot.Captures.Add(watchedHardware.CaptureName, new Capture() { Name = watchedHardware.CaptureName, Value = hardwareItem.Name });
+					data.Snapshot.Captures.Add(watchedHardware.CaptureName, new Capture() { Name = watchedHardware.CaptureName, Value = hardwareItem.Name });
 
-				PollSensors(hardwareItem, snapshot);
+				PollSensors(hardwareItem, data);
 			}
 		}
 
-		private static void PollSensors(Libre.IHardware hardware, Snapshot snapshot)
+		private static void PollSensors(Libre.IHardware hardware, PollData data)
 		{
-			PollHardware(hardware.SubHardware, snapshot);
+			PollHardware(hardware.SubHardware, data);
 
 			foreach (Libre.ISensor sensor in hardware.Sensors)
 			{
-				Config.Sensor watchedSensor = Config.FindSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
+				Config.Sensor watchedSensor = data.Config.FindSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
+				if (watchedSensor == null)
+					continue;
+
+				data.Snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
+
+				if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
+					data.Snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value ?? 0.0f });
+			}
+		}
+
+		#endregion Libre
+
+		#region Plugins
+
+		private static void PollPlugins(PollData data)
+		{
+			foreach (Plugin.ISource source in data.Sources)
+			{
+				source.Update();
+
+				PollHardware(source.Hardware, data);
+			}
+		}
+
+		private static void PollHardware(IEnumerable<Plugin.IHardware> hardware, PollData data)
+		{
+			foreach (Plugin.IHardware hardwareItem in hardware)
+			{
+				Config.Component watchedHardware = data.Config.FindComponent(hardwareItem.Type);
+				if (watchedHardware == null)
+					continue;
+
+				data.Snapshot.HardwareSamples.Add(new HardwareSample() { Component = watchedHardware, Name = hardwareItem.Name });
+
+				if (!string.IsNullOrWhiteSpace(watchedHardware.CaptureName))
+					data.Snapshot.Captures[watchedHardware.CaptureName] = new Capture() { Name = watchedHardware.CaptureName, Value = hardwareItem.Name };
+
+				PollSensors(hardwareItem, data);
+			}
+		}
+
+		private static void PollSensors(Plugin.IHardware hardware, PollData data)
+		{
+			foreach (Plugin.ISensor sensor in hardware.Sensors)
+			{
+				/*
+				Config.Sensor watchedSensor = Config.FindSensor(sensor.Name, sensor.Hardware.Type, sensor.Type);
 				if (watchedSensor == null)
 					continue;
 
@@ -125,7 +184,11 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 				if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
 					snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value ?? 0.0f });
-			} 
+				//*/
+			}
 		}
+
+
+		#endregion Plugins
 	}
 }

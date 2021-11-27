@@ -19,6 +19,7 @@
 		</Module>
 		<Module>
 			<Metrics>
+				<Metric Type="MemoryName" Capture="MemoryName" />
 				<Metric Type="MemoryTotal" Capture="MemTotal" />
 				<Metric Type="MemoryUsage" Capture="MemUsed" />
 			</Metrics>

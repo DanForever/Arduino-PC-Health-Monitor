@@ -18,11 +18,11 @@
  */
 
 using System.Collections.Generic;
-using System.IO;
 using System.Xml.Serialization;
 
 namespace HardwareMonitor.Protocol
 {
+	[XmlInclude(typeof(Icon))]
 	public class Metric
 	{
 		[XmlAttribute()]
@@ -35,6 +35,11 @@ namespace HardwareMonitor.Protocol
 		public bool NoUpdate { get; set; } = false;
 	}
 
+	public class Icon : Metric
+	{
+		public Icon() { NoUpdate = true; }
+	}
+
 	public class Module
 	{
 		[XmlArray()]
@@ -42,30 +47,10 @@ namespace HardwareMonitor.Protocol
 	}
 
 	[XmlRoot("Protocol")]
-	public class Config
+	public class Config : ConfigBase<Config>
 	{
 		[XmlArray()]
 		public List<Module> Modules { get; set; }
-
-		public static Config Load(string filename)
-		{
-			XmlSerializer serializer = new XmlSerializer(typeof(Config));
-
-			using (TextReader reader = new StreamReader(filename))
-			{
-				return (Config)serializer.Deserialize(reader);
-			}
-		}
-
-		public void Save(string filename)
-		{
-			XmlSerializer serializer = new XmlSerializer(typeof(Config));
-
-			using (TextWriter writer = new StreamWriter(filename))
-			{
-				serializer.Serialize(writer, this);
-			}
-		}
 
 		public static void SaveDummy()
 		{

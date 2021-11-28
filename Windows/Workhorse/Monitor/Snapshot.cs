@@ -51,6 +51,7 @@ namespace HardwareMonitor.Monitor
 
 		public string Name { get; set; }
 	}
+
 	public class Capture
 	{
 		/// <summary>

@@ -18,6 +18,8 @@
  */
 
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace HardwareMonitor
 {
@@ -26,6 +28,7 @@ namespace HardwareMonitor
 		private bool _onceOnlyDataSent = false;
 		public Connection.ActiveConnection Connection { get; set; }
 		public Protocol.Config Protocol { get; set; }
+		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
 
 		public void Connect(Connection.AvailableConnection availableConnection)
@@ -39,7 +42,7 @@ namespace HardwareMonitor
 			}
 		}
 
-		public void Update(Monitor.Snapshot snapshot)
+		public async Task Update(Monitor.Snapshot snapshot)
 		{
 			if (Protocol == null)
 				return;
@@ -52,13 +55,13 @@ namespace HardwareMonitor
 
 			foreach(var module in Protocol.Modules)
 			{
-				UpdateModule(snapshot, module);
+				await UpdateModule(snapshot, module);
 			}
 
 			_onceOnlyDataSent = true;
 		}
 
-		private async void UpdateModule(Monitor.Snapshot snapshot, Protocol.Module module)
+		private async Task UpdateModule(Monitor.Snapshot snapshot, Protocol.Module module)
 		{
 			foreach(var metric in module.Metrics)
 			{
@@ -70,9 +73,19 @@ namespace HardwareMonitor
 				{
 					if(metric.NoUpdate)
 					{
-						Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
-						packet.Connections = new List<Connection.ActiveConnection>() { Connection };
-						await packet.SendAsync(HardwareMonitor.Protocol.PacketType.SensorUpdate, metric.Type, capturedValue.Value);
+						Protocol.Icon icon = metric as Protocol.Icon;
+
+						if (icon != null && Icons != null)
+						{
+							string iconPath = Path.Join("Images", $"{Icons.GetIcon(capturedValue.Value)}.bmp");
+							HardwareMonitor.Connection.IconSender.Send(icon.Type, iconPath, Connection);
+						}
+						else
+						{
+							Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
+							packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+							await packet.SendAsync(HardwareMonitor.Protocol.PacketType.SensorUpdate, metric.Type, capturedValue.Value);
+						}
 					}
 					else
 					{

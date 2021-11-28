@@ -7,6 +7,7 @@
 				<Metric Type="CpuTotalLoad" Capture="CPUTotalLoad" />
 				<Metric Type="CpuTemperature" Capture="CpuPackageTemp" />
 				<Metric Type="CpuAverageClock" Capture="CpuAverageClock" />
+				<Metric xsi:type="Icon" Type="CpuIcon" Capture="CpuName" />
 			</Metrics>
 		</Module>
 		<Module>
@@ -15,6 +16,7 @@
 				<Metric Type="GpuClock" Capture="GpuClock" />
 				<Metric Type="GpuTemperature" Capture="GpuTemp" />
 				<Metric Type="GpuLoad" Capture="GpuLoad" />
+				<Metric xsi:type="Icon" Type="GpuIcon" Capture="GpuName" />
 			</Metrics>
 		</Module>
 		<Module>
@@ -22,6 +24,7 @@
 				<Metric Type="MemoryName" Capture="MemoryName" />
 				<Metric Type="MemoryTotal" Capture="MemTotal" />
 				<Metric Type="MemoryUsage" Capture="MemUsed" />
+				<Metric xsi:type="Icon" Type="MemoryIcon" Capture="MemoryName" />
 			</Metrics>
 		</Module>
 	</Modules>

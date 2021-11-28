@@ -59,19 +59,22 @@ namespace HardwareMonitor.Connection
 
     public static class IconSender
     {
-        public static async void Send(Protocol.Metrics metric, string filepath, Device device)
+        public static async void Send(Protocol.Metrics metric, string filepath, ActiveConnection connection)
         {
+			if (filepath == null)
+				return;
+
             Icon icon = await Load(filepath);
 
             if (icon == null)
                 return;
 
-            await SendChunks(icon, metric, device);
+            await SendChunks(icon, metric, connection);
         }
 
-		public static async void DebugSend(int width, int height, byte[] data, Protocol.Metrics metric, Device device)
+		public static async void DebugSend(int width, int height, byte[] data, Protocol.Metrics metric, ActiveConnection connection)
 		{
-			await SendChunks(new Icon() { Width = (ushort)width, Height = (ushort)height, Data = data }, metric, device);
+			await SendChunks(new Icon() { Width = (ushort)width, Height = (ushort)height, Data = data }, metric, connection);
 		}
 
 		private static async Task<Icon> Load(string filepath)
@@ -155,23 +158,23 @@ namespace HardwareMonitor.Connection
 			}
 		}
 
-		private static async Task SendChunks(Icon icon, Protocol.Metrics metric, Device device)
+		private static async Task SendChunks(Icon icon, Protocol.Metrics metric, ActiveConnection connection)
         {
             int chunk = 0;
             int chunksize = 1024;
 
             while(chunk < icon.Data.Length)
             {
-                chunk += await SendChunk(icon, metric, chunk, chunksize, device);
+                chunk += await SendChunk(icon, metric, chunk, chunksize, connection);
 
                 await Task.Delay(10);
             }
         }
 
-        private static async Task<int> SendChunk(Icon icon, Protocol.Metrics metric, int chunk, int chunksize, Device device)
+        private static async Task<int> SendChunk(Icon icon, Protocol.Metrics metric, int chunk, int chunksize, ActiveConnection connection)
 		{
 			GuaranteedPacket packet = new GuaranteedPacket();
-			packet.Connections = new List<ActiveConnection>() { device.Connection };
+			packet.Connections = new List<ActiveConnection>() { connection };
 
 			int segmentSize = Math.Min(chunksize, icon.Data.Length - chunk);
             ArraySegment<byte> segment = new ArraySegment<byte>(icon.Data, chunk, segmentSize);

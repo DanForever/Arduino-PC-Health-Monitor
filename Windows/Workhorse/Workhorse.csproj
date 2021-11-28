@@ -10,6 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Data\icons.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\protocol.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

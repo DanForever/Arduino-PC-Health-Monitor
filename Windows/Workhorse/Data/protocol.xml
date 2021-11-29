@@ -22,7 +22,7 @@
 		<Module>
 			<Metrics>
 				<Metric Type="MemoryName" Capture="MemoryName" />
-				<Metric Type="MemoryTotal" Capture="MemTotal" />
+				<Metric Type="MemoryTotal" Capture="MemoryTotal" />
 				<Metric Type="MemoryUsage" Capture="MemUsed" />
 				<Metric xsi:type="Icon" Type="MemoryIcon" Capture="MemoryName" />
 			</Metrics>

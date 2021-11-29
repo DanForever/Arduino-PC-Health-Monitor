@@ -14,12 +14,17 @@
 		<Sensor Name="GPU Core" Component="Gpu" Type="Load" CaptureAs="GpuLoad" />
 		
 		<Sensor Name="^Memory Used" Component="Memory" Type="Data" CaptureAs="MemUsed" />
-		<Sensor Name="^Memory Available" Component="Memory" Type="Data" />
 	</Sensors>
 	<CompoundSensors>
 		<CompoundSensor Name="Average Core Clock" Algorithm="Average" CaptureAs="CpuAverageClock">
 			<Sensors>
 				<Sensor Name="Core #(\d+)" Type="Clock" />
+			</Sensors>
+		</CompoundSensor>
+		<CompoundSensor Name="Total Memory Capacity" Algorithm="Sum" CaptureAs="MemoryTotal">
+			<Sensors>
+				<Sensor Name="^Memory Used" Component="Memory" Type="Data" />
+				<Sensor Name="^Memory Available" Component="Memory" Type="Data" />
 			</Sensors>
 		</CompoundSensor>
 	</CompoundSensors>

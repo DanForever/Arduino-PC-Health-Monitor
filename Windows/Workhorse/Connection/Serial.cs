@@ -162,15 +162,20 @@ namespace HardwareMonitor.Connection
 
     class ActiveSerialConnection : ActiveConnection
     {
+		private string _name;
         private SerialPort _serialPort = new SerialPort();
         private DataReciever _dataReciever = new DataReciever();
         private event ActiveConnection.DataRecievedHandler _dataRecievedEvent;
 
-        bool ActiveConnection.IsOpen => _serialPort.IsOpen;
+		string ActiveConnection.Name => _name;
 
-        public ActiveSerialConnection(AvailableSerialConnection availableSerialConnection)
+		bool ActiveConnection.IsOpen => _serialPort.IsOpen;
+
+		public ActiveSerialConnection(AvailableSerialConnection availableSerialConnection)
         {
-            _serialPort.PortName = availableSerialConnection.Name;
+			_name = availableSerialConnection.Name;
+
+			_serialPort.PortName = availableSerialConnection.Name;
             _serialPort.DataReceived += _serialPort_DataReceived;
             _serialPort.Open();
 

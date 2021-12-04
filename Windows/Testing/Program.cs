@@ -26,44 +26,33 @@ namespace HardwareMonitor.Testing
 	{
 		static async Task<int> Main(string[] args)
 		{
-			var sensorConfig = Monitor.Config.Computer.Load("Data/sensors.xml");
-			var protocolConfig = Protocol.Config.Load("Data/protocol.xml");
-			var pluginConfig = Plugin.Config.Config.Load("Data/plugins.xml");
-			var iconConfig = Icon.Config.Load("Data/icons.xml");
+			string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
-			var pluginManager = new Plugin.Manager(pluginConfig);
+			Console.WriteLine("Dan's hardware monitor");
 
-			Console.WriteLine("Waiting for device...");
-			Device device = new Device();
-			device.Protocol = protocolConfig;
-			device.Icons = iconConfig;
+			// Instanticate the class that will perform the main body of work for us
+			Main program = new Main();
 
-			while(!device.IsConnected)
+			// Hook up the feedback so it's printed to the console
+			program.Feedback += (string text) => Console.WriteLine(text);
+
+			// Listen out for an exit request
+			Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs e) =>
 			{
-				var availableConnections = Connection.Manager.EnumerateAvailableConnections();
+				Console.WriteLine("Exit requested...");
 
-				foreach(Connection.AvailableConnection connection in availableConnections)
-				{
-					device.Connect(connection);
+				// Cancel the OS based force-quit and instead allow the application to quit gracefully
+				e.Cancel = true;
+				program.RequestExit = true;
+			};
 
-					if(device.IsConnected)
-						break;
-				}
-			}
+			// Run the application
+			int retcode = await program.Run();
 
-			Console.WriteLine("Connected!");
-			//HardwareMonitor.Connection.IconSender.Send(Protocol.Metrics.CpuIcon, "images/ryzen_black.bmp", device);
-			//HardwareMonitor.Connection.IconSender.Send(Protocol.Metrics.GpuIcon, "images/nvidia_rtx.bmp", device);
-			//HardwareMonitor.Connection.IconSender.Send(Protocol.Metrics.MemoryIcon, "images/gskill_tzn.bmp", device);
+			// Some final user feedback
+			Console.WriteLine("Exit complete");
 
-			while (device.IsConnected)
-			{
-				Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(sensorConfig, pluginManager.Sources);
-
-				await device.Update(snapshot);
-			}
-
-			return 0;
+			return retcode;
 		}
-    }
+	}
 }

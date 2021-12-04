@@ -31,7 +31,9 @@ namespace HardwareMonitor.Connection
         public delegate void DataRecievedHandler(ActiveConnection connection, byte[] data, int dataLength);
         public event DataRecievedHandler DataRecieved;
 
-        public bool IsOpen { get; }
+		public string Name { get; }
+
+		public bool IsOpen { get; }
 
         public void Send(byte[] data);
     }

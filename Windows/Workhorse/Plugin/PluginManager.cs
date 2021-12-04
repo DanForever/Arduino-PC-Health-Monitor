@@ -57,7 +57,8 @@ namespace HardwareMonitor.Plugin
 
 				paths[i] = Path.GetFullPath(Path.Combine(root, pluginConfig.Name, pluginConfig.Name + ".dll"));
 #else
-				paths[i] = Path.Combine("Plugins", pluginConfig.Name) + ".dll";
+				string root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(typeof(Manager).Assembly.Location))));
+				paths[i] = Path.GetFullPath(Path.Combine(root, pluginConfig.Name, pluginConfig.Name + ".dll"));
 #endif
 			}
 

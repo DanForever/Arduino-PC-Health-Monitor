@@ -47,9 +47,6 @@ namespace HardwareMonitor
 
 		private Plugin.Manager _pluginManager;
 
-		// @todo: Refactor so that the connection is done outside the Device class and then passed to a new device on success
-		private Device _temp;
-
 		private List<Device> _devices = new List<Device>();
 
 		/// <summary>
@@ -126,34 +123,33 @@ namespace HardwareMonitor
 			// Now check for any new connections we can make
 			var availableConnections = Connection.Connections.Enumerate();
 
-			foreach (Connection.AvailableConnection connection in availableConnections)
+			foreach (Connection.AvailableConnection availableConnection in availableConnections)
 			{
 				// This is potentially n^2, but I'm not expecting the list being checked to be more than maybe 2 items
-				if (IsAlreadyConnected(connection))
+				if (IsAlreadyConnected(availableConnection))
 					continue;
 
-				if (_temp == null)
-				{
-					_temp = new Device();
-					_temp.Protocol = _protocolConfig;
-					_temp.Icons = _iconConfig;
-				}
+				Connection.ActiveConnection activeConnection = null;
 
 				try
 				{
-					_temp.Connection = connection.Connect();
+					activeConnection = availableConnection.Connect();
 				}
 				catch (Connection.ConnectionFailedException e)
 				{
-					Feedback?.Invoke($"Failed to connect to {connection.Name}: {e.Message}");
+					Feedback?.Invoke($"Failed to connect to {availableConnection.Name}: {e.Message}");
 				}
 
-				if (_temp.IsConnected)
+				if (activeConnection != null && activeConnection.IsOpen)
 				{
-					Feedback?.Invoke($"Connected to {_temp.Connection.Name}");
+					Device device = new Device();
+					device.Protocol = _protocolConfig;
+					device.Icons = _iconConfig;
+					device.Connection = activeConnection;
 
-					_devices.Add(_temp);
-					_temp = null;
+					Feedback?.Invoke($"Connected to {device.Connection.Name}");
+
+					_devices.Add(device);
 				}
 			}
 		}

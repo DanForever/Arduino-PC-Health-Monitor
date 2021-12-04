@@ -23,14 +23,14 @@ namespace HardwareMonitor.Monitor
 {
     public class UpdateVisitor : IVisitor
     {
-        public void VisitComputer(IComputer computer)
+        #region IVisitor
+
+        void IVisitor.VisitComputer(IComputer computer)
         {
             computer.Traverse(this);
         }
 
-        #region IVisitor
-
-        public void VisitHardware(IHardware hardware)
+        void IVisitor.VisitHardware(IHardware hardware)
         {
             hardware.Update();
 
@@ -38,12 +38,12 @@ namespace HardwareMonitor.Monitor
             foreach (ISensor sensor in hardware.Sensors) sensor.Accept(this);
         }
 
-        public void VisitSensor(ISensor sensor)
+        void IVisitor.VisitSensor(ISensor sensor)
         {
             foreach (IParameter parameter in sensor.Parameters) parameter.Accept(this);
         }
 
-        public void VisitParameter(IParameter parameter)
+        void IVisitor.VisitParameter(IParameter parameter)
         {
         }
 

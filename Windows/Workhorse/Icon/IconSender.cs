@@ -24,18 +24,32 @@ using System.Threading.Tasks;
 
 namespace HardwareMonitor.Connection
 {
+	#region Internal Utility Types
+
 	namespace Bitmap
 	{
-		class Header
+		/// <summary>
+		/// This is the main header or "preamble" containing general bmp file details
+		/// </summary>
+		internal class Header
 		{
+			#region Public Properties
+
 			public ushort Signature { get; set; }
 			public uint FileSize { get; set; }
 			public uint Reserved { get; set; }
 			public uint DataOffset { get; set; }
+
+			#endregion Public Properties
 		}
 
-		class InfoHeader
+		/// <summary>
+		/// This is the interesting header that contains the information we need about the bitmap image itself
+		/// </summary>
+		internal class InfoHeader
 		{
+			#region Public Properties
+
 			public uint Size { get; set; }
 			public uint Width { get; set; }
 			public uint Height { get; set; }
@@ -47,19 +61,38 @@ namespace HardwareMonitor.Connection
 			public uint YPixelsPerMetre { get; set; }
 			public uint ColoursUsed { get; set; }
 			public uint ColoursImportant { get; set; }
+
+			#endregion Public Properties
 		}
 	}
 
-    public class Icon
-    {
-        public ushort Width { get; set; }
+	internal class Icon
+	{
+		#region Public Properties
+
+		public ushort Width { get; set; }
         public ushort Height { get; set; }
         public byte[] Data { get; set; }
-    }
 
-    public static class IconSender
-    {
-        public static async void Send(Protocol.Metrics metric, string filepath, ActiveConnection connection)
+		#endregion Public Properties
+	}
+
+	#endregion Internal Utility Types
+
+	public static class IconSender
+	{
+		#region Public Methods
+
+		/// <summary>
+		/// Send an icon to a device.
+		/// </summary>
+		/// <remarks>
+		/// It's async void so you can "fire and forget" - there may be a better way to accomplish this - .ConfigureAwait(false) ?
+		/// </remarks>
+		/// <param name="metric"></param>
+		/// <param name="filepath"></param>
+		/// <param name="connection"></param>
+		public static async void Send(Protocol.Metrics metric, string filepath, ActiveConnection connection)
         {
 			if (filepath == null)
 				return;
@@ -77,6 +110,10 @@ namespace HardwareMonitor.Connection
 			await SendChunks(new Icon() { Width = (ushort)width, Height = (ushort)height, Data = data }, metric, connection);
 		}
 
+		#endregion Public Methods
+
+		#region Private Methods
+
 		private static async Task<Icon> Load(string filepath)
 		{
 			return await Task.Run(() => LoadSync(filepath));
@@ -84,23 +121,6 @@ namespace HardwareMonitor.Connection
 
         private static Icon LoadSync(string filepath)
         {
-			//Stream imageStreamSource = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
-
-			//BmpBitmapDecoder decoder = new BmpBitmapDecoder(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
-			//BitmapSource bitmapSource = decoder.Frames[0];
-
-			//if (bitmapSource.Format != System.Windows.Media.PixelFormats.Bgr565)
-			//{
-			//    Debug.Print($"Image at path `{filepath}` is not RGB565!");
-			//    return null;
-			//}
-
-			//byte[] icon = new byte[bitmapSource.PixelHeight * bitmapSource.PixelWidth * sizeof(short)];
-
-			//bitmapSource.CopyPixels(icon, bitmapSource.PixelWidth * sizeof(short), 0);
-
-			//return new Icon() { Width = (ushort)bitmapSource.PixelWidth, Height = (ushort)bitmapSource.PixelHeight, Data = icon };
-
 			using (FileStream stream = File.OpenRead(filepath))
 			{
 				using (BinaryReader reader = new BinaryReader(stream))
@@ -182,6 +202,8 @@ namespace HardwareMonitor.Connection
             await packet.SendAsync(Protocol.PacketType.SensorUpdate, metric, icon.Width, icon.Height, chunk, segment);
 
             return segmentSize;
-        }
-    }
+		}
+
+		#endregion Private Methods
+	}
 }

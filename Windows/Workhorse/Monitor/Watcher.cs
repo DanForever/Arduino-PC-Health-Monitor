@@ -26,17 +26,26 @@ using Libre = LibreHardwareMonitor.Hardware;
 
 namespace HardwareMonitor.Monitor.Asynchronous
 {
+	/// <summary>
+	/// Public API that presents functions that can be called using async / await
+	/// </summary>
 	public static class Watcher
 	{
+		#region Public Methods
+
 		public static async Task<Snapshot> Poll(Config.Computer config, IEnumerable<Plugin.ISource> sources)
 		{
 			return await Task.Run(() => Synchronous.Watcher.Poll(config, sources));
 		}
+		
+		#endregion Public Methods
 	}
 }
 
 namespace HardwareMonitor.Monitor.Synchronous
 {
+	#region Internal Utilities
+
 	internal static class LibreExtensions
 	{
 		private static Dictionary<Libre.HardwareType, HardwareType> _hardwareTypeMap = new Dictionary<Libre.HardwareType, HardwareType>()
@@ -85,26 +94,53 @@ namespace HardwareMonitor.Monitor.Synchronous
 		}
 	}
 
+	#endregion Internal Utilities
+
+	/// <summary>
+	/// Public API that presents functions that will execute synchronously
+	/// </summary>
 	public static class Watcher
 	{
+		#region Private Classes
+
 		private class CompoundSensorData
 		{
+			#region Private fields
+
 			private List<SensorSample> _samples = new List<SensorSample>();
+
+			#endregion Private fields
+
+			#region Public Properties
 
 			public List<SensorSample> Samples => _samples;
 
 			public Config.CompoundSensor Sensor { get; set; }
+			
+			#endregion Public Properties
 		}
 
 		private class PollData
 		{
+			#region Public Properties
+
 			public Config.Computer Config { get; set; }
 			public IEnumerable<Plugin.ISource> Sources { get; set; }
 			public Dictionary<string, CompoundSensorData> CompoundSensors { get; set; }
 			public Snapshot Snapshot { get; set; }
+
+			#endregion Public Properties
 		}
 
+		#endregion Private Classes
+
+		#region Private fields
+
 		private static PollData _data = new PollData();
+
+		#endregion Private fields
+
+		#region Public Methods
 
 		public static Snapshot Poll(Config.Computer config, IEnumerable<Plugin.ISource> sources)
 		{
@@ -136,6 +172,8 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 			return _data.Snapshot;
 		}
+
+		#endregion Public Methods
 
 		#region Libre
 
@@ -247,6 +285,8 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 		#endregion Plugins
 
+		#region Private Methods
+
 		private static void ProcessCompoundSensors(PollData data)
 		{
 			foreach(var compoundSensorData in data.CompoundSensors.Values)
@@ -274,5 +314,7 @@ namespace HardwareMonitor.Monitor.Synchronous
 				data.Snapshot.Captures.Add(compoundSensorData.Sensor.CaptureName, new Capture() { Name = compoundSensorData.Sensor.CaptureName, Value = result });
 			}
 		}
+
+		#endregion Private Methods
 	}
 }

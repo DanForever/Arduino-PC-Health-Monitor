@@ -22,10 +22,12 @@ using System.Collections.Generic;
 namespace HardwareMonitor.Monitor
 {
 	/// <summary>
-	/// Contains the values obtained from a single poll of the hardware. Immutable
+	/// Contains the values obtained from a single poll of the hardware.
 	/// </summary>
 	public class SensorSample
 	{
+		#region Public Properties
+
 		/// <summary>
 		/// The configuration that triggered this particular value to be captured
 		/// </summary>
@@ -43,17 +45,31 @@ namespace HardwareMonitor.Monitor
 		/// Depending on the sensor type it could be in Celcius, Gigabytes, Mhz, etc
 		/// </remarks>
 		public float Value { get; set; }
+
+		#endregion Public Properties
 	}
 
+	/// <summary>
+	/// Contains any useful information we want about the hardware itself. Typically this information is unchanged from poll to poll
+	/// </summary>
 	public class HardwareSample
 	{
+		#region Public Properties
+
 		public Config.Component Component { get; set; }
 
 		public string Name { get; set; }
+
+		#endregion Public Properties
 	}
 
+	/// <summary>
+	/// represents a piece of information we're interested in *captured* with a custom name defined by the data
+	/// </summary>
 	public class Capture
 	{
+		#region Public Properties
+
 		/// <summary>
 		/// The unique name of this capture
 		/// </summary>
@@ -67,16 +83,29 @@ namespace HardwareMonitor.Monitor
 		/// For Hardware, this will be the name given by that component
 		/// </example>
 		public dynamic Value { get; set; }
+
+		#endregion Public Properties
 	}
 
+	/// <summary>
+	/// Contains all the data sampled and captured during a poll of the hardware and sensors
+	/// </summary>
 	public class Snapshot
 	{
+		#region Private fields
+
 		private List<HardwareSample> _hardwareSamples = new List<HardwareSample>();
 		private List<SensorSample> _sensorSamples = new List<SensorSample>();
 		private Dictionary<string, Capture> _captures = new Dictionary<string, Capture>();
 
+		#endregion Private fields
+
+		#region Public Properties
+
 		public List<HardwareSample> HardwareSamples => _hardwareSamples;
 		public List<SensorSample> SensorSamples => _sensorSamples;
 		public Dictionary<string, Capture> Captures => _captures;
+		
+		#endregion Public Properties
 	}
 }

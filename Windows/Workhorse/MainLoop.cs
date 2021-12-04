@@ -26,6 +26,24 @@ namespace HardwareMonitor
 {
 	public class Main
 	{
+		#region Private fields
+
+		// Configs
+		private Monitor.Config.Computer _sensorConfig;
+		private Protocol.Config _protocolConfig;
+		private Plugin.Config.Config _pluginConfig;
+		private Icon.Config _iconConfig;
+
+		// Plugins
+		private Plugin.Manager _pluginManager;
+
+		// Connected devices
+		private List<Device> _devices = new List<Device>();
+
+		#endregion Private fields
+
+		#region Public Properties
+
 		/// <summary>
 		/// The "framerate" or total time from one hardware poll to the next.
 		/// Dictates how long the thread sleeps for between polls
@@ -37,17 +55,16 @@ namespace HardwareMonitor
 		/// </summary>
 		public bool RequestExit { get; set; } = false;
 
+		#endregion Public Properties
+
+		#region Events
+
 		public delegate void FeedbackHandler(string text);
 		public event FeedbackHandler Feedback;
 
-		private Monitor.Config.Computer _sensorConfig;
-		private Protocol.Config _protocolConfig;
-		private Plugin.Config.Config _pluginConfig;
-		private Icon.Config _iconConfig;
+		#endregion Events
 
-		private Plugin.Manager _pluginManager;
-
-		private List<Device> _devices = new List<Device>();
+		#region Public Methods
 
 		/// <summary>
 		/// Call this to start the application running
@@ -82,6 +99,10 @@ namespace HardwareMonitor
 
 			return 0;
 		}
+
+		#endregion Public Methods
+
+		#region Private Methods
 
 		private void Initialize()
 		{
@@ -166,5 +187,7 @@ namespace HardwareMonitor
 				await device.Update(snapshot);
 			}
 		}
+
+		#endregion Private Methods
 	}
 }

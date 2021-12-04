@@ -18,7 +18,6 @@
  */
 
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 
@@ -26,14 +25,22 @@ namespace HardwareMonitor.Monitor.Config
 {
 	public abstract class CaptureDescriptor
 	{
+		#region Public Properties
+
 		[XmlAttribute("CaptureAs")]
 		public string CaptureName { get; set; }
+
+		#endregion Public Properties
 	}
 
 	public class Component : CaptureDescriptor
 	{
+		#region Public Properties
+
 		[XmlAttribute()]
 		public HardwareType Type { get; set; }
+
+		#endregion Public Properties
 	}
 
 	/// <summary>
@@ -41,6 +48,14 @@ namespace HardwareMonitor.Monitor.Config
 	/// </summary>
 	public class Sensor : CaptureDescriptor
 	{
+		#region Private fields
+
+		private Regex _nameRegex = null;
+		
+		#endregion Private fields
+
+		#region Public Properties
+
 		/// <summary>
 		/// The name of the sensor to look for. Regex
 		/// </summary>
@@ -59,8 +74,6 @@ namespace HardwareMonitor.Monitor.Config
 		[XmlAttribute()]
 		public SensorType Type { get; set; }
 
-		private Regex _nameRegex = null;
-
 		[XmlIgnore()]
 		public Regex NameRegex
 		{
@@ -72,6 +85,8 @@ namespace HardwareMonitor.Monitor.Config
 				return _nameRegex;
 			}
 		}
+
+		#endregion Public Properties
 	}
 
 	public class CompoundSensor : CaptureDescriptor
@@ -105,24 +120,38 @@ namespace HardwareMonitor.Monitor.Config
 	}
 
 	[XmlRoot()]
-	public class Computer
+	public class Computer : ConfigBase<Computer>
 	{
+		#region Private fields
+
 		private List<Component> _hardware = new List<Component>();
 		private List<Sensor> _sensors = new List<Sensor>();
 		private List<CompoundSensor> _compoundSensors = new List<CompoundSensor>();
+
+		#endregion Private fields
+
+		#region Public Properties
 
 		public List<Component> Hardware => _hardware;
 		public List<Sensor> Sensors => _sensors;
 		public List<CompoundSensor> CompoundSensors => _compoundSensors;
 
-		public bool IsHardwareSpecified(HardwareType type)
-		{
-			return Hardware.Exists((Component component) => component.Type == type);
-		}
+		#endregion Public Properties
+
+		#region Private Methods
 
 		private static bool IsSensorSpecified(List<Sensor> sensors, string name, HardwareType component, SensorType sensorType)
 		{
 			return sensors.Exists((Sensor sensor) => sensor.Name == name && sensor.Component == component && sensor.Type == sensorType);
+		}
+		
+		#endregion Private Methods
+
+		#region Public Methods
+
+		public bool IsHardwareSpecified(HardwareType type)
+		{
+			return Hardware.Exists((Component component) => component.Type == type);
 		}
 
 		public bool IsSensorSpecified(string name, HardwareType component, SensorType sensorType)
@@ -161,26 +190,6 @@ namespace HardwareMonitor.Monitor.Config
 			return null;
 		}
 
-		public static Computer Load(string filename)
-		{
-			XmlSerializer serializer = new XmlSerializer(typeof(Computer));
-
-			using (TextReader reader = new StreamReader(filename))
-			{
-				return (Computer)serializer.Deserialize(reader);
-			}
-		}
-
-		public void Save(string filename)
-		{
-			XmlSerializer serializer = new XmlSerializer(typeof(Computer));
-
-			using(TextWriter writer = new StreamWriter(filename))
-			{
-				serializer.Serialize(writer, this);
-			}
-		}
-
 		public static void SaveDummy()
 		{
 			Computer config = new Computer();
@@ -198,5 +207,7 @@ namespace HardwareMonitor.Monitor.Config
 
 			config.Save("example.computer.xml");
 		}
+
+		#endregion Public Methods
 	}
 }

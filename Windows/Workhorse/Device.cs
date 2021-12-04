@@ -31,17 +31,6 @@ namespace HardwareMonitor
 		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
 
-		public void Connect(Connection.AvailableConnection availableConnection)
-		{
-			try
-			{
-				Connection = availableConnection.Connect();
-			}
-			catch(System.IO.FileNotFoundException)
-			{
-			}
-		}
-
 		public async Task Update(Monitor.Snapshot snapshot)
 		{
 			if (Protocol == null)

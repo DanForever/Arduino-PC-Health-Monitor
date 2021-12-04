@@ -177,7 +177,19 @@ namespace HardwareMonitor.Connection
 
 			_serialPort.PortName = availableSerialConnection.Name;
             _serialPort.DataReceived += _serialPort_DataReceived;
-            _serialPort.Open();
+
+			try
+			{
+				_serialPort.Open();
+			}
+			catch(System.IO.FileNotFoundException)
+			{
+				throw new ConnectionFailedException("Invalid serial port") { AvailableConnection = availableSerialConnection };
+			}
+			catch(UnauthorizedAccessException)
+			{
+				throw new ConnectionFailedException($"Serial port {availableSerialConnection.Name} is already open by another application") { AvailableConnection = availableSerialConnection };
+			}
 
             _dataReciever.DebugRecieved += _dataReciever_DebugRecieved;
             _dataReciever.DataRecieved += _dataReciever_DataRecieved;

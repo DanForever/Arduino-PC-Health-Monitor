@@ -139,7 +139,14 @@ namespace HardwareMonitor
 					_temp.Icons = _iconConfig;
 				}
 
-				_temp.Connect(connection);
+				try
+				{
+					_temp.Connection = connection.Connect();
+				}
+				catch (Connection.ConnectionFailedException e)
+				{
+					Feedback?.Invoke($"Failed to connect to {connection.Name}: {e.Message}");
+				}
 
 				if (_temp.IsConnected)
 				{

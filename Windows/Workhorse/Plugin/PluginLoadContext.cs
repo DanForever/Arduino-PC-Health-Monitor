@@ -25,12 +25,22 @@ namespace HardwareMonitor.Plugin
 {
 	class LoadContext : AssemblyLoadContext
 	{
+		#region Private Fields
+		
 		private AssemblyDependencyResolver _resolver;
+
+		#endregion Private Fields
+
+		#region C-Tor
 
 		public LoadContext(string pluginPath)
 		{
 			_resolver = new AssemblyDependencyResolver(pluginPath);
 		}
+
+		#endregion C-Tor
+
+		#region AssemblyLoadContext overrides
 
 		protected override Assembly Load(AssemblyName assemblyName)
 		{
@@ -53,5 +63,7 @@ namespace HardwareMonitor.Plugin
 
 			return IntPtr.Zero;
 		}
+
+		#endregion AssemblyLoadContext overrides
 	}
 }

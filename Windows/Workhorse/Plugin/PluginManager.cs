@@ -28,9 +28,19 @@ namespace HardwareMonitor.Plugin
 {
 	public class Manager
 	{
+		#region Private fields
+		
 		private List<ISource> _sources;
 
+		#endregion Private fields
+
+		#region Public Properties
+
 		public IEnumerable<ISource> Sources => _sources;
+
+		#endregion Public Properties
+
+		#region C-Tor
 
 		public Manager(Config.Config config)
 		{
@@ -42,6 +52,10 @@ namespace HardwareMonitor.Plugin
 				return CreateSources(pluginAssembly);
 			}).ToList();
 		}
+
+		#endregion C-Tor
+
+		#region Private Methods
 
 		private string[] BuildPluginPaths(Config.Config config)
 		{
@@ -65,14 +79,14 @@ namespace HardwareMonitor.Plugin
 			return paths;
 		}
 
-		static Assembly LoadPlugin(string absolutePath)
+		private static Assembly LoadPlugin(string absolutePath)
 		{
 			Debug.WriteLine($"Loading commands from: {absolutePath}");
 			LoadContext loadContext = new LoadContext(absolutePath);
 			return loadContext.LoadFromAssemblyName(AssemblyName.GetAssemblyName(absolutePath));
 		}
 
-		static IEnumerable<ISource> CreateSources(Assembly assembly)
+		private static IEnumerable<ISource> CreateSources(Assembly assembly)
 		{
 			int count = 0;
 
@@ -97,5 +111,7 @@ namespace HardwareMonitor.Plugin
 					$"Available types: {availableTypes}");
 			}
 		}
+		
+		#endregion Private Methods
 	}
 }

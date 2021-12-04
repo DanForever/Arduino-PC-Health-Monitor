@@ -25,6 +25,8 @@ namespace HardwareMonitor.Protocol
 	[XmlInclude(typeof(Icon))]
 	public class Metric
 	{
+		#region Public Properties
+
 		[XmlAttribute()]
 		public Metrics Type { get; set; }
 
@@ -33,24 +35,41 @@ namespace HardwareMonitor.Protocol
 
 		[XmlAttribute]
 		public bool NoUpdate { get; set; } = false;
+
+
+		#endregion Public Properties
 	}
 
 	public class Icon : Metric
 	{
+		#region C-Tor
+
 		public Icon() { NoUpdate = true; }
+		
+		#endregion C-Tor
 	}
 
 	public class Module
 	{
+		#region Public Properties
+
 		[XmlArray()]
 		public List<Metric> Metrics { get; set; }
+
+		#endregion Public Properties
 	}
 
 	[XmlRoot("Protocol")]
 	public class Config : ConfigBase<Config>
 	{
+		#region Public Properties
+
 		[XmlArray()]
 		public List<Module> Modules { get; set; }
+
+		#endregion Public Properties
+
+		#region Public Methods
 
 		public static void SaveDummy()
 		{
@@ -78,5 +97,7 @@ namespace HardwareMonitor.Protocol
 
 			config.Save("example.protocol.xml");
 		}
+
+		#endregion Public Methods
 	}
 }

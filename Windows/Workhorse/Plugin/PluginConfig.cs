@@ -25,15 +25,25 @@ namespace HardwareMonitor.Plugin.Config
 	[XmlType("Plugin")]
 	public class Entry
 	{
+		#region Public Properties
+
 		[XmlAttribute()]
 		public string Name { get; set; }
+
+		#endregion Public Properties
 	}
 
 	[XmlRoot("Plugins")]
 	public class Config : ConfigBase<Config>
 	{
+		#region Public Properties
+		
 		[XmlElement("Plugin")]
 		public List<Entry> Plugins { get; set; }
+
+		#endregion Public Properties
+
+		#region Public Methods
 
 		public static void SaveDummy()
 		{
@@ -47,5 +57,7 @@ namespace HardwareMonitor.Plugin.Config
 
 			config.Save("example.plugins.xml");
 		}
+
+		#endregion Public Methods
 	}
 }

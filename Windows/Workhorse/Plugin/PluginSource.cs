@@ -21,10 +21,22 @@ using System.Collections.Generic;
 
 namespace HardwareMonitor.Plugin
 {
+	/// <summary>
+	/// This class is responsible for providing a source of IHardware and ISensor instances
+	/// It's essentially the entrypoint into the plugin
+	/// </summary>
 	public interface ISource
 	{
+		#region Public Properties
+
 		public IEnumerable<IHardware> Hardware { get; }
 
+		#endregion Public Properties
+
+		#region Public Methods
+
 		public void Update();
+
+		#endregion Public Methods
 	}
 }

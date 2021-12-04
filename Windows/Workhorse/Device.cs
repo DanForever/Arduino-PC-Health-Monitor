@@ -25,11 +25,22 @@ namespace HardwareMonitor
 {
 	public class Device
 	{
+		#region Private Fields
+
 		private bool _onceOnlyDataSent = false;
+
+		#endregion Private Fields
+
+		#region Public Properties
+
 		public Connection.ActiveConnection Connection { get; set; }
 		public Protocol.Config Protocol { get; set; }
 		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
+
+		#endregion Public Properties
+
+		#region Public Methods
 
 		public async Task Update(Monitor.Snapshot snapshot)
 		{
@@ -49,6 +60,10 @@ namespace HardwareMonitor
 
 			_onceOnlyDataSent = true;
 		}
+
+		#endregion Public Methods
+
+		#region Private Methods
 
 		private async Task UpdateModule(Monitor.Snapshot snapshot, Protocol.Module module)
 		{
@@ -85,5 +100,7 @@ namespace HardwareMonitor
 				}
 			}
 		}
+
+		#endregion Private Methods
 	}
 }

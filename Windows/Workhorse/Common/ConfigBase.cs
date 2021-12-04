@@ -24,6 +24,8 @@ namespace HardwareMonitor
 {
 	public abstract class ConfigBase<T> where T : ConfigBase<T>
 	{
+		#region Public Methods
+
 		public static T Load(string filename)
 		{
 			XmlSerializer serializer = new XmlSerializer(typeof(T));
@@ -43,5 +45,7 @@ namespace HardwareMonitor
 				serializer.Serialize(writer, this);
 			}
 		}
+
+		#endregion Public Methods
 	}
 }

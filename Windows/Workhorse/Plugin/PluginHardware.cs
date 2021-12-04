@@ -23,10 +23,14 @@ namespace HardwareMonitor.Plugin
 {
 	public interface IHardware
 	{
+		#region Public Properties
+
 		public string Name { get; }
 
 		public HardwareType Type { get; }
 
 		public IEnumerable<ISensor> Sensors { get; }
+
+		#endregion Public Properties
 	}
 }

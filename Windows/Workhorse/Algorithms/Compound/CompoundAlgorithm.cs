@@ -23,6 +23,10 @@ namespace HardwareMonitor.Algorithms.Compound
 {
 	public interface IAlgorithm
 	{
+		#region Public Methods
+
 		float Calculate(IEnumerable<float> values);
+
+		#endregion Public Methods
 	}
 }

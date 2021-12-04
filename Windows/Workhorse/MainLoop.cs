@@ -124,7 +124,7 @@ namespace HardwareMonitor
 			_devices.RemoveAll(device => ShouldRemoveDevice(device));
 
 			// Now check for any new connections we can make
-			var availableConnections = Connection.Manager.EnumerateAvailableConnections();
+			var availableConnections = Connection.Connections.Enumerate();
 
 			foreach (Connection.AvailableConnection connection in availableConnections)
 			{

@@ -181,11 +181,6 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 		private static void CheckCompoundSensor(Libre.ISensor sensor, PollData data)
 		{
-			if(sensor.Hardware.HardwareType == Libre.HardwareType.Memory)
-			{
-				System.Diagnostics.Debug.WriteLine("poasi");
-			}
-
 			Config.CompoundSensor watchedCompoundSensor = data.Config.FindCompoundSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
 			if (watchedCompoundSensor == null)
 				return;

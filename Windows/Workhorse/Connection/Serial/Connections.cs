@@ -18,22 +18,22 @@
  */
 
 using System.Collections.Generic;
+using System.IO.Ports;
 
-namespace HardwareMonitor.Connection
+namespace HardwareMonitor.Connection.Serial
 {
-	static class Connections
+	internal static class Connections
 	{
 		#region Public Methods
 
-		public static IEnumerable<AvailableConnection> Enumerate()
+		public static IEnumerable<Connection.AvailableConnection> EnumeratePorts()
 		{
-			// Iterate over all serial ports
-			foreach (AvailableConnection availableConnection in Serial.Connections.EnumeratePorts())
-			{
-				yield return availableConnection;
-			}
+			string[] ports = SerialPort.GetPortNames();
 
-			// Iterate over every other type of connection
+			foreach (string port in ports)
+			{
+				yield return new AvailableConnection(port);
+			}
 		}
 
 		#endregion Public Methods

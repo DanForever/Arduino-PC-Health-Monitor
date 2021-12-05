@@ -18,18 +18,15 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO.Ports;
 using System.Text;
 
 namespace HardwareMonitor.Connection
 {
-    // @todo: Move out of Serial
-
-    class DataRecieverInternal
+	internal class DataRecieverInternal
     {
-        private byte[] _pattern;
+		#region Private Fields
+
+		private byte[] _pattern;
 
         private byte[] _intermediateBuffer = new byte[32];
         private int _intermediateLength = 0;
@@ -37,17 +34,33 @@ namespace HardwareMonitor.Connection
         private byte[] _data = new byte[2048];
         private int _dataLength = 0;
 
-        public bool NewlineEndsPacket { get; set; } = false;
+		#endregion Private Fields
 
-        public delegate void DataRecievedHandler(byte[] data, int length, bool matchedNewline);
+		#region Public Properties
+
+		public bool NewlineEndsPacket { get; set; } = false;
+
+		#endregion Public Properties
+
+		#region Events
+
+		public delegate void DataRecievedHandler(byte[] data, int length, bool matchedNewline);
         public event DataRecievedHandler DataRecieved;
 
-        public DataRecieverInternal(byte[] pattern)
+		#endregion Events
+
+		#region C-Tor
+
+		public DataRecieverInternal(byte[] pattern)
         {
             _pattern = pattern;
         }
 
-        public int Recieve(ArraySegment<byte> data)
+		#endregion C-Tor
+
+		#region Public Methods
+
+		public int Recieve(ArraySegment<byte> data)
         {
             for (int i = 0; i < data.Count; ++i)
             {
@@ -83,7 +96,11 @@ namespace HardwareMonitor.Connection
             return data.Count;
         }
 
-        private static bool CouldBePattern(byte[] data, int dataLength, byte[] pattern)
+		#endregion Public Methods
+
+		#region Private Methods
+
+		private static bool CouldBePattern(byte[] data, int dataLength, byte[] pattern)
         {
             int maxLength = Math.Min(dataLength, pattern.Length);
 
@@ -112,29 +129,49 @@ namespace HardwareMonitor.Connection
 
             _dataLength = 0;
         }
-    }
 
+		#endregion Private Methods
+	}
 
-    class DataReciever
+	internal class DataReciever
     {
-        public static byte[] Header => Encoding.ASCII.GetBytes("dan<`");
+		#region Public consts
+
+		// @todo: Consolidate
+		public static byte[] Header => Encoding.ASCII.GetBytes("dan<`");
         public static byte[] Footer => Encoding.ASCII.GetBytes("`>dan");
 
-        DataRecieverInternal _processUntilHeader = new DataRecieverInternal(Header) { NewlineEndsPacket = true };
+		#endregion Public consts
+
+		#region Private Fields
+
+		DataRecieverInternal _processUntilHeader = new DataRecieverInternal(Header) { NewlineEndsPacket = true };
         DataRecieverInternal _processUntilFooter = new DataRecieverInternal(Footer);
         DataRecieverInternal _activeProcessor;
 
-        public event DataRecieverInternal.DataRecievedHandler DataRecieved { add { _processUntilFooter.DataRecieved += value; } remove { _processUntilFooter.DataRecieved -= value; } }
+		#endregion Private Fields
+
+		#region Events
+
+		public event DataRecieverInternal.DataRecievedHandler DataRecieved { add { _processUntilFooter.DataRecieved += value; } remove { _processUntilFooter.DataRecieved -= value; } }
         public event DataRecieverInternal.DataRecievedHandler DebugRecieved { add { _processUntilHeader.DataRecieved += value; } remove { _processUntilHeader.DataRecieved -= value; } }
 
-        public DataReciever()
+		#endregion Events
+
+		#region C-Tor
+
+		public DataReciever()
         {
             _activeProcessor = _processUntilHeader;
             _processUntilHeader.DataRecieved += ProcessingComplete;
             _processUntilFooter.DataRecieved += ProcessingComplete;
-        }
+		}
 
-        private void ProcessingComplete(byte[] data, int length, bool matchedNewline)
+		#endregion C-Tor
+
+		#region Event Handlers
+
+		private void ProcessingComplete(byte[] data, int length, bool matchedNewline)
         {
             if (matchedNewline)
                 return;
@@ -145,7 +182,11 @@ namespace HardwareMonitor.Connection
                 _activeProcessor = _processUntilHeader;
         }
 
-        public void Recieve(byte[] data)
+		#endregion Event Handlers
+
+		#region Public Methods
+
+		public void Recieve(byte[] data)
         {
             int offset = 0;
 
@@ -158,96 +199,7 @@ namespace HardwareMonitor.Connection
                 offset += _activeProcessor.Recieve(segment);
             } while (offset < data.Length);
         }
-    }
 
-    class ActiveSerialConnection : ActiveConnection
-    {
-		private string _name;
-        private SerialPort _serialPort = new SerialPort();
-        private DataReciever _dataReciever = new DataReciever();
-        private event ActiveConnection.DataRecievedHandler _dataRecievedEvent;
-
-		string ActiveConnection.Name => _name;
-
-		bool ActiveConnection.IsOpen => _serialPort.IsOpen;
-
-		public ActiveSerialConnection(AvailableSerialConnection availableSerialConnection)
-        {
-			_name = availableSerialConnection.Name;
-
-			_serialPort.PortName = availableSerialConnection.Name;
-            _serialPort.DataReceived += _serialPort_DataReceived;
-
-			try
-			{
-				_serialPort.Open();
-			}
-			catch(System.IO.FileNotFoundException)
-			{
-				throw new ConnectionFailedException("Invalid serial port") { AvailableConnection = availableSerialConnection };
-			}
-			catch(UnauthorizedAccessException)
-			{
-				throw new ConnectionFailedException($"Serial port {availableSerialConnection.Name} is already open by another application") { AvailableConnection = availableSerialConnection };
-			}
-
-            _dataReciever.DebugRecieved += _dataReciever_DebugRecieved;
-            _dataReciever.DataRecieved += _dataReciever_DataRecieved;
-        }
-
-        event ActiveConnection.DataRecievedHandler ActiveConnection.DataRecieved { add { _dataRecievedEvent += value; } remove { _dataRecievedEvent -= value; } }
-
-        private void _serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            int bytesToRead = _serialPort.BytesToRead;
-            byte[] data = new byte[bytesToRead];
-            _serialPort.Read(data, 0, data.Length);
-
-            _dataReciever.Recieve(data);
-        }
-
-        private void _dataReciever_DebugRecieved(byte[] data, int length, bool matchedNewline)
-        {
-            string debugString = Encoding.UTF8.GetString(data);
-
-            Debug.Write(debugString);
-        }
-
-        private void _dataReciever_DataRecieved(byte[] data, int length, bool matchedNewline)
-        {
-            _dataRecievedEvent?.Invoke(this, data, length);
-        }
-
-        void ActiveConnection.Send(byte[] data)
-        {
-            _serialPort.Write(data, 0, data.Length);
-        }
-    }
-
-    class AvailableSerialConnection : AvailableConnection
-    {
-        private string _name;
-
-        public override string Name => _name;
-
-        public AvailableSerialConnection(string name) => _name = name;
-
-		public override ActiveConnection Connect()
-		{
-			return new ActiveSerialConnection(this);
-		}
+		#endregion Public Methods
 	}
-
-    class Serial
-    {
-        public static IEnumerable<AvailableConnection> EnumeratePorts()
-        {
-            string[] ports = SerialPort.GetPortNames();
-
-            foreach (string port in ports)
-            {
-                yield return new AvailableSerialConnection(port);
-            }
-        }
-    }
 }

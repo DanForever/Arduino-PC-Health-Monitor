@@ -17,25 +17,28 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Collections.Generic;
-
 namespace HardwareMonitor.Connection
 {
-	static class Connections
+	/// <summary>
+	/// A "fire and forget" packet. We don't care if it arrives or not
+	/// </summary>
+	internal class SimplePacket : Packet
 	{
-		#region Public Methods
+		#region Packet
 
-		public static IEnumerable<AvailableConnection> Enumerate()
+		public override void Send(params dynamic[] args)
 		{
-			// Iterate over all serial ports
-			foreach (AvailableConnection availableConnection in Serial.Connections.EnumeratePorts())
-			{
-				yield return availableConnection;
-			}
+			byte[] data = SerializeData(args);
 
-			// Iterate over every other type of connection
+			foreach (ActiveConnection connection in Connections)
+			{
+				if (connection.IsOpen)
+				{
+					connection.Send(data);
+				}
+			}
 		}
 
-		#endregion Public Methods
+		#endregion Packet
 	}
 }

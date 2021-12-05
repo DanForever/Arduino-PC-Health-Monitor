@@ -17,25 +17,31 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Collections.Generic;
-
-namespace HardwareMonitor.Connection
+namespace HardwareMonitor.Connection.Serial
 {
-	static class Connections
+	class AvailableConnection : Connection.AvailableConnection
 	{
-		#region Public Methods
+		#region Private Fields
 
-		public static IEnumerable<AvailableConnection> Enumerate()
+		private string _name;
+
+		#endregion Private Fields
+
+		#region Connection.AvailableConnection
+
+		public override string Name => _name;
+
+		public override Connection.ActiveConnection Connect()
 		{
-			// Iterate over all serial ports
-			foreach (AvailableConnection availableConnection in Serial.Connections.EnumeratePorts())
-			{
-				yield return availableConnection;
-			}
-
-			// Iterate over every other type of connection
+			return new ActiveConnection(this);
 		}
 
-		#endregion Public Methods
+		#endregion Connection.AvailableConnection
+
+		#region C-Tor
+
+		public AvailableConnection(string name) => _name = name;
+
+		#endregion C-Tor
 	}
 }

@@ -90,7 +90,8 @@ namespace HardwareMonitor
 
 				// Sleep until the next update
 				int timeTakenToUpdate = (int)stopWatch.ElapsedMilliseconds;
-				if(timeTakenToUpdate < UpdateRate)
+
+				if (timeTakenToUpdate < UpdateRate)
 				{
 					int timeToSleep = UpdateRate - timeTakenToUpdate;
 					Thread.Sleep(timeToSleep);
@@ -164,6 +165,8 @@ namespace HardwareMonitor
 				if (activeConnection != null && activeConnection.IsOpen)
 				{
 					Device device = new Device();
+					device.IdentityRecieved += (Device device) => PrintDeviceIdentity(device);
+
 					device.Protocol = _protocolConfig;
 					device.Icons = _iconConfig;
 					device.Connection = activeConnection;
@@ -173,6 +176,36 @@ namespace HardwareMonitor
 					_devices.Add(device);
 				}
 			}
+		}
+
+		private void PrintDeviceIdentity(Device device)
+		{
+			string[] MicrocontrollerStrings = new string[]
+			{
+				"Teensy 3.2",
+				"Teensy 4.0",
+				"Seeeduino Xiao",
+			};
+
+			string[] ScreenStrings = new string[]
+			{
+				"ILI9341",
+				"ILI9486",
+				"ILI9488",
+				"NT35510",
+			};
+
+			string[] ResolutionStrings = new string[]
+			{
+				"240 x 320",
+				"320 x 480",
+				"480 x 800",
+			};
+
+			Feedback?.Invoke($"Device {device.Connection.Name} identity:");
+			Feedback?.Invoke($"  - Microcontroller:   {MicrocontrollerStrings[(int)device.Microcontroller]}");
+			Feedback?.Invoke($"  - Screen controller: {ScreenStrings[(int)device.Screen]}");
+			Feedback?.Invoke($"  - Screen Resolution: {ResolutionStrings[(int)device.Resolution]}");
 		}
 
 		private async Task UpdateDevices()

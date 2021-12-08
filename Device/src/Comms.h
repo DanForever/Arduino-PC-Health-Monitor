@@ -160,6 +160,7 @@ public:
 
 	void Update();
 	void Ack(uint16_t id);
+	void SendIdentity();
 	void ClearMessage();
 
 	bool MessageReady() { return m_messageReady; }
@@ -177,6 +178,7 @@ private:
 
 	bool m_messageReady;
 	bool m_lookingForFooter;
+	bool m_connected;
 };
 
 #endif // __COMMS_H__

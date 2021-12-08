@@ -199,7 +199,7 @@ namespace HardwareMonitor.Connection
 			int segmentSize = Math.Min(chunksize, icon.Data.Length - chunk);
             ArraySegment<byte> segment = new ArraySegment<byte>(icon.Data, chunk, segmentSize);
 
-            await packet.SendAsync(Protocol.PacketType.SensorUpdate, metric, icon.Width, icon.Height, chunk, segment);
+            await packet.SendAsync(Protocol.PacketType.Metric, metric, icon.Width, icon.Height, chunk, segment);
 
             return segmentSize;
 		}

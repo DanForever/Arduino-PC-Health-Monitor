@@ -1,7 +1,9 @@
 #ifndef __METRICS_H__
 #define __METRICS_H__
 
-enum class Metrics
+#include <cstdint>
+
+enum class Metrics : uint8_t
 {
     CpuName,
     CpuIcon,

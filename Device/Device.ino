@@ -1,4 +1,8 @@
 
+#include "src/IdentityImplementation.h"
+
+#include "src/PacketType.h"
+
 #include "src/Screen.h"
 #include "src/Comms.h"
 #include "src/images/cpu/common.h"
@@ -16,14 +20,6 @@
 
 Screen screen;
 Comms comms;
-
-enum class MessageCategory
-{
-	Metric,
-	Guaranteed,
-	GaranteedAck,
-	Debug,
-};
 
 enum ModuleTypes
 {
@@ -50,15 +46,19 @@ void SensorUpdate(Message& message)
 
 void HandleMessage(Message& message)
 {
-	MessageCategory messageCategory = (MessageCategory)message.Read();
+	ePacketType packetType = (ePacketType)message.Read();
 
-	switch (messageCategory)
+	switch (packetType)
 	{
-	case MessageCategory::Metric:
+	case ePacketType::Metric:
 		SensorUpdate(message);
 		break;
 
-	case MessageCategory::Guaranteed:
+	case ePacketType::IdentityRequest:
+		comms.SendIdentity();
+		break;
+
+	case ePacketType::Guaranteed:
 		{
 			uint16_t packetId;
 			message.Read(packetId);
@@ -68,13 +68,13 @@ void HandleMessage(Message& message)
 		}
 		break;
 
-	case MessageCategory::Debug:
+	case ePacketType::Debug:
 		Serial.println("Debug message recieved!");
 		break;
 
 	default:;
 		Serial.print("Unrecognised message category: ");
-		Serial.println((int)messageCategory);
+		Serial.println((int)packetType);
 	}
 }
 

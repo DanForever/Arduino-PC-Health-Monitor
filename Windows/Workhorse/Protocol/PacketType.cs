@@ -21,7 +21,10 @@ namespace HardwareMonitor.Protocol
 {
 	public enum PacketType
 	{
-		SensorUpdate,
+		Version,
+		IdentityRequest,
+		Identity,
+		Metric,
 		Guaranteed,
 		GuaranteedAck,
 		Debug,

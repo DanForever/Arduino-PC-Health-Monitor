@@ -21,24 +21,84 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
+using HardwareMonitor.Protocol;
+
 namespace HardwareMonitor
 {
+	public enum eMicrocontroller
+	{
+		Teensy32,
+		Teensy40,
+		SeeediunoXiao,
+
+		Unknown
+	}
+
+	public enum eScreen
+	{
+		ILI9341,
+		ILI9486,
+		ILI9488,
+		NT35510,
+
+		Unknown
+	}
+
+	public enum eResolution
+	{
+		R240x320,
+		R320x480,
+		R480x800,
+
+		Unknown
+	}
+
 	public class Device
 	{
 		#region Private Fields
 
 		private bool _onceOnlyDataSent = false;
+		private Connection.ActiveConnection _activeConnection;
+
+		private eMicrocontroller _microcontroller = eMicrocontroller.Unknown;
+		private eScreen _screen = eScreen.Unknown;
+		private eResolution _resolution = eResolution.Unknown;
 
 		#endregion Private Fields
 
 		#region Public Properties
 
-		public Connection.ActiveConnection Connection { get; set; }
+		public Connection.ActiveConnection Connection
+		{
+			get
+			{
+				return _activeConnection;
+			}
+
+			set
+			{
+				_activeConnection = value;
+				_activeConnection.DataRecieved += _activeConnection_DataRecieved;
+				RequestIdentity();
+			}
+		}
+
 		public Protocol.Config Protocol { get; set; }
 		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
 
+		public eMicrocontroller Microcontroller => _microcontroller;
+		public eScreen Screen => _screen;
+		public eResolution Resolution => _resolution;
+
 		#endregion Public Properties
+
+		#region Events
+
+		public delegate void SimpleDeviceEventHandler(Device device);
+		public event SimpleDeviceEventHandler IdentityRecieved;
+
+		#endregion Events
 
 		#region Public Methods
 
@@ -88,19 +148,42 @@ namespace HardwareMonitor
 						{
 							Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
 							packet.Connections = new List<Connection.ActiveConnection>() { Connection };
-							await packet.SendAsync(HardwareMonitor.Protocol.PacketType.SensorUpdate, metric.Type, capturedValue.Value);
+							await packet.SendAsync(HardwareMonitor.Protocol.PacketType.Metric, metric.Type, capturedValue.Value);
 						}
 					}
 					else
 					{
 						Connection.SimplePacket packet = new Connection.SimplePacket();
 						packet.Connections = new List<Connection.ActiveConnection>() { Connection };
-						packet.Send(HardwareMonitor.Protocol.PacketType.SensorUpdate, metric.Type, capturedValue.Value);
+						packet.Send(HardwareMonitor.Protocol.PacketType.Metric, metric.Type, capturedValue.Value);
 					}
 				}
 			}
 		}
 
+		private void RequestIdentity()
+		{
+			Connection.SimplePacket packet = new Connection.SimplePacket();
+			packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+			packet.Send(HardwareMonitor.Protocol.PacketType.IdentityRequest);
+		}
+
 		#endregion Private Methods
+
+		#region Event Handlers
+
+		private void _activeConnection_DataRecieved(Connection.ActiveConnection connection, byte[] data, int dataLength)
+		{
+			if((PacketType)data[0] == PacketType.Identity)
+			{
+				_microcontroller = (eMicrocontroller)data[1];
+				_screen = (eScreen)data[2];
+				_resolution = (eResolution)data[3];
+
+				IdentityRecieved?.Invoke(this);
+			}
+		}
+
+		#endregion Event Handlers
 	}
 }

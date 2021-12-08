@@ -1,6 +1,8 @@
 #include "Comms.h"
 
 #include <Arduino.h>
+#include "PacketType.h"
+#include "IdentityImplementation.h"
 
 namespace
 {
@@ -11,7 +13,9 @@ namespace
 Comms::Comms()
 	: m_messageReady(false)
 	, m_lookingForFooter(false)
+	, m_connected(false)
 {
+	Serial.begin(9600);
 }
 
 void Comms::Update()
@@ -31,8 +35,7 @@ void Comms::Ack(uint16_t id)
 	memcpy(buffer, MessageHeader, headerLength);
 	bufferUsed += headerLength;
 
-	// @todo: MessageCategory.Ack
-	buffer[bufferUsed] = 2;
+	buffer[bufferUsed] = (uint8_t)ePacketType::GaranteedAck;
 	++bufferUsed;
 
 	memcpy(buffer + bufferUsed, &id, sizeof(uint16_t));
@@ -116,4 +119,18 @@ void Comms::ProcessMainBuffer()
 			}
 		}
 	}
+}
+
+void Comms::SendIdentity()
+{
+	uint8_t buffer[8];
+
+	buffer[0] = (uint8_t)ePacketType::Identity;
+	buffer[1] = (uint8_t)Identity.Microcontroller;
+	buffer[2] = (uint8_t)Identity.Screen;
+	buffer[3] = (uint8_t)Identity.Resolution;
+
+	::Serial.write(MessageHeader, strlen(MessageHeader));
+	::Serial.write(buffer, 4);
+	::Serial.write(MessageFooter, strlen(MessageFooter));
 }

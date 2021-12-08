@@ -1,7 +1,8 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-#include <ILI9341_t3.h>
+#include "IdentityImplementation.h"
+
 #define ILI9341_SILVER      0xA510
 
 class Screen
@@ -86,7 +87,7 @@ public:
 	uint16_t MeasureTextHeight(const char* text) { return m_tft.measureTextHeight(text); }
 
 private:
-	ILI9341_t3 m_tft;
+	ScreenApi m_tft;
 	int16_t m_xOffset;
 	int16_t m_yOffset;
 };

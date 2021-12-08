@@ -83,7 +83,7 @@ namespace HardwareMonitor.Connection
                 await Task.Delay(TimeOut);
             }
 
-            Debug.Print($"Acknowledgement of packet {Id} received by all connections");
+            //Debug.Print($"Acknowledgement of packet {Id} received by all connections");
         }
 
 		#endregion Public Methods

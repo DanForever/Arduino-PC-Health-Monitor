@@ -11,6 +11,7 @@ class Module
 {
 public:
 	Module(Screen* screen, Position position);
+	virtual ~Module();
 
 	void Draw();
 	void Clear(uint16_t clearColour = ILI9341_BLACK);
@@ -21,9 +22,13 @@ public:
 	void PushOffset();
 	void PopOffset();
 
-	Screen* GetScreen();
+	virtual bool HandleMessage(Metrics metric, Message& message) { return false; }
+	virtual void HandleMessage(Message& message) {}
 
-	virtual bool HandleMessage(Metrics metric, Message& message) = 0;
+protected:
+	Screen* GetScreen();
+	Component* GetComponent(uint8_t index);
+	uint8_t GetComponentCount() const { return m_components.size(); }
 
 private:
 	Screen* m_screen;
@@ -36,6 +41,11 @@ private:
 inline Screen* Module::GetScreen()
 {
 	return m_screen;
+}
+
+inline Component* Module::GetComponent(uint8_t index)
+{
+	return m_components[index];
 }
 
 #endif // __MODULE_H_

@@ -92,7 +92,7 @@ namespace HardwareMonitor.Connection
 		/// <param name="metric"></param>
 		/// <param name="filepath"></param>
 		/// <param name="connection"></param>
-		public static async void Send(Protocol.Metrics metric, string filepath, ActiveConnection connection)
+		public static async void Send(Layout.MappedComponent mappedComponent, string filepath, ActiveConnection connection)
         {
 			if (filepath == null)
 				return;
@@ -102,13 +102,8 @@ namespace HardwareMonitor.Connection
             if (icon == null)
                 return;
 
-            await SendChunks(icon, metric, connection);
+            await SendChunks(icon, mappedComponent, connection);
         }
-
-		public static async void DebugSend(int width, int height, byte[] data, Protocol.Metrics metric, ActiveConnection connection)
-		{
-			await SendChunks(new Icon() { Width = (ushort)width, Height = (ushort)height, Data = data }, metric, connection);
-		}
 
 		#endregion Public Methods
 
@@ -178,20 +173,20 @@ namespace HardwareMonitor.Connection
 			}
 		}
 
-		private static async Task SendChunks(Icon icon, Protocol.Metrics metric, ActiveConnection connection)
+		private static async Task SendChunks(Icon icon, Layout.MappedComponent mappedComponent, ActiveConnection connection)
         {
             int chunk = 0;
             int chunksize = 1024;
 
             while(chunk < icon.Data.Length)
             {
-                chunk += await SendChunk(icon, metric, chunk, chunksize, connection);
+                chunk += await SendChunk(icon, mappedComponent, chunk, chunksize, connection);
 
                 await Task.Delay(10);
             }
         }
 
-        private static async Task<int> SendChunk(Icon icon, Protocol.Metrics metric, int chunk, int chunksize, ActiveConnection connection)
+        private static async Task<int> SendChunk(Icon icon, Layout.MappedComponent mappedComponent, int chunk, int chunksize, ActiveConnection connection)
 		{
 			GuaranteedPacket packet = new GuaranteedPacket();
 			packet.Connections = new List<ActiveConnection>() { connection };
@@ -199,7 +194,7 @@ namespace HardwareMonitor.Connection
 			int segmentSize = Math.Min(chunksize, icon.Data.Length - chunk);
             ArraySegment<byte> segment = new ArraySegment<byte>(icon.Data, chunk, segmentSize);
 
-            await packet.SendAsync(Protocol.PacketType.Metric, metric, icon.Width, icon.Height, chunk, segment);
+            await packet.SendAsync(HardwareMonitor.Protocol.PacketType.ModuleUpdate, mappedComponent.ModuleIndex, (byte)1, mappedComponent.ComponentIndex, icon.Width, icon.Height, chunk, segment);
 
             return segmentSize;
 		}

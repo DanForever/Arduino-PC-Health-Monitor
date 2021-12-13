@@ -24,7 +24,9 @@ namespace HardwareMonitor.Protocol
 		Version,
 		IdentityRequest,
 		Identity,
-		Metric,
+		ModuleDefinition,
+		ModuleUpdate,
+		Metric, // Deprecated
 		Guaranteed,
 		GuaranteedAck,
 		Debug,

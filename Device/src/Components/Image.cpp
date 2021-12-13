@@ -1,7 +1,10 @@
 #include "Image.h"
 
-Image::Image()
-	: m_centre(false)
+#include "../Modules/Module.h"
+
+Image::Image(Module* parent)
+	: m_parent(parent)
+	, m_centre(false)
 {}
 
 void Image::Centre(bool centre)
@@ -33,6 +36,33 @@ void Image::AddSection(Screen* screen, uint16_t width, uint16_t height, int32_t 
 		data += lengthToDraw;
 		dataLength -= lengthToDraw;
 	}
+}
+
+void Image::HandleSetupMessage(Screen* screen, Message& message)
+{
+	Centre(true);
+
+	message.Read(m_position.X);
+	message.Read(m_position.Y);
+}
+
+void Image::HandleUpdateMessage(Screen* screen, Message& message)
+{
+	uint16_t width = -1;
+	message.Read(width);
+
+	uint16_t height = -1;
+	message.Read(height);
+
+	int32_t position = -1;
+	message.Read(position);
+
+	uint16_t buffer[512];
+	uint16_t elementsWritten = message.Read(buffer, 512);
+
+	m_parent->PushOffset();
+		AddSection(screen, width, height, position / sizeof(uint16_t), buffer, elementsWritten);
+	m_parent->PopOffset();
 }
 
 void Image::Draw(Screen*)

@@ -48,3 +48,26 @@ void Text::Clear(Screen* screen, uint16_t clearColour)
 {
 	screen->FillRect(m_position.X, m_position.Y, m_textWidth, m_textHeight, clearColour);
 }
+
+void Text::HandleSetupMessage(Screen* screen, Message& message)
+{
+	// Format:
+	//
+	// int16_t Position X
+	// int16_t Position Y
+	//
+	// uint8_t text size
+
+	message.Read(m_position.X);
+	message.Read(m_position.Y);
+
+	message.Read(m_textSize);
+}
+
+void Text::HandleUpdateMessage(Screen* screen, Message& message)
+{
+	char buffer[Text::MAX_LENGTH];
+	message.Read(buffer, Text::MAX_LENGTH);
+
+	SetText(screen, buffer);
+}

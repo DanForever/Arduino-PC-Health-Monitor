@@ -21,9 +21,15 @@ public:
 		const uint16_t messageSize = Size();
 		const size_t amountToCopy = min(messageSize, bufferSize);
 
+		Serial.print("Text size: ");
+		Serial.println(messageSize);
+
 		for (size_t i = 0; i < amountToCopy; ++i)
 		{
 			textBuffer[i] = Read();
+
+			Serial.print("Char: ");
+			Serial.println(textBuffer[i]);
 		}
 
 		uint16_t nullTerminatorPosition = messageSize;
@@ -61,7 +67,7 @@ public:
 		return m_buffer[m_readPosition];
 	}
 
-	bool Write(uint8_t* source, uint16_t size)
+	bool Write(const uint8_t* source, uint16_t size)
 	{
 		const uint16_t freeSpace = FreeSpace();
 		if (size <= freeSpace)
@@ -76,6 +82,14 @@ public:
 		}
 
 		return false;
+	}
+
+	template <typename T>
+	void Write(const T& value)
+	{
+		const uint8_t* input = reinterpret_cast<const uint8_t*>(&value);
+
+		Write(input, (uint16_t)sizeof(T));
 	}
 
 	bool Write(uint8_t byte) { return Write(&byte, 1); }

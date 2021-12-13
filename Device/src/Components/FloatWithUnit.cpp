@@ -1,12 +1,27 @@
 #include "FloatWithUnit.h"
 
+#include <Arduino.h>
 #include <cstring>
+
+const char UnitStrCelcius[] PROGMEM = "C";
+const char UnitStrMhz[] PROGMEM = "Mhz";
+const char UnitStrGB[] PROGMEM = "GB";
+const char UnitStrPercent[] PROGMEM = "%";
+
+const char* const UnitStrings[] PROGMEM =
+{
+	UnitStrCelcius,
+	UnitStrMhz,
+	UnitStrGB,
+	UnitStrPercent,
+};
 
 FloatWithUnit::FloatWithUnit()
 	: m_valueWidth(0)
 	, m_unitWidth(0)
 	, m_textWidth(0)
 	, m_textHeight(0)
+	, m_precision(0)
 	, m_textSize(0)
 	, m_unitTextSize(0)
 {
@@ -27,7 +42,7 @@ void FloatWithUnit::SetTextSize(uint8_t textSize)
 
 void FloatWithUnit::SetValue(Screen* screen, float value)
 {
-	snprintf(m_value, MAX_VALUE_LENGTH, "%.0f", value);
+	snprintf(m_value, MAX_VALUE_LENGTH, "%.*f", m_precision, value);
 
 	screen->SetTextSize(m_textSize);
 	m_valueWidth = screen->MeasureTextWidth(m_value);
@@ -42,12 +57,17 @@ void FloatWithUnit::SetUnit(Screen* screen, const char* unit)
 {
 	std::strncpy(m_unit, unit, MAX_UNIT_LENGTH);
 
+	InitializeUnit(screen);
+
+	m_changed = true;
+}
+
+void FloatWithUnit::InitializeUnit(Screen* screen)
+{
 	screen->SetTextSize(m_unitTextSize);
 	m_unitWidth = screen->MeasureTextWidth(m_unit);
 
 	CalculateTextWidth();
-
-	m_changed = true;
 }
 
 void FloatWithUnit::Draw(Screen* screen)
@@ -64,6 +84,44 @@ void FloatWithUnit::Draw(Screen* screen)
 void FloatWithUnit::Clear(Screen* screen, uint16_t clearColour)
 {
 	screen->FillRect(m_position.X, m_position.Y, m_textWidth, m_textHeight, clearColour);
+}
+
+void FloatWithUnit::HandleSetupMessage(Screen* screen, Message& message)
+{
+	// Format:
+	//
+	// int16_t Position X
+	// int16_t Position Y
+	//
+	// uint8_t text size
+	// uint8_t unit text size
+	//
+	// uint8_t unit
+	// uint8_t precision
+
+
+	message.Read(m_position.X);
+	message.Read(m_position.Y);
+
+	message.Read(m_textSize);
+	message.Read(m_unitTextSize);
+
+	uint8_t unit;
+	message.Read(unit);
+	strcpy_P(m_unit, (char*)pgm_read_dword(&(UnitStrings[unit])));
+	InitializeUnit(screen);
+
+	// We store precision as a byte, but printf interprets it as an int
+	m_precision = message.Read();
+
+	m_changed = true;
+}
+
+void FloatWithUnit::HandleUpdateMessage(Screen* screen, Message& message)
+{
+	float value;
+	message.Read(value);
+	SetValue(screen, value);
 }
 
 void FloatWithUnit::CalculateTextWidth()

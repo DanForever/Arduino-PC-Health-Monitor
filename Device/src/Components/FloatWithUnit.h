@@ -21,7 +21,11 @@ public:
 	virtual void Draw(Screen* screen) override;
 	virtual void Clear(Screen* screen, uint16_t clearColour) override;
 
+	virtual void HandleSetupMessage(Screen* screen, Message& message) override;
+	virtual void HandleUpdateMessage(Screen* screen, Message& message) override;
+
 private:
+	void InitializeUnit(Screen* screen);
 	void CalculateTextWidth();
 
 	uint16_t m_valueWidth;
@@ -29,6 +33,8 @@ private:
 
 	uint16_t m_textWidth;
 	uint16_t m_textHeight;
+
+	int m_precision;
 
 	Position m_position;
 	uint8_t m_textSize;

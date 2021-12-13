@@ -215,6 +215,12 @@ namespace HardwareMonitor
 				if (!device.IsConnected)
 					continue;
 
+				if(device.Layout == null)
+				{
+					var layout = Layout.Config.Load("example.layout.xml");
+					await device.SetLayout(layout);
+				}
+
 				Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(_sensorConfig, _pluginManager.Sources);
 
 				await device.Update(snapshot);

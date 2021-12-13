@@ -7,11 +7,15 @@
 class Border final : public Component
 {
 public:
+	Border();
 	Border(int16_t width, int16_t height, uint16_t colour);
 
 	// Component
 	virtual void Draw(Screen* screen) override;
-	virtual void Clear(Screen* screen, uint16_t clearColour);
+	virtual void Clear(Screen* screen, uint16_t clearColour) override;
+
+	virtual void HandleSetupMessage(Screen* screen, Message& message) override;
+	virtual void HandleUpdateMessage(Screen* screen, Message& message) override;
 
 private:
 	int16_t m_borderWidth;

@@ -19,6 +19,9 @@ public:
 	virtual void Draw(Screen* screen) override;
 	virtual void Clear(Screen* screen, uint16_t clearColour) override;
 
+	virtual void HandleSetupMessage(Screen* screen, Message& message) override;
+	virtual void HandleUpdateMessage(Screen* screen, Message& message) override;
+
 private:
 	uint16_t m_textWidth;
 	uint16_t m_textHeight;

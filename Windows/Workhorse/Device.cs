@@ -60,6 +60,8 @@ namespace HardwareMonitor
 		private bool _onceOnlyDataSent = false;
 		private Connection.ActiveConnection _activeConnection;
 
+		private Layout.Config _layout;
+
 		private eMicrocontroller _microcontroller = eMicrocontroller.Unknown;
 		private eScreen _screen = eScreen.Unknown;
 		private eResolution _resolution = eResolution.Unknown;
@@ -87,6 +89,8 @@ namespace HardwareMonitor
 		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
 
+		public Layout.Config Layout => _layout;
+
 		public eMicrocontroller Microcontroller => _microcontroller;
 		public eScreen Screen => _screen;
 		public eResolution Resolution => _resolution;
@@ -113,19 +117,69 @@ namespace HardwareMonitor
 			if (!Connection.IsOpen)
 				return;
 
-			foreach(var module in Protocol.Modules)
+			foreach (var mappedComponent in _layout.MappedComponents)
 			{
-				await UpdateModule(snapshot, module);
+				await UpdateMappedComponent(snapshot, mappedComponent.Key, mappedComponent.Value);
 			}
 
 			_onceOnlyDataSent = true;
+		}
+
+		public async Task SetLayout(Layout.Config layout)
+		{
+			if (!IsConnected)
+				return;
+
+			//@todo: Validate layout against device, make sure it's suitable
+
+			_layout = layout;
+
+			Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
+			packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+
+			dynamic[] args = layout.CollectValues();
+			await packet.SendAsync(args);
 		}
 
 		#endregion Public Methods
 
 		#region Private Methods
 
-		private async Task UpdateModule(Monitor.Snapshot snapshot, Protocol.Module module)
+		private async Task UpdateMappedComponent(Monitor.Snapshot snapshot, string useCapture, List<Layout.MappedComponent> mappedComponents)
+		{
+			Monitor.Capture capture;
+			if (snapshot.Captures.TryGetValue(useCapture, out capture))
+			{
+				foreach(Layout.MappedComponent mappedComponent in mappedComponents)
+				{
+					if (mappedComponent.Component.NoUpdate && _onceOnlyDataSent)
+						continue;
+
+					if (mappedComponent.Component.NoUpdate)
+					{
+						if (mappedComponent.Component is Layout.Icon && Icons != null)
+						{
+							string iconPath = Path.Join("Images", $"{Icons.GetIcon(capture.Value)}.bmp");
+							HardwareMonitor.Connection.IconSender.Send(mappedComponent, iconPath, Connection);
+						}
+						else
+						{
+							Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
+							packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+							await packet.SendAsync(HardwareMonitor.Protocol.PacketType.ModuleUpdate, mappedComponent.ModuleIndex, (byte)1, mappedComponent.ComponentIndex, capture.Value);
+						}
+					}
+					else
+					{
+						Connection.SimplePacket packet = new Connection.SimplePacket();
+						packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+						packet.Send(HardwareMonitor.Protocol.PacketType.ModuleUpdate, mappedComponent.ModuleIndex, (byte)1, mappedComponent.ComponentIndex, capture.Value);
+					}
+				}
+			}
+		}
+
+		private async Task UpdateModuleDeprecated(Monitor.Snapshot snapshot, Protocol.Module module)
 		{
 			foreach(var metric in module.Metrics)
 			{
@@ -142,7 +196,7 @@ namespace HardwareMonitor
 						if (icon != null && Icons != null)
 						{
 							string iconPath = Path.Join("Images", $"{Icons.GetIcon(capturedValue.Value)}.bmp");
-							HardwareMonitor.Connection.IconSender.Send(icon.Type, iconPath, Connection);
+							//HardwareMonitor.Connection.IconSender.Send(icon.Type, iconPath, Connection);
 						}
 						else
 						{

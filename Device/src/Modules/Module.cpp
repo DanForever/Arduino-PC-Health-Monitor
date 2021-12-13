@@ -5,6 +5,16 @@ Module::Module(Screen* screen, Position position)
 	, m_position(position)
 {}
 
+Module::~Module()
+{
+	for (auto* component : m_components)
+	{
+		delete component;
+	}
+
+	m_components.clear();
+}
+
 void Module::Draw()
 {
 	PushOffset();

@@ -32,7 +32,11 @@ namespace HardwareMonitor
 
 			using (TextReader reader = new StreamReader(filename))
 			{
-				return (T)serializer.Deserialize(reader);
+				T config = (T)serializer.Deserialize(reader);
+
+				config.OnLoadFinished();
+
+				return config;
 			}
 		}
 
@@ -47,5 +51,11 @@ namespace HardwareMonitor
 		}
 
 		#endregion Public Methods
+
+		#region Protected Methods
+
+		protected virtual void OnLoadFinished() { }
+
+		#endregion Protected Methods
 	}
 }

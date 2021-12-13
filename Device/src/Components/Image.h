@@ -3,11 +3,15 @@
 
 #include "Component.h"
 
+class Module;
+
 //------------------------------------------------------------------------------------------------------
 class Image final : public Component
 {
 public:
-	Image();
+	Image() = default; // TEMP
+
+	Image(Module* parent);
 
 	void Centre(bool centre);
 	void SetPosition(const Position& position);
@@ -17,8 +21,12 @@ public:
 	virtual void Draw(Screen* screen) override;
 	virtual void Clear(Screen* screen, uint16_t clearColour);
 
+	virtual void HandleSetupMessage(Screen* screen, Message& message) override;
+	virtual void HandleUpdateMessage(Screen* screen, Message& message) override;
+
 private:
 	Position m_position;
+	Module* m_parent;
 	bool m_centre;
 };
 

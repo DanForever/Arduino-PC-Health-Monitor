@@ -8,7 +8,6 @@ class Border final : public Component
 {
 public:
 	Border();
-	Border(int16_t width, int16_t height, uint16_t colour);
 
 	// Component
 	virtual void Draw(Screen* screen) override;

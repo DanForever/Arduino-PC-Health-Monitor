@@ -22,7 +22,6 @@ public:
 	void PushOffset();
 	void PopOffset();
 
-	virtual bool HandleMessage(Metrics metric, Message& message) { return false; }
 	virtual void HandleMessage(Message& message) {}
 
 protected:

@@ -2,7 +2,6 @@
 #define __COMPONENT_H__
 
 #include "../Screen.h"
-#include "../Metrics.h"
 #include "../Comms.h"
 
 struct Position

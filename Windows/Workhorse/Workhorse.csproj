@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\Layouts\standard.v.240.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.8.9" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
   </ItemGroup>
@@ -14,7 +18,7 @@
     <Content Include="Data\icons.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\protocol.xml">
+    <Content Include="Data\Layouts\standard.v.240.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\sensors.xml">

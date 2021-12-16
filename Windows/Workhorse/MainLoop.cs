@@ -30,7 +30,6 @@ namespace HardwareMonitor
 
 		// Configs
 		private Monitor.Config.Computer _sensorConfig;
-		private Protocol.Config _protocolConfig;
 		private Plugin.Config.Config _pluginConfig;
 		private Icon.Config _iconConfig;
 
@@ -39,6 +38,8 @@ namespace HardwareMonitor
 
 		// Connected devices
 		private List<Device> _devices = new List<Device>();
+
+		private Layout.LayoutManager _layoutManager = new Layout.LayoutManager();
 
 		#endregion Private fields
 
@@ -108,11 +109,12 @@ namespace HardwareMonitor
 		private void Initialize()
 		{
 			_sensorConfig = Monitor.Config.Computer.Load("Data/sensors.xml");
-			_protocolConfig = Protocol.Config.Load("Data/protocol.xml");
 			_pluginConfig = Plugin.Config.Config.Load("Data/plugins.xml");
 			_iconConfig = Icon.Config.Load("Data/icons.xml");
 
 			_pluginManager = new Plugin.Manager(_pluginConfig);
+
+			_layoutManager.Load();
 		}
 
 		private bool IsAlreadyConnected(Connection.AvailableConnection connection)
@@ -167,7 +169,6 @@ namespace HardwareMonitor
 					Device device = new Device();
 					device.IdentityRecieved += (Device device) => PrintDeviceIdentity(device);
 
-					device.Protocol = _protocolConfig;
 					device.Icons = _iconConfig;
 					device.Connection = activeConnection;
 
@@ -217,8 +218,11 @@ namespace HardwareMonitor
 
 				if(device.Layout == null)
 				{
-					var layout = Layout.Config.Load("example.layout.xml");
-					await device.SetLayout(layout);
+					Layout.Config layout = _layoutManager.GetLayout(device.Resolution, device.Orientation);
+					if (layout != null)
+						await device.SetLayout(layout);
+					else
+						continue;
 				}
 
 				Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(_sensorConfig, _pluginManager.Sources);

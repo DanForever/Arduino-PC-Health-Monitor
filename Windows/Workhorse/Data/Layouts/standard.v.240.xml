@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Layout Orientation="Vertical" Resolution="320x240" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Modules>
+    <Module X="0" Y="0">
+      <Components>
+        <Component xsi:type="Border" X="0" Y="0" Width="240" Height="120" Colour="Blue" />
+        <Component xsi:type="Text" X="16" Y="8" TextSize="1" UseCapture="CpuName" NoUpdate="true" />
+        <Component xsi:type="Icon" X="60" Y="69" UseCapture="CpuName" NoUpdate="true" />
+        <Component xsi:type="Metric" X="105" Y="25" TextSize="3" UnitTextSize="1" Unit="Celcius" Precision="0" UseCapture="CpuPackageTemp" />
+        <Component xsi:type="Metric" X="105" Y="55" TextSize="3" UnitTextSize="1" Unit="Mhz" Precision="1" UseCapture="CpuAverageClock" />
+        <Component xsi:type="Metric" X="105" Y="85" TextSize="3" UnitTextSize="3" Unit="Percent" Precision="0" UseCapture="CPUTotalLoad" />
+      </Components>
+    </Module>
+    <Module X="0" Y="121">
+      <Components>
+        <Component xsi:type="Border" X="0" Y="0" Width="240" Height="120" Colour="Green" />
+        <Component xsi:type="Text" X="16" Y="8" TextSize="1" UseCapture="GpuName" NoUpdate="true" />
+        <Component xsi:type="Icon" X="60" Y="69" UseCapture="GpuName" NoUpdate="true" />
+        <Component xsi:type="Metric" X="105" Y="25" TextSize="3" UnitTextSize="1" Unit="Celcius" Precision="0" UseCapture="GpuTemp" />
+        <Component xsi:type="Metric" X="105" Y="55" TextSize="3" UnitTextSize="1" Unit="Mhz" Precision="1" UseCapture="GpuClock" />
+        <Component xsi:type="Metric" X="105" Y="85" TextSize="3" UnitTextSize="3" Unit="Percent" Precision="0" UseCapture="GpuLoad" />
+      </Components>
+    </Module>
+    <Module X="0" Y="241">
+      <Components>
+        <Component xsi:type="Border" X="0" Y="0" Width="240" Height="79" Colour="Yellow" />
+        <Component xsi:type="Text" X="16" Y="8" TextSize="1" UseCapture="MemoryName" NoUpdate="true" />
+        <Component xsi:type="Icon" X="60" Y="48" UseCapture="MemoryName" NoUpdate="true" />
+        <Component xsi:type="Metric" X="105" Y="25" TextSize="2" UnitTextSize="1" Unit="GB" Precision="0" UseCapture="MemUsed" />
+        <Component xsi:type="Metric" X="165" Y="25" TextSize="2" UnitTextSize="1" Unit="GB" Precision="0" UseCapture="MemoryTotal" />
+      </Components>
+    </Module>
+  </Modules>
+</Layout>

@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 using HardwareMonitor.Protocol;
 
@@ -46,11 +47,22 @@ namespace HardwareMonitor
 
 	public enum eResolution
 	{
+		[XmlEnum("240x320")]
 		R240x320,
+
+		[XmlEnum("320x480")]
 		R320x480,
+
+		[XmlEnum("480x800")]
 		R480x800,
 
 		Unknown
+	}
+
+	public enum Orientation
+	{
+		Vertical,
+		Horizontal
 	}
 
 	public class Device
@@ -85,7 +97,6 @@ namespace HardwareMonitor
 			}
 		}
 
-		public Protocol.Config Protocol { get; set; }
 		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
 
@@ -94,6 +105,7 @@ namespace HardwareMonitor
 		public eMicrocontroller Microcontroller => _microcontroller;
 		public eScreen Screen => _screen;
 		public eResolution Resolution => _resolution;
+		public Orientation Orientation => Orientation.Vertical;
 
 		#endregion Public Properties
 
@@ -108,9 +120,6 @@ namespace HardwareMonitor
 
 		public async Task Update(Monitor.Snapshot snapshot)
 		{
-			if (Protocol == null)
-				return;
-
 			if (Connection == null)
 				return;
 
@@ -174,42 +183,6 @@ namespace HardwareMonitor
 						Connection.SimplePacket packet = new Connection.SimplePacket();
 						packet.Connections = new List<Connection.ActiveConnection>() { Connection };
 						packet.Send(HardwareMonitor.Protocol.PacketType.ModuleUpdate, mappedComponent.ModuleIndex, (byte)1, mappedComponent.ComponentIndex, capture.Value);
-					}
-				}
-			}
-		}
-
-		private async Task UpdateModuleDeprecated(Monitor.Snapshot snapshot, Protocol.Module module)
-		{
-			foreach(var metric in module.Metrics)
-			{
-				if (metric.NoUpdate && _onceOnlyDataSent)
-					continue;
-
-				Monitor.Capture capturedValue;
-				if (!string.IsNullOrWhiteSpace(metric.Capture) && snapshot.Captures.TryGetValue(metric.Capture, out capturedValue))
-				{
-					if(metric.NoUpdate)
-					{
-						Protocol.Icon icon = metric as Protocol.Icon;
-
-						if (icon != null && Icons != null)
-						{
-							string iconPath = Path.Join("Images", $"{Icons.GetIcon(capturedValue.Value)}.bmp");
-							//HardwareMonitor.Connection.IconSender.Send(icon.Type, iconPath, Connection);
-						}
-						else
-						{
-							Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
-							packet.Connections = new List<Connection.ActiveConnection>() { Connection };
-							await packet.SendAsync(HardwareMonitor.Protocol.PacketType.Metric, metric.Type, capturedValue.Value);
-						}
-					}
-					else
-					{
-						Connection.SimplePacket packet = new Connection.SimplePacket();
-						packet.Connections = new List<Connection.ActiveConnection>() { Connection };
-						packet.Send(HardwareMonitor.Protocol.PacketType.Metric, metric.Type, capturedValue.Value);
 					}
 				}
 			}

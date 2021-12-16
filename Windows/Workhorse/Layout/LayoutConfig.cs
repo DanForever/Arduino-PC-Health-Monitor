@@ -82,7 +82,8 @@ namespace HardwareMonitor.Layout
 	[XmlRoot("Layout")]
 	public partial class Config : ConfigBase<Config>
 	{
-		// @todo: Orientation, resolution
+		public Orientation Orientation { get; set; }
+		public eResolution Resolution { get; set; }
 
 		public List<Module> Modules { get; set; }
 

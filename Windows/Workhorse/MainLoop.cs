@@ -95,7 +95,7 @@ namespace HardwareMonitor
 				if (timeTakenToUpdate < UpdateRate)
 				{
 					int timeToSleep = UpdateRate - timeTakenToUpdate;
-					Thread.Sleep(timeToSleep);
+					await Task.Delay(timeToSleep);
 				}
 			}
 

@@ -168,8 +168,13 @@ namespace HardwareMonitor
 					{
 						if (mappedComponent.Component is Layout.Icon && Icons != null)
 						{
-							string iconPath = Path.Join("Images", $"{Icons.GetIcon(capture.Value)}.bmp");
-							HardwareMonitor.Connection.IconSender.Send(mappedComponent, iconPath, Connection);
+							string iconName = Icons.GetIcon(capture.Value);
+
+							if (iconName != null)
+							{
+								string iconPath = Path.Join("Images", $"{iconName}.bmp");
+								HardwareMonitor.Connection.IconSender.Send(mappedComponent, iconPath, Connection);
+							}
 						}
 						else
 						{

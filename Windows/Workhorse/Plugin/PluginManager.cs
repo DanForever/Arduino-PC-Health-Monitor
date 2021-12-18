@@ -48,8 +48,15 @@ namespace HardwareMonitor.Plugin
 
 			_sources = pluginPaths.SelectMany(pluginPath =>
 			{
-				Assembly pluginAssembly = LoadPlugin(pluginPath);
-				return CreateSources(pluginAssembly);
+				try
+				{
+					Assembly pluginAssembly = LoadPlugin(pluginPath);
+					return CreateSources(pluginAssembly);
+				}
+				catch(System.InvalidOperationException)
+				{
+					return Enumerable.Empty<ISource>();
+				}
 			}).ToList();
 		}
 

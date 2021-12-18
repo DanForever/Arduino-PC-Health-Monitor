@@ -21,15 +21,9 @@ public:
 		const uint16_t messageSize = Size();
 		const size_t amountToCopy = min(messageSize, bufferSize);
 
-		Serial.print("Text size: ");
-		Serial.println(messageSize);
-
 		for (size_t i = 0; i < amountToCopy; ++i)
 		{
 			textBuffer[i] = Read();
-
-			Serial.print("Char: ");
-			Serial.println(textBuffer[i]);
 		}
 
 		uint16_t nullTerminatorPosition = messageSize;

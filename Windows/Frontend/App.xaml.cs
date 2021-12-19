@@ -4,12 +4,11 @@ using Hardcodet.Wpf.TaskbarNotification;
 
 namespace HardwareMonitor
 {
-	/// <summary>
-	/// Interaction logic for App.xaml
-	/// </summary>
 	public partial class App : Application
 	{
 		private TaskbarIcon _tb;
+
+		public Main Program { get; set; }
 
 		private async void Application_Startup(object sender, StartupEventArgs e)
 		{
@@ -17,10 +16,12 @@ namespace HardwareMonitor
 			_tb = (TaskbarIcon)FindResource("MyNotifyIcon");
 
 			// Instanticate the class that will perform the main body of work for us
-			Main program = new Main();
+			Program = new Main();
 
 			// Run the application
-			int retcode = await program.Run();
+			int retcode = await Program.Run();
+
+			Shutdown(retcode);
 		}
 	}
 }

@@ -7,7 +7,7 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="NotifyIconResourceDictionary.xaml">
+    <Page Update="NotifyIcon\NotifyIconResourceDictionary.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

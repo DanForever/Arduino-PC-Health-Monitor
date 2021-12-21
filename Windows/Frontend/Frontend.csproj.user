@@ -7,7 +7,21 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="QuickInfo\QuickInfo.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="QuickInfo\QuickInfoWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="NotifyIcon\NotifyIconResourceDictionary.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="QuickInfo\QuickInfo.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="QuickInfo\QuickInfoWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

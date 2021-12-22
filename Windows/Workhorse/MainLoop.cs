@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace HardwareMonitor
@@ -56,12 +55,18 @@ namespace HardwareMonitor
 		/// </summary>
 		public bool RequestExit { get; set; } = false;
 
+		public IEnumerable<Device> Devices => _devices;
+
 		#endregion Public Properties
 
 		#region Events
 
 		public delegate void FeedbackHandler(string text);
 		public event FeedbackHandler Feedback;
+
+		public delegate void DeviceConnectionHandler(Device device);
+		public event DeviceConnectionHandler DeviceConnected;
+		public event DeviceConnectionHandler DeviceDisconnected;
 
 		#endregion Events
 
@@ -133,6 +138,7 @@ namespace HardwareMonitor
 			if (!device.IsConnected)
 			{
 				Feedback?.Invoke($"Device disconnected: {device.Connection.Name}");
+				DeviceDisconnected?.Invoke(device);
 				return true;
 			}
 
@@ -173,6 +179,7 @@ namespace HardwareMonitor
 					device.Connection = activeConnection;
 
 					Feedback?.Invoke($"Connected to {device.Connection.Name}");
+					DeviceConnected?.Invoke(device);
 
 					_devices.Add(device);
 				}
@@ -211,6 +218,8 @@ namespace HardwareMonitor
 
 		private async Task UpdateDevices()
 		{
+			Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(_sensorConfig, _pluginManager.Sources);
+
 			foreach (Device device in _devices)
 			{
 				if (!device.IsConnected)
@@ -224,8 +233,6 @@ namespace HardwareMonitor
 					else
 						continue;
 				}
-
-				Monitor.Snapshot snapshot = await Monitor.Asynchronous.Watcher.Poll(_sensorConfig, _pluginManager.Sources);
 
 				await device.Update(snapshot);
 			}

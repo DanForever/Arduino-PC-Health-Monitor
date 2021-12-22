@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Layout Orientation="Vertical" Resolution="320x240" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<Layout Name="Standard" Orientation="Vertical" Resolution="240x320" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Modules>
     <Module X="0" Y="0">
       <Components>

@@ -11,6 +11,8 @@ namespace HardwareMonitor.QuickInfo
 		private Device _device;
 
 		public string Port => _device.Connection.Name;
+		public string Layout => _device.Layout?.Name ?? "No Layout set";
+		public Orientation Orientation => _device.Orientation;
 
 		public DeviceInfo(Device device)
 		{
@@ -56,7 +58,7 @@ namespace HardwareMonitor.QuickInfo
 		{
 			foreach(Device device in App.Application.Program.Devices)
 			{
-				//Devices.Add(new DeviceInfo(device));
+				Devices.Add(new DeviceInfo(device));
 			}
 		}
 	}

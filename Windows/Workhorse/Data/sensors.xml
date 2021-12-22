@@ -7,7 +7,7 @@
 	</Hardware>
 	<Sensors>
 		<Sensor Name="CPU Total" Component="Cpu" Type="Load" CaptureAs="CPUTotalLoad" />
-		<Sensor Name="Core \(Tctl/Tdie\)" Component="Cpu" Type="Temperature" CaptureAs="CpuPackageTemp" />
+		<Sensor Name="CPU Package|Core \(Tctl\/Tdie\)" Component="Cpu" Type="Temperature" CaptureAs="CpuPackageTemp" />
 
 		<Sensor Name="GPU Core" Component="Gpu" Type="Clock" CaptureAs="GpuClock" />
 		<Sensor Name="GPU Core" Component="Gpu" Type="Temperature" CaptureAs="GpuTemp" />

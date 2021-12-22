@@ -2,6 +2,7 @@
 <Config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 	<IconMappings>
 		<Icon Hardware="Ryzen" Icon="ryzen_black" />
+		<Icon Hardware="Intel Core i7-8\d{3,5}" Icon="intel_gen8_i7" />
 		<Icon Hardware="GeForce RTX" Icon="nvidia_rtx" />
 		<Icon Hardware="GeForce GTX" Icon="nvidia_gtx" />
 		<Icon Hardware="F\d-\d{4}C\d{2}[DQ]?-\d{1,3}GTZN[C]?" Icon="gskill_tzn" />

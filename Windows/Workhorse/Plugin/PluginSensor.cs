@@ -21,6 +21,12 @@ namespace HardwareMonitor.Plugin
 {
 	public interface ISensor
 	{
+		string Name { get; }
 
+		float Value { get; }
+
+		SensorType Type { get; }
+
+		IHardware Hardware { get; }
 	}
 }

@@ -269,17 +269,38 @@ namespace HardwareMonitor.Monitor.Synchronous
 		{
 			foreach (Plugin.ISensor sensor in hardware.Sensors)
 			{
-				/*
-				Config.Sensor watchedSensor = Config.FindSensor(sensor.Name, sensor.Hardware.Type, sensor.Type);
-				if (watchedSensor == null)
-					continue;
-
-				snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
-
-				if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
-					snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value ?? 0.0f });
-				//*/
+				CheckSensor(sensor, data);
+				CheckCompoundSensor(sensor, data);
 			}
+		}
+
+		private static void CheckSensor(Plugin.ISensor sensor, PollData data)
+		{
+			Config.Sensor watchedSensor = data.Config.FindSensor(sensor.Name, sensor.Hardware.Type, sensor.Type);
+			if (watchedSensor == null)
+				return;
+
+			data.Snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value });
+
+			if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
+				data.Snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value });
+		}
+
+		private static void CheckCompoundSensor(Plugin.ISensor sensor, PollData data)
+		{
+			Config.CompoundSensor watchedCompoundSensor = data.Config.FindCompoundSensor(sensor.Name, sensor.Hardware.Type, sensor.Type);
+			if (watchedCompoundSensor == null)
+				return;
+
+			CompoundSensorData compoundSensorData;
+			if (!data.CompoundSensors.TryGetValue(watchedCompoundSensor.Name, out compoundSensorData))
+			{
+				compoundSensorData = new CompoundSensorData() { Sensor = watchedCompoundSensor };
+				data.CompoundSensors.Add(watchedCompoundSensor.Name, compoundSensorData);
+			}
+
+			Config.Sensor watchedSensor = data.Config.FindSensor(watchedCompoundSensor.Sensors, sensor.Name, sensor.Hardware.Type, sensor.Type);
+			compoundSensorData.Samples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value });
 		}
 
 

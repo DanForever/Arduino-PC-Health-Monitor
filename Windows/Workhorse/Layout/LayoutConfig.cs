@@ -9,6 +9,8 @@ namespace HardwareMonitor.Layout
 		Mhz,
 		GB,
 		Percent,
+		FPS,
+		MS
 	}
 
 	public enum Colour

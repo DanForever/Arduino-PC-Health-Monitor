@@ -34,7 +34,7 @@
 			<Components>
 				<Component xsi:type="Border" X="0" Y="0" Width="320" Height="79" Colour="Red" />
 				<Component xsi:type="Text" X="16" Y="8" TextSize="1" UseCapture="ProgramName" />
-				<Component xsi:type="Metric" X="110" Y="32" TextSize="3" UnitTextSize="1" Unit="GB" Precision="1" UseCapture="fps" />
+				<Component xsi:type="Metric" X="110" Y="32" TextSize="3" UnitTextSize="1" Unit="FPS" Precision="1" UseCapture="fps" />
 			</Components>
 		</Module>
 	</Modules>

@@ -7,6 +7,8 @@ const char UnitStrCelcius[] PROGMEM = "C";
 const char UnitStrMhz[] PROGMEM = "Mhz";
 const char UnitStrGB[] PROGMEM = "GB";
 const char UnitStrPercent[] PROGMEM = "%";
+const char UnitStrFPS[] PROGMEM = "FPS";
+const char UnitStrMS[] PROGMEM = "ms";
 
 const char* const UnitStrings[] PROGMEM =
 {
@@ -14,6 +16,8 @@ const char* const UnitStrings[] PROGMEM =
 	UnitStrMhz,
 	UnitStrGB,
 	UnitStrPercent,
+	UnitStrFPS,
+	UnitStrMS,
 };
 
 FloatWithUnit::FloatWithUnit()

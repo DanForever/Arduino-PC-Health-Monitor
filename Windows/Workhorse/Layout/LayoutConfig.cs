@@ -13,6 +13,7 @@ namespace HardwareMonitor.Layout
 
 	public enum Colour
 	{
+		Red		= 0xF800      /* 255,   0,   0 */,
 		Blue	= 0x001F      /*   0,   0, 255 */,
 		Green	= 0x07E0      /*   0, 255,   0 */,
 		Yellow	= 0xFFE0      /* 255, 255,   0 */,

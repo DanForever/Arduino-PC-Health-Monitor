@@ -4,6 +4,7 @@
 		<Component Type="Cpu" CaptureAs="CpuName" />
 		<Component Type="Gpu" CaptureAs="GpuName" />
 		<Component Type="Memory" CaptureAs="MemoryName" />
+		<Component Type="Software" CaptureAs="ProgramName" />
 	</Hardware>
 	<Sensors>
 		<Sensor Name="CPU Total" Component="Cpu" Type="Load" CaptureAs="CPUTotalLoad" />
@@ -14,6 +15,8 @@
 		<Sensor Name="GPU Core" Component="Gpu" Type="Load" CaptureAs="GpuLoad" />
 		
 		<Sensor Name="^Memory Used" Component="Memory" Type="Data" CaptureAs="MemUsed" />
+
+		<Sensor Name="fps" Component="Software" Type="Data" CaptureAs="fps" />
 	</Sensors>
 	<CompoundSensors>
 		<CompoundSensor Name="Average Core Clock" Algorithm="Average" CaptureAs="CpuAverageClock">

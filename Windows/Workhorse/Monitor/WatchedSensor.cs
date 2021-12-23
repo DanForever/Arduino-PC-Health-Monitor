@@ -19,6 +19,7 @@
 
 namespace HardwareMonitor
 {
+	// Rename as metric type?
 	public enum HardwareType
 	{
 		Cpu,
@@ -27,6 +28,8 @@ namespace HardwareMonitor
 		Motherboard,
 		Network,
 		Storage,
+
+		Software,
 
 		Count,
 		Ignored,

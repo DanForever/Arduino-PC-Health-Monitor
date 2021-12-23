@@ -7,9 +7,11 @@
 /////////////////////////////
 // Microcontroller
 #if defined( IDENTITY_M_TEENSY32 )
-#define IDENTITY_M_VALUE eMicrocontroller::Teensy32
+#	define IDENTITY_M_VALUE eMicrocontroller::Teensy32
+#elif defined( IDENTITY_M_TEENSY40 )
+#	define IDENTITY_M_VALUE eMicrocontroller::Teensy40
 #else
-#error "Microcontroller not yet implemented or unsupported"
+#	error "Microcontroller not yet implemented or unsupported"
 #endif
 
 /////////////////////////////

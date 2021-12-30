@@ -28,9 +28,11 @@ namespace HardwareMonitor
 
 		public static T Load(string filename)
 		{
+			string absolutePath = ConvertToAbsolutePath(filename);
+
 			XmlSerializer serializer = new XmlSerializer(typeof(T));
 
-			using (TextReader reader = new StreamReader(filename))
+			using (TextReader reader = new StreamReader(absolutePath))
 			{
 				T config = (T)serializer.Deserialize(reader);
 
@@ -57,5 +59,17 @@ namespace HardwareMonitor
 		protected virtual void OnLoadFinished() { }
 
 		#endregion Protected Methods
+
+		#region Private Methods
+
+		static string ConvertToAbsolutePath(string shortPath)
+		{
+			string assemblyLocation = Path.GetDirectoryName(typeof(T).Assembly.Location);
+			string absolutePath = Path.Combine(assemblyLocation, shortPath);
+
+			return absolutePath;
+		}
+
+		#endregion Private Methods
 	}
 }

@@ -9,7 +9,7 @@ using HardwareMonitor.Plugin;
 
 using Microsoft.Diagnostics.Tracing.Session;
 
-namespace FrameRateMetrics
+namespace FramerateMetrics
 {
 	public class MillisecondRecord
 	{
@@ -22,7 +22,8 @@ namespace FrameRateMetrics
 
 		#region Public Properties
 
-		public string Name { get; set; }
+		public string ProcessName { get; set; }
+		public string DisplayName { get; set; }
 		public double PreviousCounter => _previousTimestamp;
 		public double Current
 		{
@@ -90,7 +91,8 @@ namespace FrameRateMetrics
 		private Program[] _programs = new Program[1] { new Program() };
 
 		// @todo: Populate this from an xml config variable
-		private string[] _validPrograms = { "dota2" };
+		private string[] _validPrograms = { "dota2", "r5apex" };
+		private string[] _programBlacklist = { "dwm", "iCUE", "devenv", "Discord", "steamwebhelper", "NVIDIA Share", "UnrealCEFSubProcess", "chrome" };
 
 		TraceEventSession _etwSession;
 		Thread _etwThread;
@@ -131,7 +133,7 @@ namespace FrameRateMetrics
 					int pid = data.ProcessID;
 
 					Process process = Process.GetProcessById(pid);
-					if (process.HasExited)
+					if (process == null || process.HasExited)
 						return;
 
 					process.EnableRaisingEvents = true;
@@ -142,22 +144,22 @@ namespace FrameRateMetrics
 						//if process is not yet in Dictionary, add it
 						if (!_millisecondRecords.ContainsKey(pid))
 						{
-							string name = "";
-							var proc = Process.GetProcessById(pid);
-							if (proc != null)
-							{
-								using (proc)
-								{
-									name = proc.ProcessName;
-								}
-							}
-							else name = pid.ToString();
+							string processName = process.ProcessName;
+							string displayName = process.MainWindowTitle;
 
-							//////////////////
+							if (string.IsNullOrWhiteSpace(displayName))
+								displayName = process.ProcessName;
+
+							if (string.IsNullOrWhiteSpace(displayName))
+								displayName = pid.ToString();
+
+							if (string.IsNullOrWhiteSpace(processName))
+								processName = pid.ToString();
 
 							_millisecondRecords[pid] = new MillisecondRecord();
 							_millisecondRecords[pid].Current = data.TimeStampRelativeMSec;
-							_millisecondRecords[pid].Name = name;
+							_millisecondRecords[pid].DisplayName = displayName;
+							_millisecondRecords[pid].ProcessName = processName;
 						}
 
 						_millisecondRecords[pid].Current = data.TimeStampRelativeMSec;
@@ -201,17 +203,17 @@ namespace FrameRateMetrics
 			{
 				foreach(var record in _millisecondRecords.Values)
 				{
-					if(_validPrograms.Contains(record.Name))
-					{
-						double ms = record.Current - record.PreviousCounter;
-						double fps = 1000 / ms;
+					if (_programBlacklist.Contains(record.ProcessName))
+						continue;
 
-						program.Name = record.Name;
-						program.Framerates[0].Value = (float)ms;
-						program.Framerates[1].Value = (float)fps;
+					double ms = record.Current - record.PreviousCounter;
+					double fps = 1000 / ms;
 
-						break;
-					}
+					program.Name = record.DisplayName;
+					program.Framerates[0].Value = (float)ms;
+					program.Framerates[1].Value = (float)fps;
+
+					break;
 				}
 			}
 		}

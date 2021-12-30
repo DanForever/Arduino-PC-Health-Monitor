@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 
 namespace FramerateMetrics.Config
 {
-	public class Program1
+	public class Program
 	{
 		#region Private fields
 
@@ -40,7 +40,7 @@ namespace FramerateMetrics.Config
 	{
 		#region Public Properties
 
-		public List<Program1> Blacklist { get; set; }
+		public List<Program> Blacklist { get; set; }
 
 		#endregion Public Properties
 
@@ -50,11 +50,11 @@ namespace FramerateMetrics.Config
 		{
 			Config config = new();
 
-			config.Blacklist = new List<Program1>
+			config.Blacklist = new List<Program>
 			{
-				new Program1 { ProcessName = "iCUE" },
-				new Program1 { ProcessName = "chrome" },
-				new Program1 { ProcessName = "devenv" }
+				new Program { ProcessName = "iCUE" },
+				new Program { ProcessName = "chrome" },
+				new Program { ProcessName = "devenv" }
 			};
 
 			config.Save("example.frameratemetrics.xml");

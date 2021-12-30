@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 
@@ -90,9 +91,7 @@ namespace FramerateMetrics
 
 		private Program[] _programs = new Program[1] { new Program() };
 
-		// @todo: Populate this from an xml config variable
-		private string[] _validPrograms = { "dota2", "r5apex" };
-		private string[] _programBlacklist = { "dwm", "iCUE", "devenv", "Discord", "steamwebhelper", "NVIDIA Share", "UnrealCEFSubProcess", "chrome" };
+		private Config.Config _config;
 
 		TraceEventSession _etwSession;
 		Thread _etwThread;
@@ -117,6 +116,8 @@ namespace FramerateMetrics
 
 		public Source()
 		{
+			_config = Config.Config.Load(Path.Join("Data", "frameratemetrics.xml"));
+
 			//create ETW session and register providers
 			_etwSession = new TraceEventSession("mysess");
 			_etwSession.StopOnDispose = true;
@@ -203,7 +204,7 @@ namespace FramerateMetrics
 			{
 				foreach(var record in _millisecondRecords.Values)
 				{
-					if (_programBlacklist.Contains(record.ProcessName))
+					if(_config.Blacklist.Any(program => program.ProcessNameRegex.IsMatch(record.ProcessName)))
 						continue;
 
 					double ms = record.Current - record.PreviousCounter;

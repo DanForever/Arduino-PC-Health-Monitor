@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FramerateMetrics xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<Blacklist>
+		<Program ProcessName="iCUE" />
+		<Program ProcessName="chrome" />
+		<Program ProcessName="devenv" />
+		<Program ProcessName="dwm" />
+		<Program ProcessName="Discord" />
+		<Program ProcessName="steamwebhelper" />
+		<Program ProcessName="NVIDIA Share" />
+		<Program ProcessName="UnrealCEFSubProcess" />
+		<Program ProcessName="ServiceHub.ThreadedWaitDialog" />
+		<Program ProcessName="Spotify" />
+		<Program ProcessName="NVIDIA GeForce Experience" />
+	</Blacklist>
+</FramerateMetrics>

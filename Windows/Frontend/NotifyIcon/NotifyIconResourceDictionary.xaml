@@ -13,6 +13,7 @@
         </tb:TaskbarIcon.DataContext>
         <tb:TaskbarIcon.ContextMenu>
             <ContextMenu>
+                <MenuItem Header="Run on Startup" Command="{Binding ToggleRunOnStartupCommand}" IsChecked="{Binding WillRunOnStartup, Mode=OneWay}" IsCheckable="true" />
                 <MenuItem Header="Quit" Command="{Binding ExitApplicationCommand}" />
             </ContextMenu>
         </tb:TaskbarIcon.ContextMenu>

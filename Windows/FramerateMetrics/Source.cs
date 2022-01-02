@@ -133,7 +133,7 @@ namespace FramerateMetrics
 				{
 					int pid = data.ProcessID;
 
-					Process process = Process.GetProcessById(pid);
+					Process process = TryGetProcessById(pid);
 					if (process == null || process.HasExited)
 						return;
 
@@ -174,6 +174,22 @@ namespace FramerateMetrics
 		}
 
 		#endregion C-Tor
+
+		#region Private Methods
+
+		static Process TryGetProcessById(int pid)
+		{
+			try
+			{
+				return Process.GetProcessById(pid);
+			}
+			catch (ArgumentException)
+			{
+				return null;
+			}
+		}
+		
+		#endregion Private Methods
 
 		#region Event Handlers
 

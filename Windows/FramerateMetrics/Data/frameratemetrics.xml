@@ -12,5 +12,6 @@
 		<Program ProcessName="ServiceHub.ThreadedWaitDialog" />
 		<Program ProcessName="Spotify" />
 		<Program ProcessName="NVIDIA GeForce Experience" />
+		<Program ProcessName="GitHubDesktop" />
 	</Blacklist>
 </FramerateMetrics>

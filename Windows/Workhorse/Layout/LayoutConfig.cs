@@ -27,15 +27,21 @@ namespace HardwareMonitor.Layout
 	[XmlInclude(typeof(Icon))]
 	public partial class Component
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public ushort X { get; set; }
 
 		[XmlAttribute]
 		public ushort Y { get; set; }
+
+		#endregion Public Properties
 	}
 
 	public partial class Border : Component
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public ushort Width { get; set; }
 		
@@ -44,6 +50,8 @@ namespace HardwareMonitor.Layout
 
 		[XmlAttribute]
 		public Colour Colour { get; set; }
+		
+		#endregion Public Properties
 	}
 
 	public partial class Icon : Component
@@ -52,12 +60,18 @@ namespace HardwareMonitor.Layout
 
 	public partial class Text : Component
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public byte TextSize { get; set; }
+
+		#endregion Public Properties
 	}
 
 	public partial class Metric : Component
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public byte TextSize { get; set; }
 
@@ -69,10 +83,14 @@ namespace HardwareMonitor.Layout
 
 		[XmlAttribute]
 		public byte Precision { get; set; }
+
+		#endregion Public Properties
 	}
 
 	public partial class Module
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public ushort X { get; set; }
 
@@ -80,11 +98,15 @@ namespace HardwareMonitor.Layout
 		public ushort Y { get; set; }
 
 		public List<Component> Components { get; set; }
+
+		#endregion Public Properties
 	}
 
 	[XmlRoot("Layout")]
 	public partial class Config : ConfigBase<Config>
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public string Name { get; set; }
 
@@ -95,6 +117,10 @@ namespace HardwareMonitor.Layout
 		public eResolution Resolution { get; set; }
 
 		public List<Module> Modules { get; set; }
+
+		#endregion Public Properties
+
+		#region Public Methods
 
 		public static void SaveDummy()
 		{
@@ -156,5 +182,7 @@ namespace HardwareMonitor.Layout
 
 			config.Save("example.layout.xml");
 		}
+
+		#endregion Public Methods
 	}
 }

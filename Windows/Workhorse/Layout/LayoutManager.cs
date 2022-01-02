@@ -1,17 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HardwareMonitor.Layout
 {
 	public class LayoutManager
 	{
+		#region Private Fields
+
 		private List<Config> _layouts = new List<Config>();
 
+		#endregion Private Fields
+
+		#region Public Properties
+
 		public List<Config> Layouts => _layouts;
+
+		#endregion Public Properties
+
+		#region Public Methods
 
 		public Config GetLayout(eResolution resolution, Orientation orientation)
 		{
@@ -46,6 +53,10 @@ namespace HardwareMonitor.Layout
 			// @todo: User layouts
 		}
 
+		#endregion Public Methods
+
+		#region Private Methods
+
 		private void Load(string[] configs)
 		{
 			foreach (string configPath in configs)
@@ -55,5 +66,7 @@ namespace HardwareMonitor.Layout
 				Layouts.Add(layout);
 			}
 		}
+
+		#endregion Private Methods
 	}
 }

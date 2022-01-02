@@ -20,21 +20,41 @@
 namespace HardwareMonitor.Connection
 {
 	public abstract class AvailableConnection
-    {
-        public abstract string Name { get; }
+	{
+		#region Abstract Properties
+
+		public abstract string Name { get; }
+
+		#endregion Abstract Properties
+
+		#region Abstract Methods
 
 		public abstract ActiveConnection Connect();
-    }
 
-    public interface ActiveConnection
-    {
-        public delegate void DataRecievedHandler(ActiveConnection connection, byte[] data, int dataLength);
-        public event DataRecievedHandler DataRecieved;
+		#endregion Abstract Methods
+	}
+
+	public interface ActiveConnection
+	{
+		#region Interface Events
+
+		public delegate void DataRecievedHandler(ActiveConnection connection, byte[] data, int dataLength);
+		public event DataRecievedHandler DataRecieved;
+
+		#endregion Interface Events
+		
+		#region Interface Properties
 
 		public string Name { get; }
 
 		public bool IsOpen { get; }
 
-        public void Send(byte[] data);
-    }
+		#endregion Interface Properties
+
+		#region Interface Methods
+
+		public void Send(byte[] data);
+
+		#endregion Interface Methods
+	}
 }

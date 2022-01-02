@@ -8,29 +8,55 @@ namespace HardwareMonitor.QuickInfo
 {
 	public class DeviceInfo : INotifyPropertyChanged
 	{
+		#region Private Fields
+
 		private Device _device;
+
+		#endregion Private Fields
+
+		#region Public Properties
 
 		public string Port => _device.Connection.Name;
 		public string Layout => _device.Layout?.Name ?? "No Layout set";
 		public Orientation Orientation => _device.Orientation;
+
+		#endregion Public Properties
+
+		#region C-Tor
 
 		public DeviceInfo(Device device)
 		{
 			_device = device;
 		}
 
+		#endregion C-Tor
+
+		#region INotifyPropertyChanged
+
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		#endregion INotifyPropertyChanged
 	}
 
 	public partial class QuickInfo : UserControl
 	{
+		#region Public Properties
+		
 		public ObservableCollection<DeviceInfo> Devices
 		{
 			get => (ObservableCollection<DeviceInfo>)GetValue(DevicesProperty);
 			private set => SetValue(DevicesProperty, value);
 		}
 
+		#endregion Public Properties
+
+		#region Dependency Properties
+
 		public static readonly DependencyProperty DevicesProperty = DependencyProperty.Register(nameof(Devices), typeof(ObservableCollection<DeviceInfo>), typeof(QuickInfo));
+
+		#endregion Dependency Properties
+
+		#region C-Tor
 
 		public QuickInfo()
 		{
@@ -43,6 +69,10 @@ namespace HardwareMonitor.QuickInfo
 			Devices = new ObservableCollection<DeviceInfo>();
 		}
 
+		#endregion C-Tor
+
+		#region Event Handlers
+
 		private void Program_DeviceConnected(Device device)
 		{
 			Devices.Add(new DeviceInfo(device));
@@ -54,6 +84,10 @@ namespace HardwareMonitor.QuickInfo
 			Devices.Remove(deviceInfo);
 		}
 
+		#endregion Event Handlers
+
+		#region Private Methods
+
 		private void PopulateDeviceInfo()
 		{
 			foreach(Device device in App.Application.Program.Devices)
@@ -61,5 +95,7 @@ namespace HardwareMonitor.QuickInfo
 				Devices.Add(new DeviceInfo(device));
 			}
 		}
+
+		#endregion Private Methods
 	}
 }

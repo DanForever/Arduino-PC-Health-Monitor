@@ -21,6 +21,8 @@ namespace HardwareMonitor.Plugin
 {
 	public interface ISensor
 	{
+		#region Interface Properties
+
 		string Name { get; }
 
 		float Value { get; }
@@ -28,5 +30,7 @@ namespace HardwareMonitor.Plugin
 		SensorType Type { get; }
 
 		IHardware Hardware { get; }
+		
+		#endregion Interface Properties
 	}
 }

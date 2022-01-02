@@ -6,11 +6,21 @@ namespace HardwareMonitor
 {
 	public partial class App : Application
 	{
+		#region Private Fields
+
 		public static App Application => (App)Current;
 
 		private TaskbarIcon _tb;
 
+		#endregion Private Fields
+
+		#region Public Properties
+
 		public Main Program { get; set; }
+
+		#endregion Public Properties
+
+		#region Event Handlers
 
 		private async void Application_Startup(object sender, StartupEventArgs e)
 		{
@@ -25,5 +35,7 @@ namespace HardwareMonitor
 
 			Shutdown(retcode);
 		}
+
+		#endregion Event Handlers
 	}
 }

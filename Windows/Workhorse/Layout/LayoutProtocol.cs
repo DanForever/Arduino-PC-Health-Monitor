@@ -5,26 +5,44 @@ namespace HardwareMonitor.Layout
 {
 	public partial class Component
 	{
+		#region Public Properties
+
 		[XmlAttribute]
 		public string UseCapture { get; set; }
 
 		[XmlAttribute]
 		public bool NoUpdate { get; set; }
+
+		#endregion Public Properties
 	}
 
 	public class MappedComponent
 	{
+		#region Public Properties
+
 		public Component Component { get; set; }
 		public byte ModuleIndex { get; set; }
 		public byte ComponentIndex { get; set; }
+
+		#endregion Public Properties
 	}
 
 	public partial class Config
 	{
+		#region Private Methods
+
 		private Dictionary<string, List<MappedComponent>> _mappedComponents = new Dictionary<string, List<MappedComponent>>();
+
+		#endregion Private Methods
+
+		#region Public Properties
 
 		[XmlIgnore]
 		public Dictionary<string, List<MappedComponent>> MappedComponents => _mappedComponents;
+
+		#endregion Public Properties
+
+		#region ConfigBase
 
 		protected override void OnLoadFinished()
 		{
@@ -59,5 +77,7 @@ namespace HardwareMonitor.Layout
 				}
 			}
 		}
+
+		#endregion ConfigBase
 	}
 }

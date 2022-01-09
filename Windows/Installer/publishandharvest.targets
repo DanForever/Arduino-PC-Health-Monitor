@@ -1,0 +1,41 @@
+<Project>
+	<PropertyGroup>
+		<PublishOutput>$(SolutionDir)intermediate\publish\Frontend-$(Configuration).$(Platform)\</PublishOutput>
+	</PropertyGroup>
+	
+	<Target Name="BeforeBuild">
+
+		<Exec Command="dotnet publish $(SolutionDir)Frontend\Frontend.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)" />
+
+		<!--
+		<PropertyGroup>
+		<LinkerBaseInputPaths>..\..\src\Datalust.ClefTool\bin\$(Configuration)\netcoreapp1.1\win10-x64\publish</LinkerBaseInputPaths>
+		<DefineConstants>BasePath=..\..\src\Datalust.ClefTool\bin\$(Configuration)\netcoreapp1.1\win10-x64\publish</DefineConstants>
+		</PropertyGroup>-->
+
+		<!--<HeatDirectory OutputFile="ClefTool.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="ClefTool_Project" SuppressCom="true"
+		Directory="..\..\src\Datalust.ClefTool\bin\$(Configuration)\netcoreapp1.1\win10-x64\publish"
+		SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true"
+		ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />-->
+		
+		<HeatDirectory
+			ToolPath="$(WixToolPath)"
+			OutputFile="$(IntermediateOutputPath)installer\harvest.wxs"
+			Directory="$(PublishOutput)"
+			DirectoryRefId="APPLICATIONROOTDIRECTORY"
+			SuppressCom="true"
+			SuppressRegistry="true"
+			SuppressRootDirectory="true"
+			AutogenerateGuids="false"
+			GenerateGuidsNow="true"
+			PreprocessorVariable="var.PublishedFiles"
+			ComponentGroupName="HarvestedFiles"
+		/>
+		<ItemGroup>
+			<Compile Include="$(IntermediateOutputPath)installer\harvest.wxs" />
+		</ItemGroup>
+	</Target>
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);PublishedFiles=$(PublishOutput)</DefineConstants>
+	</PropertyGroup>
+</Project>

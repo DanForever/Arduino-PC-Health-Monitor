@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="{DDB0B743-8A91-41DC-B69A-79200A9F11B4}" Name="Dan's Hardware Monitor" Language="1033" Version="1.0.0.0" Manufacturer="Dan Forever" UpgradeCode="8d989610-ca2f-42b9-ad9a-8edbf296621f">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="ProductFeature" Title="Installer" Level="1">
+			<ComponentGroupRef Id="HarvestedFiles" />
+			<!--<ComponentGroupRef Id="ProductComponents" />
+			<ComponentGroupRef Id="DataComponents" />
+			<ComponentGroupRef Id="LayoutComponents" />
+			<ComponentGroupRef Id="ImageComponents" />-->
+		</Feature>
+
+		<WixVariable Id="WixUILicenseRtf" Value="gpl-3.0.rtf" />
+		<Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
+		<UI>
+			<UIRef Id="WixUI_InstallDir" />
+		</UI>
+	</Product>
+
+	<!-- Directory structure -->
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="APPLICATIONROOTDIRECTORY" Name="HardwareMonitor">
+					<!--<Directory Id="data" Name="Data">
+						<Directory Id="layouts" Name="Layouts" />
+					</Directory>
+					<Directory Id="plugins" Name="Plugins" />
+					<Directory Id="images" Name="Images" />-->
+				</Directory>
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<!-- Binaries --><!--
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="APPLICATIONROOTDIRECTORY">
+			<Component>
+				<File Id="Frontend.exe" Source="$(var.Frontend.TargetDir)\Frontend.exe" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="Frontend.dll" Source="$(var.Frontend.TargetDir)\Frontend.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="Hardcodet.NotifyIcon.Wpf.dll" Source="$(var.Frontend.TargetDir)\Hardcodet.NotifyIcon.Wpf.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="HidSharp.dll" Source="$(var.Frontend.TargetDir)\HidSharp.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="LibreHardwareMonitorLib.dll" Source="$(var.Frontend.TargetDir)\LibreHardwareMonitorLib.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="Microsoft.Win32.TaskScheduler.dll" Source="$(var.Frontend.TargetDir)\Microsoft.Win32.TaskScheduler.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="System.IO.Ports.dll" Source="$(var.Frontend.TargetDir)\System.IO.Ports.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="System.Management.dll" Source="$(var.Frontend.TargetDir)\System.Management.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+			<Component>
+				<File Id="Workhorse.dll" Source="$(var.Frontend.TargetDir)\Workhorse.dll" KeyPath="yes" Checksum="yes"/>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+	
+	--><!--Configs and settings--><!--
+	<Fragment>
+		<ComponentGroup Id="DataComponents" Directory="data">
+			<Component>
+				<File Id="icons.xml" Source="$(var.Frontend.TargetDir)Data\icons.xml" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="plugins.xml" Source="$(var.Frontend.TargetDir)Data\plugins.xml" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="sensors.xml" Source="$(var.Frontend.TargetDir)Data\sensors.xml" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	--><!-- Layouts --><!--
+	<Fragment>
+		<ComponentGroup Id="LayoutComponents" Directory="layouts">
+			<Component>
+				<File Id="standard.v.240.xml" Source="$(var.Frontend.TargetDir)\Data\Layouts\standard.v.240.xml" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="standard.v.320.xml" Source="$(var.Frontend.TargetDir)\Data\Layouts\standard.v.320.xml" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+	--><!-- Images and icons --><!--
+	<Fragment>
+		<ComponentGroup Id="ImageComponents" Directory="images">
+			<Component>
+				<File Id="gskill_tzn" Source="$(var.Frontend.TargetDir)Images\gskill_tzn.bmp" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="intel_gen8_i7" Source="$(var.Frontend.TargetDir)Images\intel_gen8_i7.bmp" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="nvidia_gtx" Source="$(var.Frontend.TargetDir)Images\nvidia_gtx.bmp" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="nvidia_rtx" Source="$(var.Frontend.TargetDir)Images\nvidia_rtx.bmp" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="ryzen" Source="$(var.Frontend.TargetDir)Images\ryzen.bmp" KeyPath="yes" />
+			</Component>
+			<Component>
+				<File Id="ryzen_black" Source="$(var.Frontend.TargetDir)Images\ryzen_black.bmp" KeyPath="yes" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>-->
+</Wix>

@@ -6,6 +6,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon />
     <StartupObject />
+	  <Platforms>x86;x64</Platforms>
+	  <PlatformTarget>$(Platform)</PlatformTarget>
+	  <Configurations>Debug;Release;Publish</Configurations>
   </PropertyGroup>
 
 <ItemGroup>
@@ -15,10 +18,11 @@
 </ItemGroup>
 
  <ItemGroup>
-        <FrameworkReference Include="Microsoft.WindowsDesktop.App"/>
+        <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
  </ItemGroup>
  
   <ItemGroup>
+    <ProjectReference Include="..\FramerateMetrics\FramerateMetrics.csproj" />
     <ProjectReference Include="..\Workhorse\Workhorse.csproj" />
   </ItemGroup>
 

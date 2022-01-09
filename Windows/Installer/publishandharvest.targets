@@ -6,18 +6,9 @@
 	<Target Name="BeforeBuild">
 
 		<Exec Command="dotnet publish $(SolutionDir)Frontend\Frontend.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)" />
+		<Exec Command="dotnet publish $(SolutionDir)FramerateMetrics\FramerateMetrics.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)Plugins\FramerateMetrics\" />
+		<Exec Command="dotnet publish $(SolutionDir)AdditionalMemoryMetrics\AdditionalMemoryMetrics.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)Plugins\AdditionalMemoryMetrics\" />
 
-		<!--
-		<PropertyGroup>
-		<LinkerBaseInputPaths>..\..\src\Datalust.ClefTool\bin\$(Configuration)\netcoreapp1.1\win10-x64\publish</LinkerBaseInputPaths>
-		<DefineConstants>BasePath=..\..\src\Datalust.ClefTool\bin\$(Configuration)\netcoreapp1.1\win10-x64\publish</DefineConstants>
-		</PropertyGroup>-->
-
-		<!--<HeatDirectory OutputFile="ClefTool.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="ClefTool_Project" SuppressCom="true"
-		Directory="..\..\src\Datalust.ClefTool\bin\$(Configuration)\netcoreapp1.1\win10-x64\publish"
-		SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true"
-		ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />-->
-		
 		<HeatDirectory
 			ToolPath="$(WixToolPath)"
 			OutputFile="$(IntermediateOutputPath)installer\harvest.wxs"

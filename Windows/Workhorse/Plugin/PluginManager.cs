@@ -44,19 +44,25 @@ namespace HardwareMonitor.Plugin
 
 		public Manager(Config.Config config)
 		{
-			string[] pluginPaths = BuildPluginPaths(config);
-
-			_sources = pluginPaths.SelectMany(pluginPath =>
+			_sources = config.Plugins.SelectMany(pluginEntry =>
 			{
-				try
+				string[] paths = new string[] { BuildDebugPath(pluginEntry), BuildReleasePath(pluginEntry) };
+
+				foreach(string path in paths)
 				{
-					Assembly pluginAssembly = LoadPlugin(pluginPath);
-					return CreateSources(pluginAssembly);
+					try
+					{
+						Assembly pluginAssembly = LoadPlugin(path);
+						return CreateSources(pluginAssembly);
+					}
+					catch (InvalidOperationException)
+					{
+						Debug.Print($"Failed to open plugin {pluginEntry.Name} at location: {path}");
+					}
 				}
-				catch(System.InvalidOperationException)
-				{
-					return Enumerable.Empty<ISource>();
-				}
+
+				return Enumerable.Empty<ISource>();
+
 			}).ToList();
 		}
 
@@ -64,26 +70,18 @@ namespace HardwareMonitor.Plugin
 
 		#region Private Methods
 
-		private string[] BuildPluginPaths(Config.Config config)
+		private string BuildDebugPath(Config.Entry pluginEntry)
 		{
-			string[] paths = new string[config.Plugins.Count];
+			string root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(typeof(Manager).Assembly.Location))));
 
-			for(int i = 0; i < paths.Length; ++i)
-			{
-				var pluginConfig = config.Plugins[i];
+			return Path.GetFullPath(Path.Combine(root, pluginEntry.Name, pluginEntry.Name + ".dll"));
+		}
 
-#if DEBUG
-				// Navigate up to the solution root
-				string root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(typeof(Manager).Assembly.Location))));
+		private string BuildReleasePath(Config.Entry pluginEntry)
+		{
+			string root = Path.GetDirectoryName(typeof(Manager).Assembly.Location);
 
-				paths[i] = Path.GetFullPath(Path.Combine(root, pluginConfig.Name, pluginConfig.Name + ".dll"));
-#else
-				string root = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(typeof(Manager).Assembly.Location))));
-				paths[i] = Path.GetFullPath(Path.Combine(root, pluginConfig.Name, pluginConfig.Name + ".dll"));
-#endif
-			}
-
-			return paths;
+			return Path.GetFullPath(Path.Combine(root, "Plugins", pluginEntry.Name, pluginEntry.Name + ".dll"));
 		}
 
 		private static Assembly LoadPlugin(string absolutePath)

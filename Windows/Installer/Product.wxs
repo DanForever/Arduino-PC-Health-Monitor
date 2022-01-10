@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="{DDB0B743-8A91-41DC-B69A-79200A9F11B4}" Name="Dan's Hardware Monitor" Language="1033" Version="1.0.0.0" Manufacturer="Dan Forever" UpgradeCode="8d989610-ca2f-42b9-ad9a-8edbf296621f">
+
+	<?define MyProductName = "Dan's Hardware Monitor" ?>
+	
+	<Product Id="*" Name="$(var.MyProductName)" Language="1033" Version="1.0.1.0" Manufacturer="Dan Forever" UpgradeCode="8d989610-ca2f-42b9-ad9a-8edbf296621f">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -9,11 +12,13 @@
 		<Feature Id="ProductFeature" Title="Installer" Level="1">
 			<!-- The actual binaries and associated files are automatically gathered using "heat", found in the "publishandharvest" targets file -->
 			<ComponentGroupRef Id="HarvestedFiles" />
+
+			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
 
 		<!-- Configure the Eula / License that will be displayed to the user-->
 		<WixVariable Id="WixUILicenseRtf" Value="gpl-3.0.rtf" />
-		
+
 		<!-- Configure the UI -->
 		<Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
 		<UI>
@@ -24,9 +29,29 @@
 	<!-- Directory structure -->
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
+
+			<!-- Program files -->
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="APPLICATIONROOTDIRECTORY" Name="HardwareMonitor" />
 			</Directory>
+
+			<!-- The Start menu -->
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="$(var.MyProductName)"/>
+			</Directory>
 		</Directory>
+	</Fragment>
+
+	<!-- Start menu Shortcuts -->
+	<Fragment>
+		<Icon Id="StartMenuIcon" SourceFile="$(var.Frontend.ProjectDir)Images\thermometer.ico" />
+		
+		<DirectoryRef Id="ApplicationProgramsFolder">
+			<Component Id="ApplicationShortcut" Guid="{9764DED9-13EE-4A06-B84B-C9EB918C0257}">
+				<Shortcut Id="ApplicationStartMenuShortcut" Name="$(var.MyProductName)" Description="The companion app that monitors the PC's health and sends the data to the device" Target="[#Frontend.exe]" Icon="StartMenuIcon" WorkingDirectory="APPLICATIONROOTDIRECTORY" />
+				<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+				<RegistryValue Root="HKCU" Key="Software\DanForever\DanHWMon" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+			</Component>
+		</DirectoryRef>
 	</Fragment>
 </Wix>

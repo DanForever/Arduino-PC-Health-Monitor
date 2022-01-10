@@ -19,6 +19,7 @@
 			SuppressRootDirectory="true"
 			AutogenerateGuids="false"
 			GenerateGuidsNow="true"
+			SuppressUniqueIds="true"
 			PreprocessorVariable="var.PublishedFiles"
 			ComponentGroupName="HarvestedFiles"
 		/>

@@ -152,36 +152,51 @@ namespace FramerateMetrics
 				{
 					int pid = data.ProcessID;
 
-					Process process = TryGetProcessById(pid);
-					if (process == null || process.HasExited)
-						return;
-
-					process.EnableRaisingEvents = true;
-					process.Exited += Process_Exited;
-
+					// Find out if we've already grabbed the metadata for this process
+					bool processDataCaptured = false;
 					lock (_sync)
 					{
-						//if process is not yet in Dictionary, add it
-						if (!_millisecondRecords.ContainsKey(pid))
+						processDataCaptured = _millisecondRecords.ContainsKey(pid);
+					}
+
+					// If we haven't...
+					if (!processDataCaptured)
+					{
+						// Grab the process
+						Process process = TryGetProcessById(pid);
+						if (process == null || process.HasExited)
+							return;
+
+						// We need to know when the process closes so we can stop displaying it on the screen
+						process.EnableRaisingEvents = true;
+						process.Exited += Process_Exited;
+
+						// Use the window title first if possible, then the process name, and then finally the process id if there's nothing else
+						string processName = process.ProcessName;
+						string displayName = process.MainWindowTitle;
+
+						if (string.IsNullOrWhiteSpace(displayName))
+							displayName = process.ProcessName;
+
+						if (string.IsNullOrWhiteSpace(displayName))
+							displayName = pid.ToString();
+
+						if (string.IsNullOrWhiteSpace(processName))
+							processName = pid.ToString();
+
+						// Then store all that metadata in the record
+						lock (_sync)
 						{
-							string processName = process.ProcessName;
-							string displayName = process.MainWindowTitle;
-
-							if (string.IsNullOrWhiteSpace(displayName))
-								displayName = process.ProcessName;
-
-							if (string.IsNullOrWhiteSpace(displayName))
-								displayName = pid.ToString();
-
-							if (string.IsNullOrWhiteSpace(processName))
-								processName = pid.ToString();
-
 							_millisecondRecords[pid] = new MillisecondRecord();
 							_millisecondRecords[pid].Current = data.TimeStampRelativeMSec;
 							_millisecondRecords[pid].DisplayName = displayName;
 							_millisecondRecords[pid].ProcessName = processName;
 						}
+					}
 
+					// Finally, record the frame time in the record
+					lock (_sync)
+					{
 						_millisecondRecords[pid].Current = data.TimeStampRelativeMSec;
 					}
 				}
@@ -219,6 +234,9 @@ namespace FramerateMetrics
 			{
 				_millisecondRecords.Remove(process.Id);
 			}
+
+			process.Exited -= Process_Exited;
+			process.Dispose();
 		}
 
 		#endregion Event Handlers

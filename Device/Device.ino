@@ -16,6 +16,39 @@ Comms comms;
 
 std::vector<Module*> Modules;
 
+bool HandleDisconnection()
+{
+	static bool connected = true;
+
+	if (::Serial)
+	{
+		if (!connected)
+		{
+			connected = true;
+
+			Modules.clear();
+			screen.FillScreen(ILI9341_BLACK);
+		}
+
+		return false;
+	}
+	else
+	{
+		if (connected)
+		{
+			connected = false;
+
+			screen.FillScreen(ILI9341_BLACK);
+			screen.ClearOffset();
+		}
+
+		screen.SetCursor(0, 0);
+		screen.Print("Companion app not detected...");
+
+		return true;
+	}
+}
+
 // Flexi layout
 void HandleMessage(Message& message)
 {
@@ -99,6 +132,9 @@ void setup()
 
 void loop()
 {
+	if (HandleDisconnection())
+		return;
+
 	comms.Update();
 
 	if (comms.MessageReady())

@@ -69,6 +69,7 @@ namespace HardwareMonitor.Connection.Serial
 			try
 			{
 				_serialPort.Open();
+				_serialPort.DtrEnable = true;
 			}
 			catch (System.IO.FileNotFoundException)
 			{

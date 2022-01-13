@@ -38,4 +38,29 @@ namespace HardwareMonitor.Connection
 
 		#endregion C-Tor
 	}
+
+	[Serializable]
+	public class ConnectionClosedException : Exception
+	{
+		#region private Fields
+
+		private ActiveConnection _connection;
+
+		#endregion private Fields
+
+		#region Public Properties
+
+		public ActiveConnection Connection => _connection;
+
+		#endregion Public Properties
+
+		#region C-Tor
+
+		public ConnectionClosedException(ActiveConnection connection) : base($"Connection with name '{connection.Name}' is closed")
+		{
+			_connection = connection;
+		}
+
+		#endregion C-Tor
+	}
 }

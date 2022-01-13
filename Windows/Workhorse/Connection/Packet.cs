@@ -17,7 +17,6 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -36,7 +35,7 @@ namespace HardwareMonitor.Connection
 
 		#region Public Properties
 
-		public IList<ActiveConnection> Connections { get; set; }
+		public ActiveConnection Connection { get; set; }
 
 		#endregion Public Properties
 

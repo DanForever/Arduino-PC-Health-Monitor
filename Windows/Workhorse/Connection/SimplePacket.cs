@@ -30,12 +30,9 @@ namespace HardwareMonitor.Connection
 		{
 			byte[] data = SerializeData(args);
 
-			foreach (ActiveConnection connection in Connections)
+			if (Connection.IsOpen)
 			{
-				if (connection.IsOpen)
-				{
-					connection.Send(data);
-				}
+				Connection.Send(data);
 			}
 		}
 

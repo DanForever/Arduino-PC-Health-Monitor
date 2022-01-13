@@ -45,7 +45,14 @@ namespace HardwareMonitor.Connection.Serial
 
 		void Connection.ActiveConnection.Send(byte[] data)
 		{
-			_serialPort.Write(data, 0, data.Length);
+			try
+			{
+				_serialPort.Write(data, 0, data.Length);
+			}
+			catch(InvalidOperationException)
+			{
+				throw new ConnectionClosedException(this);
+			}
 		}
 
 		#endregion Connection.ActiveConnection

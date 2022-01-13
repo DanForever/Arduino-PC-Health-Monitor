@@ -17,8 +17,8 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HardwareMonitor.Connection
@@ -27,14 +27,14 @@ namespace HardwareMonitor.Connection
 	/// This packet will send the data and await an acknowledgement of receipt. If it is not receieved in a timely manner, the data will be resent
 	/// </summary>
 	internal class GuaranteedPacket : Packet
-    {
+	{
 		#region private Fields
 
 		private static int TimeOut = 3000;
-        private static ushort _idPool = 0;
+		private static ushort _idPool = 0;
 
-        private ushort _id = ++_idPool;
-        private byte[] _data;
+		private ushort _id = ++_idPool;
+		private byte[] _data;
 
 		#endregion private Fields
 
@@ -56,56 +56,42 @@ namespace HardwareMonitor.Connection
 		#region Public Methods
 
 		public async Task SendAsync(params dynamic[] args)
-        {
-            dynamic[] wrappedArgs = new dynamic[args.Length + 2];
-            wrappedArgs[0] = Protocol.PacketType.Guaranteed;
-            wrappedArgs[1] = Id;
-            args.CopyTo(wrappedArgs, 2);
+		{
+			dynamic[] wrappedArgs = new dynamic[args.Length + 2];
+			wrappedArgs[0] = Protocol.PacketType.Guaranteed;
+			wrappedArgs[1] = Id;
+			args.CopyTo(wrappedArgs, 2);
 
-            _data = SerializeData(wrappedArgs);
+			_data = SerializeData(wrappedArgs);
 
-            foreach (ActiveConnection connection in Connections)
-            {
-                if (connection.IsOpen)
-                {
-                    connection.DataRecieved += Connection_DataRecieved;
-                }
-            }
+			if (Connection.IsOpen)
+			{
+				Connection.DataRecieved += Connection_DataRecieved;
+			}
 
-            while (Connections.Any())
-            {
-                foreach (ActiveConnection connection in Connections)
-                {
-                    connection.Send(_data);
-                }
-
-                await Task.Delay(TimeOut);
-            }
-
-            //Debug.Print($"Acknowledgement of packet {Id} received by all connections");
-        }
+			Connection.Send(_data);
+			await Task.Delay(TimeOut);
+		}
 
 		#endregion Public Methods
 
 		#region Event Handlers
 
 		private void Connection_DataRecieved(ActiveConnection connection, byte[] data, int dataLength)
-        {
-            MemoryStream stream = new MemoryStream(data);
+		{
+			MemoryStream stream = new MemoryStream(data);
 
-            using (BinaryReader reader = new BinaryReader(stream))
-            {
+			using (BinaryReader reader = new BinaryReader(stream))
+			{
 				Protocol.PacketType messageCategory = (Protocol.PacketType)reader.ReadByte();
-                ushort id = reader.ReadUInt16();
+				ushort id = reader.ReadUInt16();
 
-                if( messageCategory == Protocol.PacketType.GuaranteedAck && id == Id)
-                {
-                    connection.DataRecieved -= Connection_DataRecieved;
-
-                    Connections.Remove(connection);
-                }
-            }
-        }
+				if (messageCategory == Protocol.PacketType.GuaranteedAck && id == Id)
+				{
+					connection.DataRecieved -= Connection_DataRecieved;
+				}
+			}
+		}
 
 		#endregion Event Handlers
 	}

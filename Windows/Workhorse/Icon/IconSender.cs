@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -70,6 +71,7 @@ namespace HardwareMonitor.Connection
 	{
 		#region Public Properties
 
+		public string Filepath { get; set; }
 		public ushort Width { get; set; }
         public ushort Height { get; set; }
         public byte[] Data { get; set; }
@@ -165,6 +167,7 @@ namespace HardwareMonitor.Connection
 
 					return new Icon()
 					{
+						Filepath = filepath,
 						Width = (ushort)infoHeader.Width,
 						Height = (ushort)infoHeader.Height,
 						Data = data,
@@ -180,7 +183,16 @@ namespace HardwareMonitor.Connection
 
             while(chunk < icon.Data.Length)
             {
-                chunk += await SendChunk(icon, mappedComponent, chunk, chunksize, connection);
+				try
+				{
+					chunk += await SendChunk(icon, mappedComponent, chunk, chunksize, connection);
+				}
+				catch(ConnectionClosedException)
+				{
+					// The device has been unplugged, we should stop sending this icon
+					Debug.Print($"Device unplugged - cancelling send of '{icon.Filepath}' to device formally connected on '{connection.Name}'");
+					break;
+				}
 
                 await Task.Delay(10);
             }
@@ -189,7 +201,7 @@ namespace HardwareMonitor.Connection
         private static async Task<int> SendChunk(Icon icon, Layout.MappedComponent mappedComponent, int chunk, int chunksize, ActiveConnection connection)
 		{
 			GuaranteedPacket packet = new GuaranteedPacket();
-			packet.Connections = new List<ActiveConnection>() { connection };
+			packet.Connection = connection;
 
 			int segmentSize = Math.Min(chunksize, icon.Data.Length - chunk);
             ArraySegment<byte> segment = new ArraySegment<byte>(icon.Data, chunk, segmentSize);

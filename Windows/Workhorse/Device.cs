@@ -144,7 +144,7 @@ namespace HardwareMonitor
 			_layout = layout;
 
 			Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
-			packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+			packet.Connection =  Connection;
 
 			dynamic[] args = layout.CollectValues();
 			await packet.SendAsync(args);
@@ -179,14 +179,14 @@ namespace HardwareMonitor
 						else
 						{
 							Connection.GuaranteedPacket packet = new Connection.GuaranteedPacket();
-							packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+							packet.Connection = Connection;
 							await packet.SendAsync(HardwareMonitor.Protocol.PacketType.ModuleUpdate, mappedComponent.ModuleIndex, (byte)1, mappedComponent.ComponentIndex, capture.Value);
 						}
 					}
 					else
 					{
 						Connection.SimplePacket packet = new Connection.SimplePacket();
-						packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+						packet.Connection = Connection;
 						packet.Send(HardwareMonitor.Protocol.PacketType.ModuleUpdate, mappedComponent.ModuleIndex, (byte)1, mappedComponent.ComponentIndex, capture.Value);
 					}
 				}
@@ -196,7 +196,7 @@ namespace HardwareMonitor
 		private void RequestIdentity()
 		{
 			Connection.SimplePacket packet = new Connection.SimplePacket();
-			packet.Connections = new List<Connection.ActiveConnection>() { Connection };
+			packet.Connection = Connection;
 			packet.Send(HardwareMonitor.Protocol.PacketType.IdentityRequest);
 		}
 

@@ -13,5 +13,7 @@
 		<Program ProcessName="Spotify" />
 		<Program ProcessName="NVIDIA GeForce Experience" />
 		<Program ProcessName="GitHubDesktop" />
+		<Program ProcessName="Docker" />
+		<Program ProcessName="Microsoft.Photos" />
 	</Blacklist>
 </FramerateMetrics>

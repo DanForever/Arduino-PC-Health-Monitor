@@ -1,0 +1,77 @@
+name: Publish Devices
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Name of the release
+        required: true
+      tag:
+        description: Name of the tag applied to the release
+        required: true
+
+env:
+  arduino_ide_version: 1.8.16
+  teensyduino_verion: 155
+
+jobs:
+  publish-devices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        microcontroller: [["IDENTITY_M_TEENSY40","teensy:avr:teensy40:usb=serial,speed=600,opt=o2std,keys=en-us", "teensy40"], ["IDENTITY_M_TEENSY32","teensy:avr:teensy31:usb=serial,speed=72,opt=o2std,keys=en-us", "teensy32"]]
+        driver: [["IDENTITY_S_ILI9341", "ili9341"], ["IDENTITY_S_ILI9488", "ili9488"]]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Setup the environment
+        uses: ./.github/workflows/setup-environment
+        with:
+          arduino_ide_version: ${{ env.arduino_ide_version }}
+          teensyduino_verion: ${{ env.teensyduino_verion }}
+          
+      - name: Build Device
+        id: build-device
+        uses: ./.github/workflows/build-device
+        with:
+          microcontroller: ${{ matrix.microcontroller[0] }}
+          driver: ${{ matrix.driver[0] }}
+          arduino_ide_version: ${{ env.arduino_ide_version }}
+          teensyduino_verion: ${{ env.teensyduino_verion }}
+          fbqn: ${{ matrix.microcontroller[1] }}
+          
+      - name: Display Path
+        run: echo ::notice title=Path to compiled binary::${{ steps.build-device.outputs.binary-path }}
+
+      - name: Zip up binary
+        uses: papeloto/action-zip@v1
+        with:
+          files: ${{ steps.build-device.outputs.binary-path }}
+          dest: ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
+          
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          release_name: ${{ github.event.inputs.release }}
+          draft: true
+          prerelease: false
+          
+    - name: Upload
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
+        asset_name: ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
+        asset_content_type: application/zip
+
+    - uses: eregon/publish-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        release_id: ${{ steps.create_release.outputs.id }}

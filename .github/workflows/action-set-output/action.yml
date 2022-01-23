@@ -1,0 +1,15 @@
+name: Example Action Set Output
+
+description: uses set-output to create a value
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set the value
+      id: step_one
+      shell: bash
+      run: echo ::set-output name=PIE::CAKE
+    - name: Display the value
+      shell: bash
+      run: echo The value of PIE is ${{ steps.step_one.outputs.PIE }}
+    

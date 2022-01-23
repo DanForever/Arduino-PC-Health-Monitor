@@ -65,7 +65,10 @@ jobs:
         run: echo ::notice title=Path to compiled binary::${{ steps.build-device.outputs.binary-path }}
 
       - name: Zip up binary
-        run: zip ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip ${{ steps.build-device.outputs.binary-path }}
+        run: |
+          zip ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip ${{ steps.build-device.outputs.binary-path }}
+          ls -lh
+          unzip -l ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
           
       - name: Upload
         uses: actions/upload-release-asset@v1.0.1

@@ -54,4 +54,3 @@ runs:
       name:  Display binary path to user
       run: |
         echo "From Steps: ${{ steps.retrieve-binary-path.outputs.binary-path }}"
-        echo "From Outputs: ${{ outputs.binary-path }}"

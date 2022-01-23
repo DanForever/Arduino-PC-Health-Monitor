@@ -33,4 +33,4 @@ jobs:
           fbqn: ${{ matrix.microcontroller[1] }}
           
       - name: Display Path
-        run: echo Path to compiled binary -> ${{ steps.build-device.outputs.binary-path }}
+        run: echo ::notice title=Path to compiled binary::${{ steps.build-device.outputs.binary-path }}

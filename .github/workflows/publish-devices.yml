@@ -14,7 +14,7 @@ env:
   teensyduino_verion: 155
 
 jobs:
-  publish-devices:
+  publish_devices:
     runs-on: ubuntu-latest
     strategy:
       matrix:

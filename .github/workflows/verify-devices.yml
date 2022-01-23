@@ -1,5 +1,7 @@
 name: Verify Devices
-on: [push]
+on:
+  push
+  workflow_dispatch
 
 env:
   arduino_ide_version: 1.8.16

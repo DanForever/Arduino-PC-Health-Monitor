@@ -1,6 +1,8 @@
 # Dan's open source hardware health monitor
 ## _A hardware monitor that outputs its metrics for display on an arduino-compatible device_
 
+[![Verify Devices](https://github.com/DanForever/Arduino-PC-Health-Monitor/actions/workflows/verify-devices.yml/badge.svg?event=push)](https://github.com/DanForever/Arduino-PC-Health-Monitor/actions/workflows/verify-devices.yml)
+
 |![Small screen device](Documentation/Images/ili9341-2.jpg) |![Larger screen device](Documentation/Images/ili9488.jpg)   |
 |---    |---
 |![Small screen device - full view](Documentation/Images/teensy32.jpg) |![Larger screen device - full view](Documentation/Images/teensy40.jpg)   |

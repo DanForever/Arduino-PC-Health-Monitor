@@ -1,0 +1,5 @@
+recipe.preproc.macros="{compiler.path}{build.toolchain}{build.command.g++}" -E -CC -x c++ -w {compiler.cpp.flags} {build.flags.common} {build.flags.cpp} {build.flags.cpu} {build.flags.defs} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DF_CPU={build.fcpu} -D{build.usbtype} -DLAYOUT_{build.keylayout} -D?MICROCONTROLLER? -D?DISPLAYDRIVER? {includes} "{source_file}" -o "{preprocessed_file_path}"
+recipe.cpp.o.pattern="{compiler.path}{build.toolchain}{build.command.g++}" -c {build.flags.optimize} {build.flags.common} {build.flags.dep} {build.flags.cpp} {build.flags.cpu} {build.flags.defs} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DF_CPU={build.fcpu} -D{build.usbtype} -DLAYOUT_{build.keylayout} -D?MICROCONTROLLER? -D?DISPLAYDRIVER? "-I{build.path}/pch" {includes} "{source_file}" -o "{object_file}"
+
+
+recipe.hooks.postbuild.1.pattern="/bin/bash" "-c" "echo '{build.path}/{build.project_name}.elf' >> $HOME/binaries.txt"

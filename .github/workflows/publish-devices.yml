@@ -45,7 +45,7 @@ jobs:
         run: echo ::notice title=Path to compiled binary::${{ steps.build-device.outputs.binary-path }}
 
       - name: Zip up binary
-        uses: papeloto/action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: ${{ steps.build-device.outputs.binary-path }}
           dest: ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip

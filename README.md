@@ -1,9 +1,9 @@
 # Dan's open source hardware health monitor
 ## _A hardware monitor that outputs its metrics for display on an arduino-compatible device_
 
-|![Small screen device](Documentation/Images/ili9431-2.png) |![Larger screen device](Documentation/Images/ili9488.png)   |
+|![Small screen device](Documentation/Images/ili9341-2.jpg) |![Larger screen device](Documentation/Images/ili9488.jpg)   |
 |---    |---
-|![Small screen device - full view](Documentation/Images/teensy32.png) |![Larger screen device - full view](Documentation/Images/teensy40.png)   |
+|![Small screen device - full view](Documentation/Images/teensy32.jpg) |![Larger screen device - full view](Documentation/Images/teensy40.jpg)   |
 
 The hardware monitor is comprised of two parts:
 - Arduino compatible firmware, written in C++
@@ -52,3 +52,5 @@ Once you hooked up the device, you'll need to flash the firmware onto it. For no
 - Allow the user to change the layout from the companion app
 - Layout designer
 
+## Special Thanks
+This project was inspired by the "Phat Stats" project over on Hackaday: https://hackaday.io/project/19018-phat-stats-pc-performance-tft-display (and it's associated github repository here: https://github.com/koogar/Phat-Stats)

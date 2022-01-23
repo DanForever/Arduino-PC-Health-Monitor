@@ -66,7 +66,7 @@ jobs:
 
       - name: Zip up binary
         run: |
-          zip ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip ${{ steps.build-device.outputs.binary-path }}
+          zip -j ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip ${{ steps.build-device.outputs.binary-path }}
           ls -lh
           unzip -l ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
           

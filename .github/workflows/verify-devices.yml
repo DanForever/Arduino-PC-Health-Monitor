@@ -1,7 +1,5 @@
 name: Verify Devices
-on:
-  push
-  workflow_dispatch
+on: [push, workflow_dispatch]
 
 env:
   arduino_ide_version: 1.8.16
@@ -35,4 +33,4 @@ jobs:
           fbqn: ${{ matrix.microcontroller[1] }}
           
       - name: Display Path
-        run: echo Path to compiled binary: ${{ steps.build-device.outputs.binary-path }}
+        run: echo Path to compiled binary -> ${{ steps.build-device.outputs.binary-path }}

@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'Windows/**'
-  workflow_call:
+  workflow_dispatch:
     inputs:
       test:
         description: Name of the release

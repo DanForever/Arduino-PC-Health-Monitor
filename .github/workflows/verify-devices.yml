@@ -3,7 +3,7 @@ on:
   push:
     paths:
       - 'Device/**'
-  workflow_call:
+  workflow_dispatch:
 
 env:
   arduino_ide_version: 1.8.16

@@ -42,6 +42,7 @@ jobs:
       
   build-and-upload:
     runs-on: windows-latest
+    needs: create-draft-release
     strategy:
       matrix:
         build-platform: ["x86"]

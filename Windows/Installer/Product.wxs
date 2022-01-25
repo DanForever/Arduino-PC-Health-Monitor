@@ -2,8 +2,9 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
 	<?define MyProductName = "Dan's Hardware Monitor" ?>
+	<?define MyProductVersion = "0.0.1" ?>
 	
-	<Product Id="*" Name="$(var.MyProductName)" Language="1033" Version="1.0.1.0" Manufacturer="Dan Forever" UpgradeCode="8d989610-ca2f-42b9-ad9a-8edbf296621f">
+	<Product Id="*" Name="$(var.MyProductName)" Language="1033" Version="$(var.MyProductVersion)" Manufacturer="Dan Forever" UpgradeCode="8d989610-ca2f-42b9-ad9a-8edbf296621f">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />

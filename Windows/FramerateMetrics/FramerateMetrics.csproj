@@ -7,6 +7,14 @@
 		<Platforms>x86;x64</Platforms>
 		<PlatformTarget>$(Platform)</PlatformTarget>
 		<Configurations>Debug;Release;Publish</Configurations>
+		<AssemblyVersion>0.0.1.0</AssemblyVersion>
+		<Copyright>GPL-3.0-or-later</Copyright>
+		<Authors>Dan Forever</Authors>
+		<Version>0.0.1</Version>
+		<Product>Dan's open source hardware monitor (companion app)</Product>
+		<PackageProjectUrl>https://github.com/DanForever/Arduino-PC-Health-Monitor</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/DanForever/Arduino-PC-Health-Monitor.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>

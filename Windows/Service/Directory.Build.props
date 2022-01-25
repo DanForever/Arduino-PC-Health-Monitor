@@ -1,7 +1,0 @@
-<Project>
-    <PropertyGroup>
-		<MSBUildProjectExtensionsPath>$(SolutionDir)\intermediate\$(MSBuildProjectName)</MSBUildProjectExtensionsPath>
-		<IntermediateOutputPath>$(SolutionDir)\intermediate\$(MSBuildProjectName)</IntermediateOutputPath>
-		<OutDir>$(SolutionDir)bin\$(MSBuildProjectName)</OutDir>
-    </PropertyGroup>
-</Project>

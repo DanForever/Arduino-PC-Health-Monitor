@@ -71,19 +71,19 @@ jobs:
       uses: ./.github/workflows/set-csproj-version
       with:
         version: ${{ github.event.inputs.version }}
-        filepath: ./Windows/Frontend/Workhorse.csproj
+        filepath: ./Windows/Workhorse/Workhorse.csproj
 
     - name: Apply Version number to the AdditionalMemoryMetrics assembly
       uses: ./.github/workflows/set-csproj-version
       with:
         version: ${{ github.event.inputs.version }}
-        filepath: ./Windows/Frontend/AdditionalMemoryMetrics.csproj
+        filepath: ./Windows/AdditionalMemoryMetrics/AdditionalMemoryMetrics.csproj
 
     - name: Apply Version number to the FramerateMetrics assembly
       uses: ./.github/workflows/set-csproj-version
       with:
         version: ${{ github.event.inputs.version }}
-        filepath: ./Windows/Frontend/FramerateMetrics.csproj
+        filepath: ./Windows/FramerateMetrics/FramerateMetrics.csproj
 
     - name: Apply Version Number to the Installer
       shell: bash

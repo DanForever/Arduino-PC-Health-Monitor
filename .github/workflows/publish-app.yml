@@ -87,7 +87,7 @@ jobs:
 
     - name: Apply Version Number to the Installer
       shell: bash
-      run: sed -i 's/<?define MyProductVersion = "0.0.1" ?>/<?define MyProductVersion = "${{ github.event.inputs.version }}" ?>/g' ./Windows/Installer/product.wxs
+      run: sed -i 's/<?define MyProductVersion = "0\.0\.1" ?>/<?define MyProductVersion = "${{ github.event.inputs.version }}" ?>/g' ./Windows/Installer/product.wxs
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}

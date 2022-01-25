@@ -9,6 +9,9 @@ on:
       tag:
         description: Name of the tag applied to the release
         required: true
+      version:
+        description: Version number to apply to the binaries and installer
+        required: true
   
 env:
   # Path to the solution file relative to the root of the project.
@@ -56,6 +59,35 @@ jobs:
     - name: Restore NuGet packages
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+
+    # Is there a way to loop over these?
+    - name: Apply Version number to the Frontend assembly
+      uses: ./.github/workflows/set-csproj-version
+      with:
+        version: ${{ github.event.inputs.version }}
+        filepath: ./Windows/Frontend/Frontend.csproj
+
+    - name: Apply Version number to the Workhorse assembly
+      uses: ./.github/workflows/set-csproj-version
+      with:
+        version: ${{ github.event.inputs.version }}
+        filepath: ./Windows/Frontend/Workhorse.csproj
+
+    - name: Apply Version number to the AdditionalMemoryMetrics assembly
+      uses: ./.github/workflows/set-csproj-version
+      with:
+        version: ${{ github.event.inputs.version }}
+        filepath: ./Windows/Frontend/AdditionalMemoryMetrics.csproj
+
+    - name: Apply Version number to the FramerateMetrics assembly
+      uses: ./.github/workflows/set-csproj-version
+      with:
+        version: ${{ github.event.inputs.version }}
+        filepath: ./Windows/Frontend/FramerateMetrics.csproj
+
+    - name: Apply Version Number to the Installer
+      shell: bash
+      run: sed -i 's/<?define MyProductVersion = "0.0.1" ?>/<?define MyProductVersion = "${{ github.event.inputs.version }}" ?>/g' ./Windows/Installer/product.wxs
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}

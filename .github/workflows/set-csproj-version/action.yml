@@ -1,0 +1,21 @@
+name: Set C# Project Version Numbers
+
+description: Overwrites the various version tags in the csproj file with the specified version number
+
+inputs:
+  version:
+    required: true
+    type: string
+  filepath:
+    required:
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      name: Set Product version
+      run: sed -i 's/<Version>0.0.1</Version>/<Version>${{ inputs.version }}</Version>/g' ${{ inputs.filepath }}
+    - shell: bash
+      name: Set File version
+      run: sed -i 's/<AssemblyVersion>0.0.1.0</AssemblyVersion>/<AssemblyVersion>${{ inputs.version }}</AssemblyVersion>/g' ${{ inputs.filepath }}

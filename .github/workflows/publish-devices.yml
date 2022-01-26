@@ -58,7 +58,7 @@ jobs:
         id: parsed-version
         run: |
           dev_ver='${{ github.event.inputs.version }}'
-          [[ $dev_ver =~ .?([0-9]*)\.([0-9]*)\.([0-9]*) ]]
+          [[ $dev_ver =~ (\d*)\.(\d*)\.(\d*) ]]
           echo "::set-output name=version-major::$(echo ${BASH_REMATCH[1]})"
           echo "::set-output name=version-minor::$(echo ${BASH_REMATCH[2]})"
           echo "::set-output name=version-patch::$(echo ${BASH_REMATCH[3]})"

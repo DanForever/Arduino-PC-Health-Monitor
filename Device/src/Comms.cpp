@@ -1,6 +1,8 @@
 #include "Comms.h"
 
 #include <Arduino.h>
+
+#include "Version.h"
 #include "PacketType.h"
 #include "IdentityImplementation.h"
 
@@ -123,12 +125,26 @@ void Comms::ProcessMainBuffer()
 
 void Comms::SendIdentity()
 {
-	uint8_t buffer[8];
+	uint8_t buffer[4];
 
 	buffer[0] = (uint8_t)ePacketType::Identity;
 	buffer[1] = (uint8_t)Identity.Microcontroller;
 	buffer[2] = (uint8_t)Identity.Screen;
 	buffer[3] = (uint8_t)Identity.Resolution;
+
+	::Serial.write(MessageHeader, strlen(MessageHeader));
+	::Serial.write(buffer, 4);
+	::Serial.write(MessageFooter, strlen(MessageFooter));
+}
+
+void Comms::SendVersion()
+{
+	uint8_t buffer[4];
+	
+	buffer[0] = (uint8_t)ePacketType::Version;
+	buffer[1] = VERSION_MAJOR;
+	buffer[2] = VERSION_MINOR;
+	buffer[3] = VERSION_PATCH;
 
 	::Serial.write(MessageHeader, strlen(MessageHeader));
 	::Serial.write(buffer, 4);

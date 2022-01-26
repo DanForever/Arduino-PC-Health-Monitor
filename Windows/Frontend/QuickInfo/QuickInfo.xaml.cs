@@ -38,6 +38,7 @@ namespace HardwareMonitor.QuickInfo
 		public string Port => _device.Connection.Name;
 		public string Layout => _device.Layout?.Name ?? "No Layout set";
 		public Orientation Orientation => _device.Orientation;
+		public string Version => _device.Version;
 
 		#endregion Public Properties
 

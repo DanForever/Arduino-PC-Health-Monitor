@@ -5,12 +5,12 @@
 
 enum class ePacketType : uint8_t
 {
+	VersionRequest,
 	Version,
 	IdentityRequest,
 	Identity,
 	ModuleDefinition,
 	ModuleUpdate,
-	Metric,
 	Guaranteed,
 	GaranteedAck,
 	Debug,

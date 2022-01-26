@@ -78,6 +78,10 @@ namespace HardwareMonitor
 		private eScreen _screen = eScreen.Unknown;
 		private eResolution _resolution = eResolution.Unknown;
 
+		private int _versionMajor;
+		private int _versionMinor;
+		private int _versionPatch;
+
 		#endregion Private Fields
 
 		#region Public Properties
@@ -94,6 +98,7 @@ namespace HardwareMonitor
 				_activeConnection = value;
 				_activeConnection.DataRecieved += _activeConnection_DataRecieved;
 				RequestIdentity();
+				RequestVersion();
 			}
 		}
 
@@ -106,6 +111,8 @@ namespace HardwareMonitor
 		public eScreen Screen => _screen;
 		public eResolution Resolution => _resolution;
 		public Orientation Orientation => Orientation.Vertical;
+
+		public string Version => $"{_versionMajor}.{_versionMinor}.{_versionPatch}";
 
 		#endregion Public Properties
 
@@ -193,6 +200,13 @@ namespace HardwareMonitor
 			}
 		}
 
+		private void RequestVersion()
+		{
+			Connection.SimplePacket packet = new Connection.SimplePacket();
+			packet.Connection = Connection;
+			packet.Send(HardwareMonitor.Protocol.PacketType.VersionRequest);
+		}
+
 		private void RequestIdentity()
 		{
 			Connection.SimplePacket packet = new Connection.SimplePacket();
@@ -206,13 +220,22 @@ namespace HardwareMonitor
 
 		private void _activeConnection_DataRecieved(Connection.ActiveConnection connection, byte[] data, int dataLength)
 		{
-			if((PacketType)data[0] == PacketType.Identity)
+			PacketType packetType = (PacketType)data[0];
+			switch (packetType)
 			{
-				_microcontroller = (eMicrocontroller)data[1];
-				_screen = (eScreen)data[2];
-				_resolution = (eResolution)data[3];
+				case PacketType.Identity:
+					_microcontroller = (eMicrocontroller)data[1];
+					_screen = (eScreen)data[2];
+					_resolution = (eResolution)data[3];
 
-				IdentityRecieved?.Invoke(this);
+					IdentityRecieved?.Invoke(this);
+					break;
+
+				case PacketType.Version:
+					_versionMajor = data[1];
+					_versionMinor = data[2];
+					_versionPatch = data[3];
+					break;
 			}
 		}
 

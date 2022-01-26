@@ -169,6 +169,7 @@ public:
 	void Update();
 	void Ack(uint16_t id);
 	void SendIdentity();
+	void SendVersion();
 	void ClearMessage();
 
 	bool MessageReady() { return m_messageReady; }

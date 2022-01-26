@@ -21,12 +21,12 @@ namespace HardwareMonitor.Protocol
 {
 	public enum PacketType
 	{
+		VersionRequest,
 		Version,
 		IdentityRequest,
 		Identity,
 		ModuleDefinition,
 		ModuleUpdate,
-		Metric, // Deprecated
 		Guaranteed,
 		GuaranteedAck,
 		Debug,

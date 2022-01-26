@@ -56,6 +56,10 @@ void HandleMessage(Message& message)
 
 	switch (packetType)
 	{
+	case ePacketType::VersionRequest:
+		comms.SendVersion();
+		break;
+
 	case ePacketType::ModuleDefinition:
 		HandleModuleDefinition(message);
 		break;

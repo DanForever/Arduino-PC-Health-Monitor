@@ -9,6 +9,9 @@ on:
       tag:
         description: Name of the tag applied to the release
         required: true
+      version:
+        description: Version name to be applied to the binaries (X.X.X format)
+        required: true
 
 env:
   arduino_ide_version: 1.8.16
@@ -50,6 +53,22 @@ jobs:
         with:
           arduino_ide_version: ${{ env.arduino_ide_version }}
           teensyduino_verion: ${{ env.teensyduino_verion }}
+          
+      - name: Break down version input
+        id: parsed-version
+        run: |
+          dev_ver='${{ github.event.inputs.version }}'
+          [[ $dev_ver =~ .?([0-9]*)\.([0-9]*)\.([0-9]*) ]]
+          echo "::set-output name=version-major::$(echo ${BASH_REMATCH[1]})"
+          echo "::set-output name=version-minor::$(echo ${BASH_REMATCH[2]})"
+          echo "::set-output name=version-patch::$(echo ${BASH_REMATCH[3]})"
+          
+      - name: Write version number to version header
+        run: |
+          echo ::notice title=Parsed version number::${{ steps.parsed-version.outputs.version-major }}.${{ steps.parsed-version.outputs.version-minor }}.${{ steps.parsed-version.outputs.version-patch }}
+          sed -i 's/#define VERSION_MAJOR 0/#define VERSION_MAJOR ${{ steps.parsed-version.outputs.version-major }}/g' ./Device/src/Version.h
+          sed -i 's/#define VERSION_MINOR 0/#define VERSION_MINOR ${{ steps.parsed-version.outputs.version-minor }}/g' ./Device/src/Version.h
+          sed -i 's/#define VERSION_PATCH 1/#define VERSION_PATCH ${{ steps.parsed-version.outputs.version-patch }}/g' ./Device/src/Version.h
           
       - name: Build Device
         id: build-device

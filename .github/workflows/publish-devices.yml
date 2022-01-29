@@ -3,12 +3,6 @@ name: Publish Devices
 on:
   workflow_dispatch:
     inputs:
-      release:
-        description: Name of the release
-        required: true
-      tag:
-        description: Name of the tag applied to the release
-        required: true
       version:
         description: Version name to be applied to the binaries (X.X.X format)
         required: true
@@ -28,8 +22,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.tag }}
-          release_name: ${{ github.event.inputs.release }}
+          tag_name: "devices.v${{ github.event.inputs.version }}"
+          release_name: "devices.v${{ github.event.inputs.version }}"
           draft: true
           prerelease: false
     outputs:

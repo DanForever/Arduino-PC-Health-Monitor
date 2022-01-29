@@ -3,12 +3,6 @@ name: Publish Companion app
 on:
   workflow_dispatch:
     inputs:
-      release:
-        description: Name of the release
-        required: true
-      tag:
-        description: Name of the tag applied to the release
-        required: true
       version:
         description: Version number to apply to the binaries and installer
         required: true
@@ -35,8 +29,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.tag }}
-          release_name: ${{ github.event.inputs.release }}
+          tag_name: "companion-app.v${{ github.event.inputs.version }}"
+          release_name: "companion-app.v${{ github.event.inputs.version }}"
           draft: true
           prerelease: false
     outputs:

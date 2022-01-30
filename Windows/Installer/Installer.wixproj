@@ -57,6 +57,10 @@
       <HintPath>$(WixToolPath)WixUIExtension.dll</HintPath>
       <Name>WixUIExtension</Name>
     </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixToolPath)WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
   </ItemGroup>
   <Import Project="$([MSBuild]::GetPathOfFileAbove(directory.build.targets))" Condition="Exists('$([MSBuild]::GetPathOfFileAbove(directory.build.targets))')" />
   <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />

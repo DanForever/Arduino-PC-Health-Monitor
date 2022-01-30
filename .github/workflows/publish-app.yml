@@ -42,7 +42,7 @@ jobs:
     needs: create-draft-release
     strategy:
       matrix:
-        build-platform: ["x86"]
+        build-platform: ["x86", "x64"]
     steps:
     - name: Checkout
       uses: actions/checkout@v2

@@ -4,3 +4,4 @@ Windows/packages/
 bin/
 intermediate/
 act.exe
+*.user

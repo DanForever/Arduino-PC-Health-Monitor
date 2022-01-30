@@ -1,0 +1,105 @@
+name: Publish Devices
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version name to be applied to the binaries (X.X.X format)
+        required: true
+
+env:
+  arduino_ide_version: 1.8.16
+  teensyduino_verion: 155
+
+jobs:
+  create-draft-release:
+    name: Create Draft Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: "devices.v${{ github.event.inputs.version }}"
+          release_name: "devices.v${{ github.event.inputs.version }}"
+          draft: true
+          prerelease: false
+    outputs:
+      release-id: ${{ steps.create_release.outputs.id }}
+      release-url: ${{ steps.create_release.outputs.upload_url }}
+  
+  build-and-upload:
+    name: Build devices and upload binaries to draft release
+    runs-on: ubuntu-latest
+    needs: create-draft-release
+    strategy:
+      matrix:
+        microcontroller: [["IDENTITY_M_TEENSY40","teensy:avr:teensy40:usb=serial,speed=600,opt=o2std,keys=en-us", "teensy40"], ["IDENTITY_M_TEENSY32","teensy:avr:teensy31:usb=serial,speed=72,opt=o2std,keys=en-us", "teensy32"]]
+        driver: [["IDENTITY_S_ILI9341", "ili9341"], ["IDENTITY_S_ILI9488", "ili9488"]]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Setup the environment
+        uses: ./.github/workflows/setup-environment
+        with:
+          arduino_ide_version: ${{ env.arduino_ide_version }}
+          teensyduino_verion: ${{ env.teensyduino_verion }}
+          
+      - name: Break down version input
+        id: parsed-version
+        run: |
+          dev_ver='${{ github.event.inputs.version }}'
+          [[ $dev_ver =~ ([0-9]*)\.([0-9]*)\.([0-9]*) ]]
+          echo "::set-output name=version-major::$(echo ${BASH_REMATCH[1]})"
+          echo "::set-output name=version-minor::$(echo ${BASH_REMATCH[2]})"
+          echo "::set-output name=version-patch::$(echo ${BASH_REMATCH[3]})"
+          
+      - name: Write version number to version header
+        run: |
+          echo ::notice title=Parsed version number::${{ steps.parsed-version.outputs.version-major }}.${{ steps.parsed-version.outputs.version-minor }}.${{ steps.parsed-version.outputs.version-patch }}
+          sed -i 's/#define VERSION_MAJOR 0/#define VERSION_MAJOR ${{ steps.parsed-version.outputs.version-major }}/g' ./Device/src/Version.h
+          sed -i 's/#define VERSION_MINOR 0/#define VERSION_MINOR ${{ steps.parsed-version.outputs.version-minor }}/g' ./Device/src/Version.h
+          sed -i 's/#define VERSION_PATCH 1/#define VERSION_PATCH ${{ steps.parsed-version.outputs.version-patch }}/g' ./Device/src/Version.h
+          
+      - name: Build Device
+        id: build-device
+        uses: ./.github/workflows/build-device
+        with:
+          microcontroller: ${{ matrix.microcontroller[0] }}
+          driver: ${{ matrix.driver[0] }}
+          arduino_ide_version: ${{ env.arduino_ide_version }}
+          teensyduino_verion: ${{ env.teensyduino_verion }}
+          fbqn: ${{ matrix.microcontroller[1] }}
+          
+      - name: Display Path
+        run: echo ::notice title=Path to compiled binary::${{ steps.build-device.outputs.binary-path }}
+
+      - name: Zip up binary
+        run: |
+          zip -j ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip ${{ steps.build-device.outputs.binary-path }}
+          ls -lh
+          unzip -l ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
+          
+      - name: Upload
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-draft-release.outputs.release-url }}
+          asset_path: ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
+          asset_name: ${{ matrix.microcontroller[2] }}-${{ matrix.driver[1] }}.zip
+          asset_content_type: application/zip
+  
+  publish-draft:
+    name: Publish Draft Release
+    runs-on: ubuntu-latest
+    needs: [create-draft-release, build-and-upload]
+    steps:
+      - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.create-draft-release.outputs.release-id }}

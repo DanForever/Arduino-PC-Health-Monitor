@@ -1,0 +1,56 @@
+name: Build Device
+
+description: Build the hardware monitor firmware with the specified hardware configuration
+
+inputs:
+  microcontroller:
+    required: true
+    type: string
+  driver:
+    required: true
+    type: string
+  arduino_ide_version:
+    required: true
+    type: string
+  teensyduino_verion:
+    required: true
+    type: string
+  fbqn:
+    required: true
+    type: string
+
+outputs:
+  binary-path:
+    description: Path to the compiled binary
+    value: ${{ steps.retrieve-binary-path.outputs.binary-path }}
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      name: Install build environment overrides
+      run: cp -rf .github/overrides/teensy${{ inputs.teensyduino_verion }}/* $HOME/arduino_ide/arduino-${{ inputs.arduino_ide_version }}
+      
+    - shell: bash
+      name: Apply build configuration to environment overrides
+      run: |
+        sed -i 's/?MICROCONTROLLER?/${{ inputs.microcontroller }}/g' $HOME/arduino_ide/arduino-${{ inputs.arduino_ide_version }}/hardware/teensy/avr/platform.local.txt
+        sed -i 's/?DISPLAYDRIVER?/${{ inputs.driver }}/g' $HOME/arduino_ide/arduino-${{ inputs.arduino_ide_version }}/hardware/teensy/avr/platform.local.txt
+        
+    - shell: bash
+      name: Compile
+      run: $HOME/arduino_ide/arduino-${{ inputs.arduino_ide_version }}/arduino --verbose --board "${{ inputs.fbqn }}" --verify Device/Device.ino
+
+    - id: retrieve-binary-path
+      shell: bash
+      name: Retrieve Binary Path
+      run: |
+        PATH=$(cat $HOME/binaries.txt)
+        echo "Path is $PATH"
+        echo "BINPATH=$PATH" >> $GITHUB_ENV
+        echo "::set-output name=binary-path::$(echo $PATH)"
+
+    - shell: bash
+      name:  Display binary path to user
+      run: |
+        echo "From Steps: ${{ steps.retrieve-binary-path.outputs.binary-path }}"

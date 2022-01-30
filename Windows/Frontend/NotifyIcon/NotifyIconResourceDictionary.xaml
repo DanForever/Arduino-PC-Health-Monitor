@@ -3,6 +3,9 @@
                     xmlns:tb="http://www.hardcodet.net/taskbar"
                     xmlns:local="clr-namespace:HardwareMonitor.NotifyIcon"
                     xmlns:quickinfo="clr-namespace:HardwareMonitor.QuickInfo">
+    
+    <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+    
     <!-- Globally declared notify icon -->
     <tb:TaskbarIcon x:Key="MyNotifyIcon"
                   IconSource="pack://application:,,,/Frontend;component/Images/thermometer.ico"
@@ -13,6 +16,7 @@
         </tb:TaskbarIcon.DataContext>
         <tb:TaskbarIcon.ContextMenu>
             <ContextMenu>
+                <MenuItem Header="Update available!" Command="{Binding UpdateAvailableCommand}" Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource booleanToVisibilityConverter}}" />
                 <MenuItem Header="Run on Startup" Command="{Binding ToggleRunOnStartupCommand}" IsChecked="{Binding WillRunOnStartup, Mode=OneWay}" IsCheckable="true" />
                 <MenuItem Header="Quit" Command="{Binding ExitApplicationCommand}" />
             </ContextMenu>

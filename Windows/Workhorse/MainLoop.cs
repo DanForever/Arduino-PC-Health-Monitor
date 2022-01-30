@@ -80,7 +80,7 @@ namespace HardwareMonitor
 		{
 			Initialize();
 
-			Stopwatch stopWatch = new Stopwatch();
+			Stopwatch stopWatch = new();
 
 			while(!RequestExit)
 			{
@@ -111,7 +111,7 @@ namespace HardwareMonitor
 
 		#region Private Methods
 
-		private void Initialize()
+		private async void Initialize()
 		{
 			_sensorConfig = Monitor.Config.Computer.Load("Data/sensors.xml");
 			_pluginConfig = Plugin.Config.Config.Load("Data/plugins.xml");
@@ -120,6 +120,8 @@ namespace HardwareMonitor
 			_pluginManager = new Plugin.Manager(_pluginConfig);
 
 			_layoutManager.Load();
+
+			await Releases.Releases.UpdateLatestReleases();
 		}
 
 		private bool IsAlreadyConnected(Connection.AvailableConnection connection)

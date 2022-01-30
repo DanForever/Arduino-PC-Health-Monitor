@@ -137,10 +137,23 @@ namespace HardwareMonitor.NotifyIcon
 		#endregion Private Methods
 	}
 
+	static class AppUpdater
+	{
+		public static async void Update()
+		{
+			if (MessageBox.Show("Download and install the latest verion of Dan's open source hardware health monitor?\nThis will cause the program to exit.", "Update?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
+			{
+				await Releases.Releases.DownloadAndRunLatestCompanionAppInstaller();
+				App.Application.Program.RequestExit = true;
+			}
+		}
+	}
+
 	class NotifyIconViewModel
 	{
 		#region Private Fields
 
+		private ICommand _updateAvailableCommand = new DelegateCommand { CommandAction = () => AppUpdater.Update(), CanExecuteFunc = () => Releases.Releases.CompanionAppUpdateAvailable };
 		private ICommand _exitApplicationCommand = new DelegateCommand { CommandAction = () => { ((App)Application.Current).Program.RequestExit = true; } };
 		private ICommand _toggleRunOnStartupCommand = new DelegateCommand { CommandAction = TaskScheduler.ToggleRunOnStartup };
 
@@ -148,6 +161,7 @@ namespace HardwareMonitor.NotifyIcon
 
 		#region Public Properties
 
+		public ICommand UpdateAvailableCommand => _updateAvailableCommand;
 		public ICommand ExitApplicationCommand => _exitApplicationCommand;
 		public ICommand ToggleRunOnStartupCommand => _toggleRunOnStartupCommand;
 		public bool WillRunOnStartup => TaskScheduler.TaskExists();

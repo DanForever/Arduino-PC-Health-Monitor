@@ -32,7 +32,7 @@ namespace AdditionalMemoryMetrics
 
 		IEnumerable<IHardware> ISource.Hardware => _hardware;
 
-		void ISource.Update()
+		void ISource.PollingStarted(HardwareMonitor.Monitor.Config.Computer config)
 		{
 			ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_PhysicalMemory");
 			foreach (ManagementObject obj in searcher.Get())

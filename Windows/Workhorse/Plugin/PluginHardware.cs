@@ -17,6 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace HardwareMonitor.Plugin
@@ -28,6 +29,8 @@ namespace HardwareMonitor.Plugin
 		public string Name { get; }
 
 		public HardwareType Type { get; }
+
+		public IEnumerable<IHardware> Hardware => Array.Empty<IHardware>();
 
 		public IEnumerable<ISensor> Sensors { get; }
 

@@ -20,8 +20,11 @@
 using System;
 using System.Diagnostics;
 using System.IO.Ports;
+using System.Runtime.Versioning;
 using System.Text;
 
+[assembly:UnsupportedOSPlatform("ios")]
+[assembly:UnsupportedOSPlatform("android")]
 namespace HardwareMonitor.Connection.Serial
 {
 	internal class ActiveConnection : Connection.ActiveConnection

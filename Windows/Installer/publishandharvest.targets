@@ -8,6 +8,7 @@
 		<Exec Command="dotnet publish $(SolutionDir)Frontend\Frontend.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)" />
 		<Exec Command="dotnet publish $(SolutionDir)FramerateMetrics\FramerateMetrics.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)Plugins\FramerateMetrics\" />
 		<Exec Command="dotnet publish $(SolutionDir)AdditionalMemoryMetrics\AdditionalMemoryMetrics.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)Plugins\AdditionalMemoryMetrics\" />
+		<Exec Command="dotnet publish $(SolutionDir)LibreHardwareMetrics\LibreHardwareMetrics.csproj -c $(Configuration) -r win-$(Platform) --no-self-contained -p:PublishReadyToRun=true --output $(PublishOutput)Plugins\LibreHardwareMetrics\" />
 
 		<HeatDirectory
 			ToolPath="$(WixToolPath)"

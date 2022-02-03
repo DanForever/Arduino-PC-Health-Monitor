@@ -245,7 +245,7 @@ namespace FramerateMetrics
 
 		IEnumerable<IHardware> ISource.Hardware => _programs;
 
-		void ISource.Update()
+		void ISource.PollingStarted(HardwareMonitor.Monitor.Config.Computer config)
 		{
 			// First let's reset the output values, incase the game has shut down in the mean time
 			Program program = _programs[0];

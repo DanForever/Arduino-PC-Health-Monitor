@@ -22,8 +22,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Libre = LibreHardwareMonitor.Hardware;
-
 namespace HardwareMonitor.Monitor.Asynchronous
 {
 	/// <summary>
@@ -44,58 +42,6 @@ namespace HardwareMonitor.Monitor.Asynchronous
 
 namespace HardwareMonitor.Monitor.Synchronous
 {
-	#region Internal Utilities
-
-	internal static class LibreExtensions
-	{
-		private static Dictionary<Libre.HardwareType, HardwareType> _hardwareTypeMap = new Dictionary<Libre.HardwareType, HardwareType>()
-		{
-			{Libre.HardwareType.Motherboard         ,HardwareType.Motherboard},
-			//{Libre.HardwareType.SuperIO				,HardwareType.},
-			{Libre.HardwareType.Cpu                 ,HardwareType.Cpu},
-			{Libre.HardwareType.Memory              ,HardwareType.Memory},
-			{Libre.HardwareType.GpuNvidia           ,HardwareType.Gpu},
-			{Libre.HardwareType.GpuAmd              ,HardwareType.Gpu},
-			{Libre.HardwareType.Storage             ,HardwareType.Storage},
-			{Libre.HardwareType.Network             ,HardwareType.Network},
-			//{Libre.HardwareType.Cooler				,HardwareType.c},
-			//{Libre.HardwareType.EmbeddedController	,HardwareType.},
-			//{Libre.HardwareType.Psu					,HardwareType.},
-		};
-
-		private static Dictionary<Libre.SensorType, SensorType> _sensorTypeMap = new Dictionary<Libre.SensorType, SensorType>()
-		{
-			//{Libre.SensorType.Voltage,			SensorType.},
-			//{Libre.SensorType.Current,			SensorType.},
-			//{Libre.SensorType.Power,			 SensorType.},
-			{Libre.SensorType.Clock,             SensorType.Clock},
-			{Libre.SensorType.Temperature,       SensorType.Temperature},
-			{Libre.SensorType.Load,              SensorType.Load},
-			//{Libre.SensorType.Frequency,		 SensorType.},
-			//{Libre.SensorType.Fan,				SensorType.},
-			//{Libre.SensorType.Flow,				SensorType.},
-			//{Libre.SensorType.Control,			SensorType.},
-			//{Libre.SensorType.Level,			 SensorType.},
-			//{Libre.SensorType.Factor,			 SensorType.},
-			{Libre.SensorType.Data,             SensorType.Data},
-			//{Libre.SensorType.SmallData,		 SensorType.},
-			//{Libre.SensorType.Throughput,		 SensorType.},
-			//{Libre.SensorType.TimeSpan,			SensorType.},
-		};
-
-		public static HardwareType Convert(this Libre.HardwareType hardwareType)
-		{
-			return _hardwareTypeMap.GetValueOrDefault(hardwareType, HardwareType.Ignored);
-		}
-
-		public static SensorType Convert(this Libre.SensorType sensorType)
-		{
-			return _sensorTypeMap.GetValueOrDefault(sensorType, SensorType.Ignored);
-		}
-	}
-
-	#endregion Internal Utilities
-
 	/// <summary>
 	/// Public API that presents functions that will execute synchronously
 	/// </summary>
@@ -149,24 +95,6 @@ namespace HardwareMonitor.Monitor.Synchronous
 			_data.CompoundSensors = new Dictionary<string, CompoundSensorData>();
 			_data.Snapshot = new Snapshot();
 
-			Libre.Computer computer = new Libre.Computer
-			{
-				IsCpuEnabled = config.IsHardwareSpecified(HardwareType.Cpu),
-				IsGpuEnabled = config.IsHardwareSpecified(HardwareType.Gpu),
-				IsMemoryEnabled = config.IsHardwareSpecified(HardwareType.Memory),
-				IsMotherboardEnabled = config.IsHardwareSpecified(HardwareType.Motherboard),
-				IsNetworkEnabled = config.IsHardwareSpecified(HardwareType.Network),
-				IsStorageEnabled = config.IsHardwareSpecified(HardwareType.Storage),
-				IsControllerEnabled = false,
-				IsPsuEnabled = false,
-			};
-
-			computer.Open();
-			computer.Accept(new UpdateVisitor());
-
-			PollHardware(computer.Hardware, _data);
-			computer.Close();
-
 			PollPlugins(_data);
 			ProcessCompoundSensors(_data);
 
@@ -175,76 +103,15 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 		#endregion Public Methods
 
-		#region Libre
-
-		private static void PollHardware(IEnumerable<Libre.IHardware> hardware, PollData data)
-		{
-			foreach (Libre.IHardware hardwareItem in hardware)
-			{
-				Config.Component watchedHardware = data.Config.FindComponent(hardwareItem.HardwareType.Convert());
-				if (watchedHardware == null)
-					continue;
-
-				data.Snapshot.HardwareSamples.Add(new HardwareSample() { Component = watchedHardware, Name = hardwareItem.Name });
-
-				if (!string.IsNullOrWhiteSpace(watchedHardware.CaptureName))
-					data.Snapshot.Captures.Add(watchedHardware.CaptureName, new Capture() { Name = watchedHardware.CaptureName, Value = hardwareItem.Name });
-
-				PollSensors(hardwareItem, data);
-			}
-		}
-
-		private static void PollSensors(Libre.IHardware hardware, PollData data)
-		{
-			PollHardware(hardware.SubHardware, data);
-
-			foreach (Libre.ISensor sensor in hardware.Sensors)
-			{
-				CheckSensor(sensor, data);
-				CheckCompoundSensor(sensor, data);
-			}
-		}
-
-		private static void CheckSensor(Libre.ISensor sensor, PollData data)
-		{
-			Config.Sensor watchedSensor = data.Config.FindSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
-			if (watchedSensor == null)
-				return;
-
-			data.Snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
-
-			if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
-				data.Snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value ?? 0.0f });
-		}
-
-		private static void CheckCompoundSensor(Libre.ISensor sensor, PollData data)
-		{
-			Config.CompoundSensor watchedCompoundSensor = data.Config.FindCompoundSensor(sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
-			if (watchedCompoundSensor == null)
-				return;
-
-			CompoundSensorData compoundSensorData;
-			if(!data.CompoundSensors.TryGetValue(watchedCompoundSensor.Name, out compoundSensorData))
-			{
-				compoundSensorData = new CompoundSensorData() { Sensor = watchedCompoundSensor };
-				data.CompoundSensors.Add(watchedCompoundSensor.Name, compoundSensorData);
-			}
-
-			Config.Sensor watchedSensor = data.Config.FindSensor(watchedCompoundSensor.Sensors, sensor.Name, sensor.Hardware.HardwareType.Convert(), sensor.SensorType.Convert());
-			compoundSensorData.Samples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value ?? 0.0f });
-		}
-
-		#endregion Libre
-
 		#region Plugins
 
 		private static void PollPlugins(PollData data)
 		{
 			foreach (Plugin.ISource source in data.Sources)
 			{
-				source.Update();
-
-				PollHardware(source.Hardware, data);
+				source.PollingStarted(data.Config);
+					PollHardware(source.Hardware, data);
+				source.PollingFinished(data.Config);
 			}
 		}
 
@@ -267,6 +134,8 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 		private static void PollSensors(Plugin.IHardware hardware, PollData data)
 		{
+			PollHardware(hardware.Hardware, data);
+
 			foreach (Plugin.ISensor sensor in hardware.Sensors)
 			{
 				CheckSensor(sensor, data);

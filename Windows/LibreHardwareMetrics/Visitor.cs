@@ -17,27 +17,36 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using System.Collections.Generic;
+using LibreHardwareMonitor.Hardware;
 
-namespace HardwareMonitor.Plugin
+namespace LibreHardwareMetrics
 {
-	/// <summary>
-	/// This class is responsible for providing a source of IHardware and ISensor instances
-	/// It's essentially the entrypoint into the plugin
-	/// </summary>
-	public interface ISource
-	{
-		#region Public Properties
+    public class Visitor : IVisitor
+    {
+        #region IVisitor
 
-		public IEnumerable<IHardware> Hardware { get; }
+        void IVisitor.VisitComputer(IComputer computer)
+        {
+            computer.Traverse(this);
+        }
 
-		#endregion Public Properties
+        void IVisitor.VisitHardware(IHardware hardware)
+        {
+            hardware.Update();
 
-		#region Public Methods
+            foreach (IHardware subHardware in hardware.SubHardware) subHardware.Accept(this);
+            foreach (ISensor sensor in hardware.Sensors) sensor.Accept(this);
+        }
 
-		public void PollingStarted(HardwareMonitor.Monitor.Config.Computer config) { }
-		public void PollingFinished(HardwareMonitor.Monitor.Config.Computer config) { }
+        void IVisitor.VisitSensor(ISensor sensor)
+        {
+            foreach (IParameter parameter in sensor.Parameters) parameter.Accept(this);
+        }
 
-		#endregion Public Methods
-	}
+        void IVisitor.VisitParameter(IParameter parameter)
+        {
+        }
+
+        #endregion IVisitor
+    }
 }

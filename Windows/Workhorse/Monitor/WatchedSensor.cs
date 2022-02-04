@@ -28,6 +28,9 @@ namespace HardwareMonitor
 		Motherboard,
 		Network,
 		Storage,
+		Cooler,
+		EmbeddedController,
+		SuperIO,
 
 		Software,
 
@@ -40,6 +43,10 @@ namespace HardwareMonitor
 		Clock,
 		Load,
 		Temperature,
+		Voltage,
+		Current,
+		Power,
+		Fan,
 
 		Data,
 

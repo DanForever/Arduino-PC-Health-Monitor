@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -101,9 +102,21 @@ namespace HardwareMonitor.Monitor.Synchronous
 			return _data.Snapshot;
 		}
 
+		public static void Dump(StreamWriter stream, IEnumerable<Plugin.ISource> sources)
+		{
+			Config.DummyComputer dummyConfig = new Config.DummyComputer();
+
+			foreach (Plugin.ISource source in sources)
+			{
+				source.PollingStarted(dummyConfig);
+					DumpHardware(stream, source.Hardware);
+				source.PollingFinished(dummyConfig);
+			}
+		}
+
 		#endregion Public Methods
 
-		#region Plugins
+		#region Polling
 
 		private static void PollPlugins(PollData data)
 		{
@@ -173,7 +186,36 @@ namespace HardwareMonitor.Monitor.Synchronous
 		}
 
 
-		#endregion Plugins
+		#endregion Polling
+
+		#region Dump
+
+		private static void DumpHardware(StreamWriter stream, IEnumerable<Plugin.IHardware> hardware, string prefix = "")
+		{
+			foreach (Plugin.IHardware hardwareItem in hardware)
+			{
+				stream.WriteLine($"{prefix}Hardware:");
+				stream.WriteLine($"{prefix} - Name: {hardwareItem.Name}");
+				stream.WriteLine($"{prefix} - Type: {hardwareItem.Type}");
+
+				DumpHardware(stream, hardwareItem.Hardware, $"{prefix}  ");
+				DumpSensors(stream, hardwareItem.Sensors, $"{prefix}  ");
+			}
+		}
+
+
+		private static void DumpSensors(StreamWriter stream, IEnumerable<Plugin.ISensor> sensors, string prefix)
+		{
+			foreach (Plugin.ISensor sensor in sensors)
+			{
+				stream.WriteLine($"{prefix}Sensor:");
+				stream.WriteLine($"{prefix} - Name: {sensor.Name}");
+				stream.WriteLine($"{prefix} - Type: {sensor.Type}");
+				stream.WriteLine($"{prefix} -Value: {sensor.Value}");
+			}
+		}
+
+		#endregion Dump
 
 		#region Private Methods
 

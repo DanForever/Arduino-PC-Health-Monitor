@@ -149,7 +149,7 @@ namespace HardwareMonitor.Monitor.Config
 
 		#region Public Methods
 
-		public bool IsHardwareSpecified(HardwareType type)
+		public virtual bool IsHardwareSpecified(HardwareType type)
 		{
 			return Hardware.Exists((Component component) => component.Type == type);
 		}
@@ -209,5 +209,20 @@ namespace HardwareMonitor.Monitor.Config
 		}
 
 		#endregion Public Methods
+	}
+
+	/// <summary>
+	/// Pretends to request all data types so that we can dump a complete list of statistics to a file or string
+	/// </summary>
+	internal class DummyComputer : Computer
+	{
+		#region Computer
+
+		public override bool IsHardwareSpecified(HardwareType type)
+		{
+			return true;
+		}
+
+		#endregion Computer
 	}
 }

@@ -18,6 +18,7 @@
             <ContextMenu>
                 <MenuItem Header="Update available!" Command="{Binding UpdateAvailableCommand}" Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource booleanToVisibilityConverter}}" />
                 <MenuItem Header="Run on Startup" Command="{Binding ToggleRunOnStartupCommand}" IsChecked="{Binding WillRunOnStartup, Mode=OneWay}" IsCheckable="true" />
+                <MenuItem Header="Write metrics snapshot to file" Command="{Binding DumpMetricsCommand}" />
                 <MenuItem Header="Quit" Command="{Binding ExitApplicationCommand}" />
             </ContextMenu>
         </tb:TaskbarIcon.ContextMenu>

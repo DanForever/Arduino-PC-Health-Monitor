@@ -57,6 +57,8 @@ namespace HardwareMonitor
 
 		public IEnumerable<Device> Devices => _devices;
 
+		public IEnumerable<Plugin.ISource> Sources => _pluginManager.Sources;
+
 		#endregion Public Properties
 
 		#region Events

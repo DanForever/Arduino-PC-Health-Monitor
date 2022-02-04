@@ -22,6 +22,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
+using Microsoft.Win32;
+
 using Reg = Microsoft.Win32;
 using TS = Microsoft.Win32.TaskScheduler;
 
@@ -139,6 +141,8 @@ namespace HardwareMonitor.NotifyIcon
 
 	static class AppUpdater
 	{
+		#region Public Methods
+
 		public static async void Update()
 		{
 			if (MessageBox.Show("Download and install the latest verion of Dan's open source hardware health monitor?\nThis will cause the program to exit.", "Update?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes)
@@ -147,6 +151,49 @@ namespace HardwareMonitor.NotifyIcon
 				App.Application.Program.RequestExit = true;
 			}
 		}
+
+		#endregion Public Methods
+	}
+
+	static class MetricsDumper
+	{
+		#region Public Methods
+
+		public static void Dump()
+		{
+			// The save file dialog immediately closes because it doesn't have a parent window
+			// Since our application is technically windowless (just a systray icon), we need
+			// to use this hack instead. Create an invisible window to act as parent for the
+			// lifetime of the save dialog
+			Window window = new()
+			{
+				Width = 0,
+				Height = 0,
+				WindowStyle = WindowStyle.None,
+				ShowInTaskbar = false,
+				ShowActivated = false
+			};
+			window.Show();
+
+			SaveFileDialog dialog = new();
+
+			// @todo: Right now we just dump the data in a human readable format, but we could offer other formats, xml, json?
+			dialog.Filter = "txt files (*.txt)|*.txt";
+			dialog.OverwritePrompt = true;
+			dialog.Title = "Dump metrics to the selected file";
+
+			if(dialog.ShowDialog(window) == true)
+			{
+				using (StreamWriter stream = new StreamWriter(dialog.FileName))
+				{
+					Monitor.Synchronous.Watcher.Dump(stream, App.Application.Program.Sources);
+				}
+			}
+
+			window.Close();
+		}
+
+		#endregion Public Methods
 	}
 
 	class NotifyIconViewModel
@@ -156,6 +203,7 @@ namespace HardwareMonitor.NotifyIcon
 		private ICommand _updateAvailableCommand = new DelegateCommand { CommandAction = () => AppUpdater.Update(), CanExecuteFunc = () => Releases.Releases.CompanionAppUpdateAvailable };
 		private ICommand _exitApplicationCommand = new DelegateCommand { CommandAction = () => { ((App)Application.Current).Program.RequestExit = true; } };
 		private ICommand _toggleRunOnStartupCommand = new DelegateCommand { CommandAction = TaskScheduler.ToggleRunOnStartup };
+		private ICommand _dumpMetricsCommand = new DelegateCommand { CommandAction = MetricsDumper.Dump };
 
 		#endregion Private Fields
 
@@ -164,6 +212,7 @@ namespace HardwareMonitor.NotifyIcon
 		public ICommand UpdateAvailableCommand => _updateAvailableCommand;
 		public ICommand ExitApplicationCommand => _exitApplicationCommand;
 		public ICommand ToggleRunOnStartupCommand => _toggleRunOnStartupCommand;
+		public ICommand DumpMetricsCommand => _dumpMetricsCommand;
 		public bool WillRunOnStartup => TaskScheduler.TaskExists();
 
 		#endregion Public Properties

@@ -1,7 +1,7 @@
 #ifndef __COMPONENT_H__
 #define __COMPONENT_H__
 
-#include "../Screen.h"
+#include "../Screen/Screen.h"
 #include "../Comms.h"
 
 struct Position

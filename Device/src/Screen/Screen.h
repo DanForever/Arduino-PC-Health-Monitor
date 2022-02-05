@@ -1,7 +1,7 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-#include "IdentityImplementation.h"
+#include "../IdentityImplementation.h"
 
 #define ILI9341_SILVER      0xA510
 
@@ -23,6 +23,19 @@ public:
 		m_tft.begin();
 		FillScreen(ILI9341_BLACK);
 	}
+
+	void Sleep()
+	{
+		m_tft.sleep(true);
+	}
+
+	void Wakeup()
+	{
+		m_tft.sleep(false);
+	}
+
+	int16_t Width() const { return m_tft.width(); }
+	int16_t Height() const { return m_tft.height(); }
 
 	void SetOffset(int16_t x, int16_t y)
 	{
@@ -47,9 +60,9 @@ public:
 		m_tft.setRotation((int)rotation);
 	}
 
-	void FillScreen(uint16_t color)
+	void FillScreen(uint16_t colour)
 	{
-		m_tft.fillScreen(color);
+		m_tft.fillScreen(colour);
 	}
 
 	void FillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t colour)
@@ -72,6 +85,8 @@ public:
 		m_tft.writeRect(x + m_xOffset, y + m_yOffset, width, height, colours);
 	}
 
+	void SetTextColour(uint16_t foreground, uint16_t background) { m_tft.setTextColor(foreground, background); }
+	void SetTextColour(uint16_t colour) { m_tft.setTextColor(colour); }
 	void SetTextSize(uint8_t size) { m_tft.setTextSize(size); }
 	void SetCursor(int16_t x, int16_t y)
 	{
@@ -87,7 +102,7 @@ public:
 	uint16_t MeasureTextHeight(const char* text) { return m_tft.measureTextHeight(text); }
 
 private:
-	ScreenApi m_tft;
+	mutable ScreenApi m_tft;
 	int16_t m_xOffset;
 	int16_t m_yOffset;
 };

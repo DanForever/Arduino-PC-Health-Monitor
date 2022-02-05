@@ -3,7 +3,8 @@
 
 #include "src/PacketType.h"
 
-#include "src/Screen.h"
+#include "src/Screen/Screen.h"
+#include "src/Screen/PrintUtils.h"
 #include "src/Comms.h"
 #include "src/Components/Component.h"
 
@@ -16,14 +17,67 @@ Comms comms;
 
 std::vector<Module*> Modules;
 
+unsigned long disconnectedTimestamp = 0;
+bool isScreenOn = false;
+
+static const int HIBERNATION_TIMEOUT_MILLISECONDS = 15 * 1000;
+char hibernationCountdownBuffer[4] = "";
+Printer hibernationCountdownPrinter(&screen);
+
+void PrintHibernateCountdown(unsigned long timeSpentDisconnected)
+{
+	int timeRemaining = (HIBERNATION_TIMEOUT_MILLISECONDS - timeSpentDisconnected) / 1000;
+	snprintf(hibernationCountdownBuffer, 4, "%i", timeRemaining);
+
+	screen.ClearOffset();
+	screen.SetTextSize(5);
+
+	Settings settings;
+	settings.TextSize = 5;
+	settings.Horizontal = HorizontalAlignment::Centre;
+	settings.Vertical = VerticalAlignment::Centre;
+
+	hibernationCountdownPrinter.Print(hibernationCountdownBuffer, screen.Width() / 2, screen.Height() / 2, settings);
+}
+
+void TurnScreenOn()
+{
+	// Turn the screen on
+	screen.Wakeup();
+
+	// Turn the LED backlight on
+	digitalWrite(8, HIGH);
+
+	isScreenOn = true;
+}
+
+void TurnScreenOff()
+{
+	// Turn the backlight off
+	digitalWrite(8, LOW);
+
+	// Put the screen into low power sleep mode
+	screen.Sleep();
+
+	isScreenOn = false;
+}
+
 bool HandleDisconnection()
 {
 	static bool connected = true;
 
 	if (::Serial)
 	{
+		// We are connected
 		if (!connected)
 		{
+			// Have have, just this frame, [re]connected
+			if (!isScreenOn)
+			{
+				TurnScreenOn();
+				delay(10);
+			}
+
 			connected = true;
 
 			Modules.clear();
@@ -34,16 +88,34 @@ bool HandleDisconnection()
 	}
 	else
 	{
+		// We are disconnected
 		if (connected)
 		{
+			// We have only just disconnected
 			connected = false;
+			disconnectedTimestamp = millis();
 
 			screen.FillScreen(ILI9341_BLACK);
 			screen.ClearOffset();
 		}
 
-		screen.SetCursor(0, 0);
-		screen.Print("Companion app not detected...");
+		if (isScreenOn)
+		{
+			const unsigned long now = millis();
+
+			const unsigned long timeSpentDisconnected = now - disconnectedTimestamp;
+			if (timeSpentDisconnected > HIBERNATION_TIMEOUT_MILLISECONDS)
+			{
+				TurnScreenOff();
+			}
+			else
+			{
+				screen.SetTextSize(1);
+				screen.SetCursor(0, 0);
+				screen.Print("Companion app not detected...");
+				PrintHibernateCountdown(timeSpentDisconnected);
+			}
+		}
 
 		return true;
 	}
@@ -130,8 +202,12 @@ void HandleModuleUpdate(Message& message)
 
 void setup()
 {
+	pinMode(8, OUTPUT);
+
 	screen.Initialize();
 	screen.FillScreen(ILI9341_BLACK);
+
+	TurnScreenOn();
 }
 
 void loop()

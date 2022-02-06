@@ -3,8 +3,6 @@
 
 #include "../IdentityImplementation.h"
 
-#define ILI9341_SILVER      0xA510
-
 class Screen
 {
 public:

@@ -19,7 +19,7 @@ public:
 	void Initialize()
 	{
 		m_tft.begin();
-		FillScreen(ILI9341_BLACK);
+		FillScreen(COLOUR_BLACK);
 	}
 
 	void Sleep()

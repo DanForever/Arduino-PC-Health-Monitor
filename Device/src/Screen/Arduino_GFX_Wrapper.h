@@ -15,11 +15,25 @@
 #	error Platform pins not defined for Arduino GFX Library
 #endif
 
-#define ILI9341_WHITE WHITE
-#define ILI9341_BLACK BLACK
-#define ILI9341_BLUE BLUE
-#define ILI9341_GREEN GREEN
-#define ILI9341_YELLOW YELLOW
+#define COLOUR_BLACK       BLACK
+#define COLOUR_NAVY        NAVY
+#define COLOUR_DARKGREEN   DARKGREEN
+#define COLOUR_DARKCYAN    DARKCYAN
+#define COLOUR_MAROON      MAROON
+#define COLOUR_PURPLE      PURPLE
+#define COLOUR_OLIVE       OLIVE
+#define COLOUR_LIGHTGREY   LIGHTGREY
+#define COLOUR_DARKGREY    DARKGREY
+#define COLOUR_BLUE        BLUE
+#define COLOUR_GREEN       GREEN
+#define COLOUR_CYAN        CYAN
+#define COLOUR_RED         RED
+#define COLOUR_MAGENTA     MAGENTA
+#define COLOUR_YELLOW      YELLOW
+#define COLOUR_WHITE       WHITE
+#define COLOUR_ORANGE      ORANGE
+#define COLOUR_GREENYELLOW GREENYELLOW
+#define COLOUR_PINK        PINK
 
 template <typename BusType, typename ScreenType>
 class ArduinoGfx

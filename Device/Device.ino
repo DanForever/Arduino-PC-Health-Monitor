@@ -81,7 +81,7 @@ bool HandleDisconnection()
 			connected = true;
 
 			Modules.clear();
-			screen.FillScreen(ILI9341_BLACK);
+			screen.FillScreen(COLOUR_BLACK);
 		}
 
 		return false;
@@ -95,7 +95,7 @@ bool HandleDisconnection()
 			connected = false;
 			disconnectedTimestamp = millis();
 
-			screen.FillScreen(ILI9341_BLACK);
+			screen.FillScreen(COLOUR_BLACK);
 			screen.ClearOffset();
 		}
 
@@ -205,7 +205,7 @@ void setup()
 	pinMode(8, OUTPUT);
 
 	screen.Initialize();
-	screen.FillScreen(ILI9341_BLACK);
+	screen.FillScreen(COLOUR_BLACK);
 
 	TurnScreenOn();
 }

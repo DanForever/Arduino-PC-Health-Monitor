@@ -23,7 +23,7 @@ void Module::Draw()
 	{
 		if (component->HasChanged())
 		{
-			component->Clear(GetScreen(), ILI9341_BLACK);
+			component->Clear(GetScreen(), COLOUR_BLACK);
 			component->Draw(GetScreen());
 		}
 	}

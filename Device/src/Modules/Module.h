@@ -14,7 +14,7 @@ public:
 	virtual ~Module();
 
 	void Draw();
-	void Clear(uint16_t clearColour = ILI9341_BLACK);
+	void Clear(uint16_t clearColour = COLOUR_BLACK);
 
 	void SetNumComponents(uint8_t count);
 	void AddComponent(Component* component);

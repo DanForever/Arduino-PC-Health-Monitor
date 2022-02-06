@@ -24,8 +24,8 @@ struct Settings
 	HorizontalAlignment Horizontal = HorizontalAlignment::Left;
 	VerticalAlignment Vertical = VerticalAlignment::Top;
 
-	uint16_t Foreground = ILI9341_WHITE;
-	uint16_t Background = ILI9341_BLACK;
+	uint16_t Foreground = COLOUR_WHITE;
+	uint16_t Background = COLOUR_BLACK;
 };
 
 // This is a special helper class designed to reduce flicker when printing string values to the screen

@@ -16,7 +16,7 @@ The hardware monitor is comprised of two parts:
 ## Features
 - Support for Teensy 3.2 and 4.0
 - Support for ILI9341 TFT modules (320x240 resolution)
-- Support for ILI9488 TFT modules (480x320 resolution)
+- Support for ILI9486 and ILI9488 TFT modules (480x320 resolution)
 - Gathered metrics and screen layouts are configurable through xml
 - The companion app can be extended to offer additional metrics through a simple plugin architecture
 - Multiple devices can be plugged in at once (if you so want)
@@ -49,7 +49,6 @@ Once you hooked up the device, you'll need to flash the firmware onto it. For no
 ## Planned Features
 - Device Flashing from the companion app (basically make the companion app capable of updating the device firmware)
 - Support for the Seeediuno Xiao microcontroller
-- Support for ILI9486
 - User layouts and configs
 - Allow the user to change the layout from the companion app
 - Layout designer

@@ -98,9 +98,9 @@ jobs:
 
     - name: Insert Teensy loader cli into installer
       uses: actions/download-artifact@v2
-        with:
-          name: teensy-loader-cli
-          path: ./Windows/External
+      with:
+        name: teensy-loader-cli
+        path: ./Windows/External
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}

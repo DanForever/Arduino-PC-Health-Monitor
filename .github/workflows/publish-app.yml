@@ -45,6 +45,8 @@ jobs:
       - name: Build Teensy Loader CLI
         id: build-step
         uses: ./.github/workflows/build-teensy-loader-cli
+        with:
+          token: ${{ secrets.TEENSY_LOADER_CLI_SOURCE_PAT }}
       - name: Store Teensy loader cli binary as asset
         uses: actions/upload-artifact@v2
         with:

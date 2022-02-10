@@ -15,6 +15,9 @@ inputs:
     description: The filepath of the resulting executable
     required: false
     default: "./teensy_loader_cli.exe"
+  token:
+    description: secret token required to checkout an external repository
+    required: true
 
 outputs:
   binary-path:
@@ -34,7 +37,7 @@ runs:
         repository: PaulStoffregen/teensy_loader_cli
         ref: ${{ inputs.version }}
         path: ${{ inputs.local_source_path }}
-        token: ${{ secrets.TEENSY_LOADER_CLI_SOURCE_PAT }}
+        token: ${{ inputs.token }}
       
     - shell: bash
       name: Fix broken include paths for windows

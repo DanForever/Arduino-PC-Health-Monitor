@@ -1,0 +1,46 @@
+name: Build Teensy Loader CLI
+
+description: Grab the Teensy loader cli source and build it (binaries are not provided)
+
+outputs:
+  binary-path:
+    description: Path to the compiled binary
+    value: ${{ steps.binary-path.outputs.binary-path }}
+
+runs:
+  using: "composite"
+  env:
+    version: "2.2"
+    local_source_path: "teensy_loader_cli_source"
+    path: "./teensy_loader_cli.exe"
+  steps:
+    - shell: bash
+      name: Install MingW
+      run: sudo apt-get -q -y install mingw-w64
+      
+    - name: Download Teensy Loader CLI Source
+      uses: actions/checkout@v2
+      with:
+        repository: PaulStoffregen/teensy_loader_cli
+        ref: ${{ env.version }}
+        path: ${{ env.local_source_path }}
+        token: ${{ secrets.TEENSY_LOADER_CLI_SOURCE_PAT }}
+      
+    - shell: bash
+      name: Fix broken include paths for windows
+      run: |
+        sed -i 's/<ddk\/hidsdi/<hidsdi/g' ${{ env.local_source_path }}/teensy_loader_cli.c
+        sed -i 's/<ddk\/hidclass/<hidclass/g' ${{ env.local_source_path }}/teensy_loader_cli.c
+        
+    - shell: bash
+      name: Compile
+      run: x86_64-w64-mingw32-gcc -O2 -Wall -s -DUSE_WIN32 -o ${{ env.path }} ${{ env.local_source_path }}/teensy_loader_cli.c -lhid -lsetupapi -lwinmm
+    
+    - id: binary-path
+      shell: bash
+      name: Output binary Path
+      run: |
+        echo "::set-output name=binary-path::$(echo ${{ env.path }})"
+
+    - shell: bash
+      run: echo $(ls -lh)

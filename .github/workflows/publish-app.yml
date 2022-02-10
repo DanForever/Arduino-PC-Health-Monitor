@@ -36,10 +36,23 @@ jobs:
     outputs:
       release-id: ${{ steps.create_release.outputs.id }}
       release-url: ${{ steps.create_release.outputs.upload_url }}
-      
+
+  build-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Teensy Loader CLI
+        id: build-step
+        uses: ./.github/workflows/build-teensy-loader-cli
+      - name: Store Teensy loader cli binary as asset
+        uses: actions/upload-artifact@v2
+        with:
+          name: teensy-loader-cli
+          path: ${{ steps.build-step.outputs.binary-path }}
+          retention-days: 1
+
   build-and-upload:
     runs-on: windows-latest
-    needs: create-draft-release
+    needs: [create-draft-release, build-tools]
     strategy:
       matrix:
         build-platform: ["x86", "x64"]
@@ -82,6 +95,12 @@ jobs:
     - name: Apply Version Number to the Installer
       shell: bash
       run: sed -i 's/<?define MyProductVersion = "0\.0\.1" ?>/<?define MyProductVersion = "${{ github.event.inputs.version }}" ?>/g' ./Windows/Installer/product.wxs
+
+    - name: Insert Teensy loader cli into installer
+      uses: actions/download-artifact@v2
+        with:
+          name: teensy-loader-cli
+          path: ./Windows/External
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}

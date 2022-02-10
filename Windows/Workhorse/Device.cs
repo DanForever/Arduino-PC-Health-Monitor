@@ -17,6 +17,7 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -78,9 +79,7 @@ namespace HardwareMonitor
 		private eScreen _screen = eScreen.Unknown;
 		private eResolution _resolution = eResolution.Unknown;
 
-		private int _versionMajor;
-		private int _versionMinor;
-		private int _versionPatch;
+		private Version _version;
 
 		#endregion Private Fields
 
@@ -112,7 +111,7 @@ namespace HardwareMonitor
 		public eResolution Resolution => _resolution;
 		public Orientation Orientation => Orientation.Vertical;
 
-		public string Version => $"{_versionMajor}.{_versionMinor}.{_versionPatch}";
+		public Version Version => _version;
 
 		#endregion Public Properties
 
@@ -232,9 +231,7 @@ namespace HardwareMonitor
 					break;
 
 				case PacketType.Version:
-					_versionMajor = data[1];
-					_versionMinor = data[2];
-					_versionPatch = data[3];
+					_version =  new(data[1], data[2], data[3]);
 					break;
 			}
 		}

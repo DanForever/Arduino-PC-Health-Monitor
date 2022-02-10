@@ -17,9 +17,11 @@
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -35,10 +37,14 @@ namespace HardwareMonitor.QuickInfo
 
 		#region Public Properties
 
+		public Device Device => _device;
+
 		public string Port => _device.Connection.Name;
 		public string Layout => _device.Layout?.Name ?? "No Layout set";
 		public Orientation Orientation => _device.Orientation;
-		public string Version => _device.Version;
+		public Version Version => _device.Version;
+		public bool UpdateAvailable => Version < Releases.Releases.LatestDeviceVersionAvailable;
+		public Version UpdateAvailableVersion => Releases.Releases.LatestDeviceVersionAvailable;
 
 		#endregion Public Properties
 
@@ -102,6 +108,13 @@ namespace HardwareMonitor.QuickInfo
 		{
 			DeviceInfo deviceInfo = Devices.First(d => d.Port == device.Connection.Name);
 			Devices.Remove(deviceInfo);
+		}
+
+		private async void UpdateFirmware(object sender, RoutedEventArgs e)
+		{
+			Button button = (Button)sender;
+
+			await Releases.Releases.UpdateDeviceFirmware(((DeviceInfo)button.DataContext).Device);
 		}
 
 		#endregion Event Handlers

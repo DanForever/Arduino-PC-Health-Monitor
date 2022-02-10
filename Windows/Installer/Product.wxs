@@ -20,6 +20,10 @@
 			<!-- The actual binaries and associated files are automatically gathered using "heat", found in the "publishandharvest" targets file -->
 			<ComponentGroupRef Id="HarvestedFiles" />
 
+			<?ifdef TeensyLoaderCli ?>
+				<ComponentGroupRef Id="TeensyLoaderCli" />
+			<?endif?>
+			
 			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
 
@@ -37,7 +41,16 @@
 		<Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch the hardware monitor companion app" />
 		<Property Id="WixShellExecTarget" Value="[#Frontend.exe]" />
 		<CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+		<!-- Create the icon that we'll use for the start menu icon and other related places -->
+		<Icon Id="ApplicationIcon" SourceFile="$(var.Frontend.ProjectDir)Images\thermometer.ico" />
 		
+		<!-- Set the icon for the app listing in add/remove programs -->
+		<Property Id="ARPPRODUCTICON" Value="ApplicationIcon" />
+
+		<!-- This property ensures that the install location is listed for the app in add/remove programs -->
+		<SetProperty Id="ARPINSTALLLOCATION" Value="[APPLICATIONROOTDIRECTORY]" After="CostFinalize" />
+
 	</Product>
 
 	<!-- Directory structure -->
@@ -58,14 +71,30 @@
 
 	<!-- Start menu Shortcuts -->
 	<Fragment>
-		<Icon Id="StartMenuIcon" SourceFile="$(var.Frontend.ProjectDir)Images\thermometer.ico" />
-		
 		<DirectoryRef Id="ApplicationProgramsFolder">
 			<Component Id="ApplicationShortcut" Guid="{9764DED9-13EE-4A06-B84B-C9EB918C0257}">
-				<Shortcut Id="ApplicationStartMenuShortcut" Name="$(var.MyProductName)" Description="The companion app that monitors the PC's health and sends the data to the device" Target="[#Frontend.exe]" Icon="StartMenuIcon" WorkingDirectory="APPLICATIONROOTDIRECTORY" />
+				<Shortcut Id="ApplicationStartMenuShortcut" Name="$(var.MyProductName)" Description="The companion app that monitors the PC's health and sends the data to the device" Target="[!Frontend.exe]" Icon="ApplicationIcon" WorkingDirectory="APPLICATIONROOTDIRECTORY" />
 				<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
 				<RegistryValue Root="HKCU" Key="Software\DanForever\DanHWMon" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
 			</Component>
 		</DirectoryRef>
 	</Fragment>
+
+	<!-- Teensy Loader CLI (External tool) -->
+	<?ifdef TeensyLoaderCli ?>
+	<?warning Teensy loader detected ?>
+		<Fragment>
+			<DirectoryRef Id="APPLICATIONROOTDIRECTORY">
+				<Directory Id="ExternalTools" Name="Tools" />
+			</DirectoryRef>
+
+			<ComponentGroup Id="TeensyLoaderCli">
+				<Component Id="teensy_loader_cli.exe" Directory="ExternalTools" Guid="{CEE21A5B-7EAF-4DB4-A24B-0F9C8068F298}">
+					<File Id="teensy_loader_cli.exe" KeyPath="yes" Source="$(var.TeensyLoaderCli)" />
+				</Component>
+			</ComponentGroup>
+		</Fragment>
+	<?else?>
+		<?warning Teensy loader not found ?>
+	<?endif?>
 </Wix>

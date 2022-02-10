@@ -23,7 +23,6 @@ outputs:
 
 runs:
   using: "composite"
-  inputs:
   steps:
     - shell: bash
       name: Install MingW

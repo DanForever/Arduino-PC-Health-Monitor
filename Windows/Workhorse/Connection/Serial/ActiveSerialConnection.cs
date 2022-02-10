@@ -58,6 +58,11 @@ namespace HardwareMonitor.Connection.Serial
 			}
 		}
 
+		void Connection.ActiveConnection.Disconnect()
+		{
+			_serialPort.Close();
+		}
+
 		#endregion Connection.ActiveConnection
 
 		#region C-Tor

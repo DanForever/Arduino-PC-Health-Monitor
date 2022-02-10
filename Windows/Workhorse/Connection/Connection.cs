@@ -55,6 +55,8 @@ namespace HardwareMonitor.Connection
 
 		public void Send(byte[] data);
 
+		public void Disconnect();
+
 		#endregion Interface Methods
 	}
 }

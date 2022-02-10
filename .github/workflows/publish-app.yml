@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version number to apply to the binaries and installer
+        description: Version number to apply to the companion app assemblies and installer
         required: true
   
 env:

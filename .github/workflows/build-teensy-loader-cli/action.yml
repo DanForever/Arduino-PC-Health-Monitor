@@ -2,6 +2,20 @@ name: Build Teensy Loader CLI
 
 description: Grab the Teensy loader cli source and build it (binaries are not provided)
 
+inputs:
+  version:
+    description: Version tag of the teensy_loader_cli source to checkout
+    required: false
+    default: "2.2"
+  local_source_path:
+    description: Where to checkout the source code to
+    required: false
+    default: "teensy_loader_cli_source"
+  path:
+    description: The filepath of the resulting executable
+    required: false
+    default: "./teensy_loader_cli.exe"
+
 outputs:
   binary-path:
     description: Path to the compiled binary
@@ -9,10 +23,7 @@ outputs:
 
 runs:
   using: "composite"
-  env:
-    version: "2.2"
-    local_source_path: "teensy_loader_cli_source"
-    path: "./teensy_loader_cli.exe"
+  inputs:
   steps:
     - shell: bash
       name: Install MingW
@@ -22,25 +33,25 @@ runs:
       uses: actions/checkout@v2
       with:
         repository: PaulStoffregen/teensy_loader_cli
-        ref: ${{ env.version }}
-        path: ${{ env.local_source_path }}
+        ref: ${{ inputs.version }}
+        path: ${{ inputs.local_source_path }}
         token: ${{ secrets.TEENSY_LOADER_CLI_SOURCE_PAT }}
       
     - shell: bash
       name: Fix broken include paths for windows
       run: |
-        sed -i 's/<ddk\/hidsdi/<hidsdi/g' ${{ env.local_source_path }}/teensy_loader_cli.c
-        sed -i 's/<ddk\/hidclass/<hidclass/g' ${{ env.local_source_path }}/teensy_loader_cli.c
+        sed -i 's/<ddk\/hidsdi/<hidsdi/g' ${{ inputs.local_source_path }}/teensy_loader_cli.c
+        sed -i 's/<ddk\/hidclass/<hidclass/g' ${{ inputs.local_source_path }}/teensy_loader_cli.c
         
     - shell: bash
       name: Compile
-      run: x86_64-w64-mingw32-gcc -O2 -Wall -s -DUSE_WIN32 -o ${{ env.path }} ${{ env.local_source_path }}/teensy_loader_cli.c -lhid -lsetupapi -lwinmm
+      run: x86_64-w64-mingw32-gcc -O2 -Wall -s -DUSE_WIN32 -o ${{ inputs.path }} ${{ inputs.local_source_path }}/teensy_loader_cli.c -lhid -lsetupapi -lwinmm
     
     - id: binary-path
       shell: bash
       name: Output binary Path
       run: |
-        echo "::set-output name=binary-path::$(echo ${{ env.path }})"
+        echo "::set-output name=binary-path::$(echo ${{ inputs.path }})"
 
     - shell: bash
       run: echo $(ls -lh)

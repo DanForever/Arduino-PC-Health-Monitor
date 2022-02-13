@@ -38,6 +38,8 @@ namespace HardwareMonitor
 		// Connected devices
 		private List<Device> _devices = new List<Device>();
 
+		private bool _OSInSleepState = false;
+
 		private Layout.LayoutManager _layoutManager = new Layout.LayoutManager();
 
 		#endregion Private fields
@@ -54,6 +56,27 @@ namespace HardwareMonitor
 		/// Set this to true when you want the application to end
 		/// </summary>
 		public bool RequestExit { get; set; } = false;
+
+		/// <summary>
+		/// The frontend (i.e. platform specific) project needs to monitor the OS sleep state
+		/// and update this boolean accordingly, to ensure that the devices sleep as well
+		/// </summary>
+		public bool OSInSleepState
+		{
+			get { return _OSInSleepState; }
+			set
+			{
+				_OSInSleepState = value;
+				if(_OSInSleepState)
+				{
+					// Disconnect all devices
+					foreach (Device device in Devices)
+					{
+						device.Connection.Disconnect();
+					}
+				}
+			}
+		}
 
 		public IEnumerable<Device> Devices => _devices;
 
@@ -153,6 +176,10 @@ namespace HardwareMonitor
 		{
 			// First remove any connections that are no longer valid
 			_devices.RemoveAll(device => ShouldRemoveDevice(device));
+
+			// If the OS is asleep, don't continue any further
+			if (OSInSleepState)
+				return;
 
 			// Now check for any new connections we can make
 			var availableConnections = Connection.Connections.Enumerate();

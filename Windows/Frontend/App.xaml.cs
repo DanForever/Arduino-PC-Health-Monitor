@@ -21,6 +21,8 @@ using System.Windows;
 
 using Hardcodet.Wpf.TaskbarNotification;
 
+using Microsoft.Win32;
+
 namespace HardwareMonitor
 {
 	public partial class App : Application
@@ -49,10 +51,26 @@ namespace HardwareMonitor
 			//initialize NotifyIcon
 			_tb = (TaskbarIcon)FindResource("MyNotifyIcon");
 
+			SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+
 			// Run the application
 			int retcode = await Program.Run();
 
 			Shutdown(retcode);
+		}
+
+		private void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+		{
+			switch(e.Mode)
+			{
+			case PowerModes.Suspend:
+				Program.OSInSleepState = true;
+				break;
+
+			case PowerModes.Resume:
+				Program.OSInSleepState = false;
+				break;
+			}
 		}
 
 		#endregion Event Handlers

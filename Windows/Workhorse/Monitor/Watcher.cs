@@ -136,10 +136,11 @@ namespace HardwareMonitor.Monitor.Synchronous
 				if (watchedHardware == null)
 					continue;
 
-				data.Snapshot.HardwareSamples.Add(new HardwareSample() { Component = watchedHardware, Name = hardwareItem.Name });
-
 				if (!string.IsNullOrWhiteSpace(watchedHardware.CaptureName))
-					data.Snapshot.Captures[watchedHardware.CaptureName] = new Capture() { Name = watchedHardware.CaptureName, Value = hardwareItem.Name };
+				{
+					Capture capture = new Capture(watchedHardware, hardwareItem);
+					data.Snapshot.Captures[capture.Name] = capture;
+				}
 
 				PollSensors(hardwareItem, data);
 			}
@@ -162,10 +163,11 @@ namespace HardwareMonitor.Monitor.Synchronous
 			if (watchedSensor == null)
 				return;
 
-			data.Snapshot.SensorSamples.Add(new SensorSample() { Sensor = watchedSensor, Name = sensor.Name, Value = sensor.Value });
-
 			if (!string.IsNullOrWhiteSpace(watchedSensor.CaptureName))
-				data.Snapshot.Captures.Add(watchedSensor.CaptureName, new Capture() { Name = watchedSensor.CaptureName, Value = sensor.Value });
+			{
+				Capture capture = new Capture(watchedSensor, sensor);
+				data.Snapshot.Captures[capture.Name] = capture;
+			}
 		}
 
 		private static void CheckCompoundSensor(Plugin.ISensor sensor, PollData data)
@@ -243,7 +245,8 @@ namespace HardwareMonitor.Monitor.Synchronous
 
 				float result = instance.Calculate(from sample in compoundSensorData.Samples select sample.Value);
 
-				data.Snapshot.Captures.Add(compoundSensorData.Sensor.CaptureName, new Capture() { Name = compoundSensorData.Sensor.CaptureName, Value = result });
+				Capture capture = new Capture(compoundSensorData.Sensor.CaptureName, result);
+				data.Snapshot.Captures[capture.Name] = capture;
 			}
 		}
 

@@ -25,10 +25,37 @@ namespace HardwareMonitor.Monitor.Config
 {
 	public abstract class CaptureDescriptor
 	{
+		#region Private fields
+
+		private Regex _nameRegex = null;
+
+		#endregion Private fields
+
 		#region Public Properties
 
+		/// <summary>
+		/// The name of the hardware or sensor to look for. Regex (where appropriate)
+		/// </summary>
+		[XmlAttribute()]
+		public string Name { get; set; }
+
+		/// <summary>
+		/// A unique Id used to identify this captured value from the layouts xml. Regex
+		/// </summary>
 		[XmlAttribute("CaptureAs")]
 		public string CaptureName { get; set; }
+
+		[XmlIgnore()]
+		public Regex NameRegex
+		{
+			get
+			{
+				if (_nameRegex == null)
+					_nameRegex = new Regex(Name);
+
+				return _nameRegex;
+			}
+		}
 
 		#endregion Public Properties
 	}
@@ -48,19 +75,7 @@ namespace HardwareMonitor.Monitor.Config
 	/// </summary>
 	public class Sensor : CaptureDescriptor
 	{
-		#region Private fields
-
-		private Regex _nameRegex = null;
-		
-		#endregion Private fields
-
 		#region Public Properties
-
-		/// <summary>
-		/// The name of the sensor to look for. Regex
-		/// </summary>
-		[XmlAttribute()]
-		public string Name { get; set; }
 
 		/// <summary>
 		/// The type of hardware the sensor is tied to
@@ -74,18 +89,6 @@ namespace HardwareMonitor.Monitor.Config
 		[XmlAttribute()]
 		public SensorType Type { get; set; }
 
-		[XmlIgnore()]
-		public Regex NameRegex
-		{
-			get
-			{
-				if (_nameRegex == null)
-					_nameRegex = new Regex(Name);
-
-				return _nameRegex;
-			}
-		}
-
 		#endregion Public Properties
 	}
 
@@ -98,15 +101,6 @@ namespace HardwareMonitor.Monitor.Config
 		#endregion Private fields
 
 		#region Public Properties
-
-		/// <summary>
-		/// User defined name
-		/// </summary>
-		/// <remarks>
-		/// The compount sensor will appear as a regular sensor in the snapshot, so this is used as the display name
-		/// </remarks>
-		[XmlAttribute()]
-		public string Name { get; set; }
 
 		/// <summary>
 		/// How the values of all the sensors will be aggregated

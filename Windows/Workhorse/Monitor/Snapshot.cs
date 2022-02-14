@@ -85,6 +85,27 @@ namespace HardwareMonitor.Monitor
 		public dynamic Value { get; set; }
 
 		#endregion Public Properties
+
+		public Capture(Config.Component config, Plugin.IHardware hardware)
+		{
+			if (string.IsNullOrEmpty(config.Name))
+				Name = config.CaptureName;
+			else
+				Name = config.NameRegex.Replace(hardware.Name, config.CaptureName);
+			Value = hardware.Name;
+		}
+
+		public Capture(Config.Sensor config, Plugin.ISensor sensor)
+		{
+			Name = config.NameRegex.Replace(sensor.Name, config.CaptureName);
+			Value = sensor.Value;
+		}
+
+		public Capture(string name, dynamic value)
+		{
+			Name = name;
+			Value = value;
+		}
 	}
 
 	/// <summary>
@@ -94,16 +115,11 @@ namespace HardwareMonitor.Monitor
 	{
 		#region Private fields
 
-		private List<HardwareSample> _hardwareSamples = new List<HardwareSample>();
-		private List<SensorSample> _sensorSamples = new List<SensorSample>();
 		private Dictionary<string, Capture> _captures = new Dictionary<string, Capture>();
 
 		#endregion Private fields
 
 		#region Public Properties
-
-		public List<HardwareSample> HardwareSamples => _hardwareSamples;
-		public List<SensorSample> SensorSamples => _sensorSamples;
 		public Dictionary<string, Capture> Captures => _captures;
 		
 		#endregion Public Properties

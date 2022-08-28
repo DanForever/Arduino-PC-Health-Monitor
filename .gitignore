@@ -7,3 +7,4 @@ act.exe
 *.user
 Device/arduino-cli.exe
 Windows/UpgradeLog.htm
+Device/addlicense.exe

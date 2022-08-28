@@ -4,24 +4,6 @@
 // Include the library
 #include <Arduino_GFX_Library.h>
 
-#if defined(IDENTITY_M_TEENSY32) || defined(IDENTITY_M_TEENSY40)
-#	define SCREEN_TFT_DC      20
-#	define SCREEN_TFT_CS      21
-#	define SCREEN_TFT_RST     19
-#	define SCREEN_TFT_MOSI    11
-#	define SCREEN_TFT_SCLK    13
-#	define SCREEN_TFT_MISO    12
-#elif defined ( IDENTITY_M_SEEEDUINO_XAIO_RP2040 )
-#	define SCREEN_TFT_DC      D1
-#	define SCREEN_TFT_CS      D2
-#	define SCREEN_TFT_RST     D0
-#	define SCREEN_TFT_MOSI    MOSI
-#	define SCREEN_TFT_SCLK    SCK
-#	define SCREEN_TFT_MISO    MISO
-#else
-#	error Platform pins not defined for Arduino GFX Library
-#endif
-
 #define COLOUR_BLACK       BLACK
 #define COLOUR_NAVY        NAVY
 #define COLOUR_DARKGREEN   DARKGREEN

@@ -8,6 +8,7 @@ enum class eMicrocontroller : uint8_t
 	Teensy32,
 	Teensy40,
 	SeeediunoXiao,
+	SeeediunoXiaoRp2040,
 };
 
 enum class eScreen : uint8_t

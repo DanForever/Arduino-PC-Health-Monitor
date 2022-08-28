@@ -10,6 +10,8 @@
 #	define IDENTITY_M_VALUE eMicrocontroller::Teensy32
 #elif defined( IDENTITY_M_TEENSY40 )
 #	define IDENTITY_M_VALUE eMicrocontroller::Teensy40
+#elif defined( IDENTITY_M_SEEEDUINO_XAIO_RP2040)
+#	define IDENTITY_M_VALUE eMicrocontroller::SeeediunoXiaoRp2040
 #else
 #	error "Microcontroller not yet implemented or unsupported"
 #endif
@@ -20,6 +22,12 @@
 #	include "Screen/ILI9341_t3_Wrapper.h"
 #	define IDENTITY_S_VALUE eScreen::ILI9341
 #	define IDENTITY_R_VALUE eResolution::R240x320
+#elif defined( IDENTITY_S_ILI9488 ) && defined( IDENTITY_M_SEEEDUINO_XAIO_RP2040 )
+#	define USE_GENERIC_ARDUINO_TFT_LIBRARY
+#	include "Screen/Arduino_GFX_Wrapper.h"
+#	define IDENTITY_S_VALUE eScreen::ILI9488
+#	define IDENTITY_R_VALUE eResolution::R320x480
+using ScreenApi = ArduinoGfx<Arduino_RPiPicoSPI, Arduino_ILI9488_18bit>;
 #elif defined( IDENTITY_S_ILI9488 )
 #	include "Screen/ILI9488_t3_Wrapper.h"
 #	define IDENTITY_S_VALUE eScreen::ILI9488

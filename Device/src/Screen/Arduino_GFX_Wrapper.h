@@ -11,6 +11,13 @@
 #	define SCREEN_TFT_MOSI    11
 #	define SCREEN_TFT_SCLK    13
 #	define SCREEN_TFT_MISO    12
+#elif defined ( IDENTITY_M_SEEEDUINO_XAIO_RP2040 )
+#	define SCREEN_TFT_DC      D1
+#	define SCREEN_TFT_CS      D2
+#	define SCREEN_TFT_RST     D0
+#	define SCREEN_TFT_MOSI    MOSI
+#	define SCREEN_TFT_SCLK    SCK
+#	define SCREEN_TFT_MISO    MISO
 #else
 #	error Platform pins not defined for Arduino GFX Library
 #endif

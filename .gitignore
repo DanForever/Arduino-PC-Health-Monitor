@@ -5,3 +5,4 @@ bin/
 intermediate/
 act.exe
 *.user
+Device/arduino-cli.exe

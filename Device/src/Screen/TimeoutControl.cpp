@@ -42,6 +42,8 @@ void TimeoutControl::Update(Screen* screen)
 
 			extern std::vector<class Module*> Modules;
 			Modules.clear();
+
+			screen->ClearOffset();
 			screen->FillScreen(COLOUR_BLACK);
 		}
 	}
@@ -56,6 +58,9 @@ void TimeoutControl::Update(Screen* screen)
 
 			screen->FillScreen(COLOUR_BLACK);
 			screen->ClearOffset();
+			screen->SetTextSize(1);
+			screen->SetCursor(0, 0);
+			screen->Print("Companion app not detected...");
 		}
 
 		if (m_isScreenOn)
@@ -69,9 +74,6 @@ void TimeoutControl::Update(Screen* screen)
 			}
 			else
 			{
-				screen->SetTextSize(1);
-				screen->SetCursor(0, 0);
-				screen->Print("Companion app not detected...");
 				PrintHibernateCountdown(timeSpentDisconnected, screen);
 			}
 		}
@@ -81,10 +83,7 @@ void TimeoutControl::Update(Screen* screen)
 void TimeoutControl::PrintHibernateCountdown(unsigned long timeSpentDisconnected, Screen* screen)
 {
 	int timeRemaining = (HIBERNATION_TIMEOUT_MILLISECONDS - timeSpentDisconnected) / 1000;
-	snprintf(m_hibernationCountdownBuffer, 4, "%i", timeRemaining);
-
-	screen->ClearOffset();
-	screen->SetTextSize(5);
+	snprintf(m_hibernationCountdownBuffer, HIBERNATION_BUFFER_SIZE, "%i", timeRemaining);
 
 	Settings settings;
 	settings.TextSize = 5;

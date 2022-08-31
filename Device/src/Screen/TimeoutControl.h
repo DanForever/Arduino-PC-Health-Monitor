@@ -41,7 +41,8 @@ private:
 	bool m_isScreenOn = false;
 	bool m_connected = true;
 
-	char m_hibernationCountdownBuffer[4] = "";
+	static const int HIBERNATION_BUFFER_SIZE = 8;
+	char m_hibernationCountdownBuffer[HIBERNATION_BUFFER_SIZE] = "";
 	Printer m_hibernationCountdownPrinter;
 };
 

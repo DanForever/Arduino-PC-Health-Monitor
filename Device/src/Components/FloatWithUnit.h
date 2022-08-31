@@ -21,6 +21,7 @@
 #define __COMPONENT_FLOAT_WITH_UNIT_H_
 
 #include "Component.h"
+#include "../Screen/PrintUtils.h"
 
 //------------------------------------------------------------------------------------------------------
 class FloatWithUnit final : public Component
@@ -44,20 +45,13 @@ public:
 	virtual void HandleUpdateMessage(Screen* screen, Message& message) override;
 
 private:
-	void InitializeUnit(Screen* screen);
-	void CalculateTextWidth();
-
-	uint16_t m_valueWidth;
-	uint16_t m_unitWidth;
-
-	uint16_t m_textWidth;
-	uint16_t m_textHeight;
-
 	int m_precision;
 
 	Position m_position;
 	uint8_t m_textSize;
 	uint8_t m_unitTextSize;
+
+	Printer m_printer;
 
 	char m_value[MAX_VALUE_LENGTH];
 	char m_unit[MAX_UNIT_LENGTH];

@@ -13,7 +13,7 @@
 
 Screen screen;
 Comms comms;
-TimeoutControl timeoutControl(&screen);
+TimeoutControl timeoutControl;
 
 std::vector<Module*> Modules;
 
@@ -101,12 +101,12 @@ void setup()
 	screen.Initialize();
 	screen.FillScreen(COLOUR_BLACK);
 
-	timeoutControl.Initialize();
+	timeoutControl.Initialize(&screen);
 }
 
 void loop()
 {
-	timeoutControl.Update();
+	timeoutControl.Update(&screen);
 
 	if (!::Serial)
 		return;

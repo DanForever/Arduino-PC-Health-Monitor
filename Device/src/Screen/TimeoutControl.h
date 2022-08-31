@@ -25,15 +25,14 @@
 class TimeoutControl
 {
 public:
-	TimeoutControl(Screen* screen);
-	void Initialize();
-	void Update();
+	void Initialize(Screen* screen);
+	void Update(Screen* screen);
 
 private:
-	void PrintHibernateCountdown(unsigned long timeSpentDisconnected);
+	void PrintHibernateCountdown(unsigned long timeSpentDisconnected, Screen* screen);
 
-	void TurnScreenOn();
-	void TurnScreenOff();
+	void TurnScreenOn(Screen* screen);
+	void TurnScreenOff(Screen* screen);
 
 	static const int HIBERNATION_TIMEOUT_MILLISECONDS = 15 * 1000;
 

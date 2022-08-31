@@ -38,11 +38,7 @@ const char* const UnitStrings[] PROGMEM =
 };
 
 FloatWithUnit::FloatWithUnit()
-	: m_valueWidth(0)
-	, m_unitWidth(0)
-	, m_textWidth(0)
-	, m_textHeight(0)
-	, m_precision(0)
+	: m_precision(0)
 	, m_textSize(0)
 	, m_unitTextSize(0)
 {
@@ -61,50 +57,29 @@ void FloatWithUnit::SetTextSize(uint8_t textSize)
 	m_unitTextSize = m_textSize > 2 ? m_textSize - 2 : 1;
 }
 
-void FloatWithUnit::SetValue(Screen* screen, float value)
+void FloatWithUnit::SetValue(Screen*, float value)
 {
 	snprintf(m_value, MAX_VALUE_LENGTH, "%.*f", m_precision, value);
 
-	screen->SetTextSize(m_textSize);
-	m_valueWidth = screen->MeasureTextWidth(m_value);
-	m_textHeight = screen->MeasureTextHeight(m_value);
-
-	CalculateTextWidth();
-
 	m_changed = true;
 }
 
-void FloatWithUnit::SetUnit(Screen* screen, const char* unit)
+void FloatWithUnit::SetUnit(Screen*, const char* unit)
 {
 	std::strncpy(m_unit, unit, MAX_UNIT_LENGTH);
 
-	InitializeUnit(screen);
-
 	m_changed = true;
-}
-
-void FloatWithUnit::InitializeUnit(Screen* screen)
-{
-	screen->SetTextSize(m_unitTextSize);
-	m_unitWidth = screen->MeasureTextWidth(m_unit);
-
-	CalculateTextWidth();
 }
 
 void FloatWithUnit::Draw(Screen* screen)
 {
-	screen->SetTextSize(m_textSize);
-	screen->SetCursor(m_position.X, m_position.Y);
-	screen->Print(m_value);
-	screen->SetTextSize(m_unitTextSize);
-	screen->Print(m_unit);
+	m_printer.Print(m_value, m_unit, m_position.X, m_position.Y, screen, { m_textSize, m_unitTextSize });
 
 	m_changed = false;
 }
 
-void FloatWithUnit::Clear(Screen* screen, uint16_t clearColour)
+void FloatWithUnit::Clear(Screen*, uint16_t)
 {
-	screen->FillRect(m_position.X, m_position.Y, m_textWidth, m_textHeight, clearColour);
 }
 
 void FloatWithUnit::HandleSetupMessage(Screen* screen, Message& message)
@@ -130,9 +105,8 @@ void FloatWithUnit::HandleSetupMessage(Screen* screen, Message& message)
 	uint8_t unit;
 	message.Read(unit);
 	strcpy_P(m_unit, (char*)pgm_read_dword(&(UnitStrings[unit])));
-	InitializeUnit(screen);
 
-	// We store precision as a byte, but printf interprets it as an int
+	// The precision is only a byte in the buffer, but printf needs an int in the parameter
 	m_precision = message.Read();
 
 	m_changed = true;
@@ -143,12 +117,4 @@ void FloatWithUnit::HandleUpdateMessage(Screen* screen, Message& message)
 	float value;
 	message.Read(value);
 	SetValue(screen, value);
-}
-
-void FloatWithUnit::CalculateTextWidth()
-{
-	uint16_t textWidth = m_valueWidth + m_unitWidth;
-
-	if (m_textWidth < textWidth)
-		m_textWidth = textWidth;
 }

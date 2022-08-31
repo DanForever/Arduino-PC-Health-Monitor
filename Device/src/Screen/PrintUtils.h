@@ -39,6 +39,7 @@ enum class VerticalAlignment : uint8_t
 struct Settings
 {
 	uint8_t TextSize = 1;
+	uint8_t UnitTextSize = 1;
 
 	HorizontalAlignment Horizontal = HorizontalAlignment::Left;
 	VerticalAlignment Vertical = VerticalAlignment::Top;
@@ -66,22 +67,23 @@ private:
 
 		uint16_t Width;
 		uint16_t Height;
+		uint16_t UnitWidth;
+		uint16_t UnitHeight;
 
 		Point Position;
 		Point Offset;
 
 		void Calculate(const char* text, const Settings& settings, Screen* screen);
+		void CalculateUnit(const char* text, const Settings& settings, Screen* screen);
 	};
 
 public:
-	Printer(Screen* screen);
-
-	void Print(const char* text, int16_t x, int16_t y, const Settings& settings = {});
+	void Print(const char* text, int16_t x, int16_t y, Screen* screen, const Settings& settings = {});
+	void Print(const char* text, const char* unit, int16_t x, int16_t y, Screen* screen, const Settings& settings = {});
 
 private:
-	Screen* m_screen;
-
 	Dimensions m_previousTextDimensions;
+	bool m_previousIsInitialized = false;
 };
 
 #endif // __PRINT_UTILS_H__

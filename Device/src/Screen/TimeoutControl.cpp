@@ -17,30 +17,24 @@
 
 #include "TimeoutControl.h"
 
-TimeoutControl::TimeoutControl(Screen* screen)
-	: m_screen(screen)
-	, m_hibernationCountdownPrinter(screen)
-{
-}
-
-void TimeoutControl::Initialize()
+void TimeoutControl::Initialize(Screen* screen)
 {
 	pinMode(PIN_BACKLIGHT, OUTPUT);
 
-	TurnScreenOn();
+	TurnScreenOn(screen);
 }
 
-void TimeoutControl::Update()
+void TimeoutControl::Update(Screen* screen)
 {
 	if (::Serial)
 	{
 		// We are m_connected
 		if (!m_connected)
 		{
-			// Have have, just this frame, [re]connected
+			// We have, just this frame, [re]connected
 			if (!m_isScreenOn)
 			{
-				TurnScreenOn();
+				TurnScreenOn(screen);
 				delay(10);
 			}
 
@@ -48,7 +42,7 @@ void TimeoutControl::Update()
 
 			extern std::vector<class Module*> Modules;
 			Modules.clear();
-			m_screen->FillScreen(COLOUR_BLACK);
+			screen->FillScreen(COLOUR_BLACK);
 		}
 	}
 	else
@@ -60,8 +54,8 @@ void TimeoutControl::Update()
 			m_connected = false;
 			m_disconnectedTimestamp = millis();
 
-			m_screen->FillScreen(COLOUR_BLACK);
-			m_screen->ClearOffset();
+			screen->FillScreen(COLOUR_BLACK);
+			screen->ClearOffset();
 		}
 
 		if (m_isScreenOn)
@@ -71,39 +65,39 @@ void TimeoutControl::Update()
 			const unsigned long timeSpentDisconnected = now - m_disconnectedTimestamp;
 			if (timeSpentDisconnected > HIBERNATION_TIMEOUT_MILLISECONDS)
 			{
-				TurnScreenOff();
+				TurnScreenOff(screen);
 			}
 			else
 			{
-				m_screen->SetTextSize(1);
-				m_screen->SetCursor(0, 0);
-				m_screen->Print("Companion app not detected...");
-				PrintHibernateCountdown(timeSpentDisconnected);
+				screen->SetTextSize(1);
+				screen->SetCursor(0, 0);
+				screen->Print("Companion app not detected...");
+				PrintHibernateCountdown(timeSpentDisconnected, screen);
 			}
 		}
 	}
 }
 
-void TimeoutControl::PrintHibernateCountdown(unsigned long timeSpentDisconnected)
+void TimeoutControl::PrintHibernateCountdown(unsigned long timeSpentDisconnected, Screen* screen)
 {
 	int timeRemaining = (HIBERNATION_TIMEOUT_MILLISECONDS - timeSpentDisconnected) / 1000;
 	snprintf(m_hibernationCountdownBuffer, 4, "%i", timeRemaining);
 
-	m_screen->ClearOffset();
-	m_screen->SetTextSize(5);
+	screen->ClearOffset();
+	screen->SetTextSize(5);
 
 	Settings settings;
 	settings.TextSize = 5;
 	settings.Horizontal = HorizontalAlignment::Centre;
 	settings.Vertical = VerticalAlignment::Centre;
 
-	m_hibernationCountdownPrinter.Print(m_hibernationCountdownBuffer, m_screen->Width() / 2, m_screen->Height() / 2, settings);
+	m_hibernationCountdownPrinter.Print(m_hibernationCountdownBuffer, screen->Width() / 2, screen->Height() / 2, screen, settings);
 }
 
-void TimeoutControl::TurnScreenOn()
+void TimeoutControl::TurnScreenOn(Screen* screen)
 {
 	// Turn the screen on
-	m_screen->Wakeup();
+	screen->Wakeup();
 
 	// Turn the LED backlight on
 	digitalWrite(PIN_BACKLIGHT, HIGH);
@@ -111,13 +105,13 @@ void TimeoutControl::TurnScreenOn()
 	m_isScreenOn = true;
 }
 
-void TimeoutControl::TurnScreenOff()
+void TimeoutControl::TurnScreenOff(Screen* screen)
 {
 	// Turn the backlight off
 	digitalWrite(PIN_BACKLIGHT, LOW);
 
 	// Put the screen into low power sleep mode
-	m_screen->Sleep();
+	screen->Sleep();
 
 	m_isScreenOn = false;
 }

@@ -17,6 +17,8 @@
 
 #include "TimeoutControl.h"
 
+#include <vector>
+
 void TimeoutControl::Initialize(Screen* screen)
 {
 	pinMode(PIN_BACKLIGHT, OUTPUT);

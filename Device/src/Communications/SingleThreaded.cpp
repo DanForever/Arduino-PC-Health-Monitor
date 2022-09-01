@@ -15,13 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "Comms.h"
+#include "SingleThreaded.h"
 
 #include <Arduino.h>
 
-#include "Version.h"
 #include "PacketType.h"
-#include "IdentityImplementation.h"
+
+#include "../Version.h"
+#include "../IdentityImplementation.h"
 
 namespace
 {
@@ -29,7 +30,7 @@ namespace
 	const char* MessageFooter = "`>dan";
 }
 
-Comms::Comms()
+Communications::SingleThreaded::SingleThreaded()
 	: m_messageReady(false)
 	, m_lookingForFooter(false)
 	, m_connected(false)
@@ -37,13 +38,13 @@ Comms::Comms()
 	Serial.begin(9600);
 }
 
-void Comms::Update()
+void Communications::SingleThreaded::Update()
 {
 	ReadIntoMainBuffer();
 	ProcessMainBuffer();
 }
 
-void Comms::Ack(uint16_t id)
+void Communications::SingleThreaded::Ack(uint16_t id)
 {
 	// @todo: Don't magic number the length, use a proper (ideally compile time) way of computing the needed length
 	//uint8_t buffer[5 + 5 + 1 + 2];
@@ -67,7 +68,7 @@ void Comms::Ack(uint16_t id)
 	::Serial.write(buffer, bufferUsed);
 }
 
-bool Comms::CouldBePattern(const char* pattern) const
+bool Communications::SingleThreaded::CouldBePattern(const char* pattern) const
 {
 	for (int8_t i = 0; i < m_parsingBuffer.Size(); ++i)
 	{
@@ -78,14 +79,14 @@ bool Comms::CouldBePattern(const char* pattern) const
 	return true;
 }
 
-void Comms::ClearMessage()
+void Communications::SingleThreaded::ClearMessage()
 {
 	m_messageReady = false;
 
 	m_outputBuffer.Reset();
 }
 
-void Comms::ReadIntoMainBuffer()
+void Communications::SingleThreaded::ReadIntoMainBuffer()
 {
 	while (::Serial.available())
 	{
@@ -93,7 +94,7 @@ void Comms::ReadIntoMainBuffer()
 	}
 }
 
-void Comms::ProcessMainBuffer()
+void Communications::SingleThreaded::ProcessMainBuffer()
 {
 	while (m_mainBuffer.Size() > 0)
 	{
@@ -140,7 +141,7 @@ void Comms::ProcessMainBuffer()
 	}
 }
 
-void Comms::SendIdentity()
+void Communications::SingleThreaded::SendIdentity()
 {
 	uint8_t buffer[4];
 
@@ -154,7 +155,7 @@ void Comms::SendIdentity()
 	::Serial.write(MessageFooter, strlen(MessageFooter));
 }
 
-void Comms::SendVersion()
+void Communications::SingleThreaded::SendVersion()
 {
 	uint8_t buffer[4];
 	

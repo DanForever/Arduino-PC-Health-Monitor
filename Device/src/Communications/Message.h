@@ -17,36 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMPONENT_H__
-#define __COMPONENT_H__
+#ifndef __COMMUNICATIONS_MESSAGE_H__
+#define __COMMUNICATIONS_MESSAGE_H__
 
-#include "../Screen/Screen.h"
-#include "../Communications/Message.h"
+#include "Buffer.h"
 
-struct Position
-{
-	int16_t X;
-	int16_t Y;
-};
+using Message = Buffer<1024 * 2>;
 
-//------------------------------------------------------------------------------------------------------
-class Component
-{
-public:
-	Component() : m_changed(false) {}
-	virtual ~Component() = default;
-
-	virtual void Draw(Screen* screen) = 0;
-	virtual void Clear(Screen* screen, uint16_t clearColour) = 0;
-
-	virtual void HandleSetupMessage(Screen* screen, Message& message) {}
-	virtual void HandleUpdateMessage(Screen* screen, Message& message) {}
-
-	bool HasChanged() const { return m_changed; }
-
-protected:
-	bool m_changed;
-};
-
-
-#endif // __COMPONENT_H__
+#endif // __COMMUNICATIONS_MESSAGE_H__

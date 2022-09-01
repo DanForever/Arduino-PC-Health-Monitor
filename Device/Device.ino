@@ -1,18 +1,18 @@
 
 #include "src/IdentityImplementation.h"
 
-#include "src/PacketType.h"
+#include "src/Communications/PacketType.h"
 
 #include "src/Screen/Screen.h"
 #include "src/Screen/TimeoutControl.h"
-#include "src/Comms.h"
+#include "src/Communications/SingleThreaded.h"
 
 #include "src/Modules/FlexiModule.h"
 
 #include <vector>
 
 Screen screen;
-Comms comms;
+Communications::SingleThreaded comms;
 TimeoutControl timeoutControl;
 
 std::vector<Module*> Modules;

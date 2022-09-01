@@ -21,7 +21,6 @@
 #define __MODULE_H_
 
 #include "../Components/Component.h"
-#include "../Comms.h"
 
 #include <vector>
 

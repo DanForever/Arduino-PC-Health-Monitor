@@ -17,12 +17,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __COMMS_H__
-#define __COMMS_H__
-
-#include <stdint.h>
-#include <cstddef>
-#include <Arduino.h>
+#ifndef __COMMUNICATIONS_BUFFER_H__
+#define __COMMUNICATIONS_BUFFER_H__
 
 template <int Capacity>
 class Buffer
@@ -178,35 +174,4 @@ private:
 	uint8_t m_buffer[Capacity];
 };
 
-using Message = Buffer<1024 * 2>;
-
-class Comms
-{
-public:
-	Comms();
-
-	void Update();
-	void Ack(uint16_t id);
-	void SendIdentity();
-	void SendVersion();
-	void ClearMessage();
-
-	bool MessageReady() { return m_messageReady; }
-	Message& GetMessage() { return m_outputBuffer; }
-
-private:
-	void ReadIntoMainBuffer();
-	void ProcessMainBuffer();
-	bool CouldBePattern(const char* pattern) const;
-
-private:
-	Buffer<1024 * 10> m_mainBuffer;
-	Buffer<16> m_parsingBuffer;
-	Message m_outputBuffer;
-
-	bool m_messageReady;
-	bool m_lookingForFooter;
-	bool m_connected;
-};
-
-#endif // __COMMS_H__
+#endif // __COMMUNICATIONS_BUFFER_H__

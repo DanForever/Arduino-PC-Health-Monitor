@@ -112,4 +112,11 @@
 
 static const Identity Identity{ IDENTITY_M_VALUE, IDENTITY_S_VALUE, IDENTITY_R_VALUE };
 
+/////////////////////////////
+// Multithreading
+#if defined( IDENTITY_M_SEEEDUINO_XAIO_RP2040 )
+#	define MULTITHREADING_ENABLED
+#else
+#endif
+
 #endif // __IDENTITY_IMPL_H_

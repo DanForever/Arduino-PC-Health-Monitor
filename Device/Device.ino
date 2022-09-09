@@ -5,14 +5,21 @@
 
 #include "src/Screen/Screen.h"
 #include "src/Screen/TimeoutControl.h"
-#include "src/Communications/SingleThreaded.h"
 
 #include "src/Modules/FlexiModule.h"
 
 #include <vector>
 
 Screen screen;
-Communications::SingleThreaded comms;
+
+#ifdef MULTITHREADING_ENABLED
+#	include "src/Communications/MultiThreaded.h"
+	Communications::MultiThreaded comms;
+#else
+#	include "src/Communications/SingleThreaded.h"
+	Communications::SingleThreaded comms;
+#endif
+
 TimeoutControl timeoutControl;
 
 std::vector<Module*> Modules;
@@ -111,7 +118,9 @@ void loop()
 	if (!::Serial)
 		return;
 
+#ifndef MULTITHREADING_ENABLED
 	comms.Update();
+#endif
 
 	if (comms.MessageReady())
 	{
@@ -124,3 +133,19 @@ void loop()
 		Modules[i]->Draw();
 	}
 }
+
+#ifdef MULTITHREADING_ENABLED
+
+void setup1()
+{
+}
+
+void loop1()
+{
+	if (!::Serial)
+		return;
+
+	comms.Update();
+}
+
+#endif // MULTITHREADING_ENABLED

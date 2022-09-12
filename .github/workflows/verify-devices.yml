@@ -1,4 +1,4 @@
-name: Dan Test workflow
+name: Verify Devices
 on:
   push:
     paths:

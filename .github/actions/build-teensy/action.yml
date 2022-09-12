@@ -1,0 +1,65 @@
+name: Teensy builder
+
+inputs:
+  preprocessor-define:
+    required: true
+  fqbn:
+    required: true
+  screen-driver:
+    required: true
+  arduino_ide_version:
+    type: string
+    default: 1.8.16
+  teensyduino_verion:
+    type: string
+    default: 155
+  gfx-library-version:
+    type: string
+    default: 1.2.8
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare environment
+      uses: ./.github/actions/prepare-teensyduino-build-environment
+      id: build-env
+      with:
+        arduino_ide_version: ${{ inputs.arduino_ide_version }}
+        teensyduino_verion: ${{ inputs.teensyduino_verion }}
+        gfx-library-version: ${{ inputs.gfx-library-version }}
+
+    - shell: bash
+      name: Install build environment overrides
+      run: cp -rf .github/overrides/teensy${{ inputs.teensyduino_verion }}/* ${{ steps.build-env.outputs.arduino-folder-path }}
+
+    - shell: bash
+      name: Apply build configuration to environment overrides
+      run: |
+        sed -i 's/?MICROCONTROLLER?/${{ inputs.preprocessor-define }}/g' ${{ steps.build-env.outputs.arduino-folder-path }}/hardware/teensy/avr/platform.local.txt
+        sed -i 's/?DISPLAYDRIVER?/${{ inputs.screen-driver }}/g' ${{ steps.build-env.outputs.arduino-folder-path }}/hardware/teensy/avr/platform.local.txt
+        
+    - shell: bash
+      name: Compile
+      run: ${{ steps.build-env.outputs.arduino-folder-path }}/arduino --verbose --board "${{ inputs.fqbn }}" --verify Device/Device.ino
+
+    - id: retrieve-binary-path
+      shell: bash
+      name: Retrieve binary Path
+      run: |
+        PATH=$(cat $HOME/binaries.txt)
+        echo "Path is $PATH"
+        echo "BINPATH=$PATH" >> $GITHUB_ENV
+        echo "::set-output name=binary-path::$(echo $PATH)"
+
+    - id: convert-elf-to-hex
+      shell: bash
+      name: Convert Elf binary to Hex
+      run: |
+        ${{ steps.build-env.outputs.arduino-folder-path }}/hardware/tools/arm/bin/arm-none-eabi-objcopy -O ihex -R .eeprom ${{ steps.retrieve-binary-path.outputs.binary-path }} $HOME/device.hex
+        echo "::set-output name=hex-path::$(echo $HOME/device.hex)"
+
+    - shell: bash
+      name:  Display binary path to user
+      run: |
+        echo "Elf: ${{ steps.retrieve-binary-path.outputs.binary-path }}"
+        echo "Hex: ${{ steps.convert-elf-to-hex.outputs.hex-path }}"

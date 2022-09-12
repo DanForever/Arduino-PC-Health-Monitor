@@ -1,0 +1,61 @@
+name: Arduino builder
+
+inputs:
+  arduino_cli_version:
+    type: string
+    default: 0.27.1
+  gfx-library-version:
+    type: string
+    default: 1.2.8
+  preprocessor-define:
+    type: string
+    required: true
+  fqbn:
+    type: string
+    required: true
+  screen-driver:
+    type: string
+    required: true
+  board-provider-uri:
+    type: string
+    required: true
+  board-id:
+    type: string
+    required: true
+  expected-binary-filename:
+    type: string
+    required: true
+  additional-compile-flags:
+    type: string
+
+outputs:
+  binary-path:
+    value: ./Build/${{ inputs.expected-binary-filename }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Arduino CLI
+      #uses: arduino/setup-arduino-cli@v1.1.1
+      #with:
+      #  version: ${{ inputs.arduino_cli_version }}
+      run: |
+        wget https://github.com/arduino/arduino-cli/releases/download/${{ inputs.arduino_cli_version }}/arduino-cli_${{ inputs.arduino_cli_version }}_Linux_64bit.tar.gz
+        tar -xzf ./arduino-cli_${{ inputs.arduino_cli_version }}_Linux_64bit.tar.gz
+
+    - name: Install board
+      shell: bash
+      run: |
+        ./arduino-cli core --additional-urls="${{ inputs.board-provider-uri }}" update-index
+        ./arduino-cli core --additional-urls="${{ inputs.board-provider-uri }}" install ${{ inputs.board-id }}
+
+    - name: Install libraries
+      shell: bash
+      run: |
+        ./arduino-cli lib update-index
+        ./arduino-cli lib install  "GFX Library for Arduino"@1.2.8
+        
+    - name: Compile
+      shell: bash
+      run: |
+        ./arduino-cli compile -v -b ${{ inputs.fqbn }} --export-binaries --build-property "compiler.cpp.extra_flags=-D${{ inputs.preprocessor-define }} -D${{ inputs.screen-driver }} ${{ inputs.additional-compile-flags }}" --output-dir "./build" Device/Device.ino

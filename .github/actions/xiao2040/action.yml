@@ -1,0 +1,38 @@
+name: Seeeduino Xiao RP2040 build configuration
+
+description: This action simply provides the data we need to build for the Seeeduino Xiao RP2040 microcontroller
+
+inputs:
+  preprocessor-define:
+    default: "IDENTITY_M_SEEEDUINO_XAIO_RP2040"
+  fqbn:
+    description: "Fully qualified board name"
+    default: "Seeeduino:rp2040:Seeed_XIAO_RP2040"
+  board-provider-uri:
+    type: string
+    default: https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+  board-id:
+    type: string
+    default: Seeeduino:rp2040@1.12.0
+  expected-binary-filename:
+    type: string
+    default: Device.ino.uf2
+  additional-compile-flags:
+    type: string
+    default: -DPIN_SPI0_SCK=8 -DPIN_SPI0_MOSI=10 -DPIN_SPI0_MISO=9
+  screen-driver:
+    required: true
+    
+runs:
+  using: composite
+  steps:
+    - name: Building
+      uses: ./.github/actions/build-arduino
+      with:
+        preprocessor-define: ${{ inputs.preprocessor-define }}
+        fqbn: ${{ inputs.fqbn }}
+        screen-driver: ${{ inputs.screen-driver }}
+        board-provider-uri: ${{ inputs.board-provider-uri }}
+        board-id: ${{ inputs.board-id }}
+        additional-compile-flags: ${{ inputs.additional-compile-flags }}
+        expected-binary-filename: ${{ inputs.expected-binary-filename }}

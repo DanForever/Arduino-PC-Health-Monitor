@@ -1,0 +1,22 @@
+name: Teensy 3.2 build configuration
+
+description: This action simply provides the data we need to build for the Teensy 3.2 microcontroller
+
+inputs:
+  preprocessor-define:
+    default: "IDENTITY_M_TEENSY32"
+  fqbn:
+    description: "Fully qualified board name"
+    default: "teensy:avr:teensy31:usb=serial,speed=72,opt=o2std,keys=en-us"
+  screen-driver:
+    required: true
+    
+runs:
+  using: composite
+  steps:
+    - name: Building
+      uses: ./.github/actions/build-teensy
+      with:
+        preprocessor-define: ${{ inputs.preprocessor-define }}
+        fqbn: ${{ inputs.fqbn }}
+        screen-driver: ${{ inputs.screen-driver }}

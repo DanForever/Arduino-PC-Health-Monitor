@@ -1,40 +1,49 @@
-name: Verify Devices
+name: Dan Test workflow
 on:
   push:
     paths:
       - 'Device/**'
   workflow_dispatch:
 
-env:
-  arduino_ide_version: 1.8.16
-  teensyduino_verion: 155
-
 jobs:
-  verify-devices:
+  Teensy32:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        microcontroller: [["IDENTITY_M_TEENSY40","teensy:avr:teensy40:usb=serial,speed=600,opt=o2std,keys=en-us"], ["IDENTITY_M_TEENSY32","teensy:avr:teensy31:usb=serial,speed=72,opt=o2std,keys=en-us"]]
-        driver: ["IDENTITY_S_ILI9341", "IDENTITY_S_ILI9488", "IDENTITY_S_ILI9486"]
+        screen-driver: ["IDENTITY_S_ILI9341", "IDENTITY_S_ILI9488", "IDENTITY_S_ILI9486"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         
-      - name: Setup the environment
-        uses: ./.github/workflows/setup-environment
+      - name: Build Teensy 3.2
+        uses: ./.github/actions/teensy32
         with:
-          arduino_ide_version: ${{ env.arduino_ide_version }}
-          teensyduino_verion: ${{ env.teensyduino_verion }}
-          
-      - name: Build Device
-        id: build-device
-        uses: ./.github/workflows/build-device
+          screen-driver: ${{ matrix.screen-driver }}
+
+  Teensy40:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        screen-driver: ["IDENTITY_S_ILI9341", "IDENTITY_S_ILI9488", "IDENTITY_S_ILI9486"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Build Teensy 4.0
+        uses: ./.github/actions/teensy40
         with:
-          microcontroller: ${{ matrix.microcontroller[0] }}
-          driver: ${{ matrix.driver }}
-          arduino_ide_version: ${{ env.arduino_ide_version }}
-          teensyduino_verion: ${{ env.teensyduino_verion }}
-          fbqn: ${{ matrix.microcontroller[1] }}
-          
-      - name: Display Path
-        run: echo ::notice title=Path to compiled binary::${{ steps.build-device.outputs.binary-path }}
+          screen-driver: ${{ matrix.screen-driver }}
+
+  Xiao2040:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        screen-driver: ["IDENTITY_S_ILI9488"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build Seeeduino Xiao RP2040
+        uses: ./.github/actions/xiao2040
+        with:
+          screen-driver: ${{ matrix.screen-driver }}

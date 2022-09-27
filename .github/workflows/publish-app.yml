@@ -55,7 +55,7 @@ jobs:
           retention-days: 1
 
   build-and-upload:
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: [create-draft-release, build-tools]
     strategy:
       matrix:

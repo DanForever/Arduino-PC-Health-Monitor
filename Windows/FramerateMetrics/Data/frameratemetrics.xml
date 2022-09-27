@@ -8,6 +8,7 @@
 		<Program ProcessName="Discord" />
 		<Program ProcessName="steamwebhelper" />
 		<Program ProcessName="NVIDIA Share" />
+		<Program ProcessName="NVIDIA Broadcast" />
 		<Program ProcessName="UnrealCEFSubProcess" />
 		<Program ProcessName="ServiceHub.ThreadedWaitDialog" />
 		<Program ProcessName="Spotify" />

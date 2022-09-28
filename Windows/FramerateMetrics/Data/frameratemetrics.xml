@@ -16,5 +16,6 @@
 		<Program ProcessName="GitHubDesktop" />
 		<Program ProcessName="Docker" />
 		<Program ProcessName="Microsoft.Photos" />
+		<Program ProcessName="EpicGamesLauncher" />
 	</Blacklist>
 </FramerateMetrics>

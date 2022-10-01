@@ -14,10 +14,16 @@ inputs:
     type: string
     default: 0.0.1
     
+outputs:
+  binary-path:
+    description: The path to the binary file that was built by this action
+    value: ${{ steps.building.outputs.binary-path }}
+    
 runs:
   using: composite
   steps:
     - name: Building
+      id: building
       uses: ./.github/actions/build-teensy
       with:
         preprocessor-define: ${{ inputs.preprocessor-define }}

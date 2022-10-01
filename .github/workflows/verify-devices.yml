@@ -25,7 +25,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run: echo "Github Event name: ${{ github.event_name }}"
+      - run: |
+          echo "Github Event name: ${{ github.event_name }}"
 
       - name: Version
         id: version

@@ -34,15 +34,10 @@ jobs:
     name: Build devices and upload binaries to draft release
     runs-on: ubuntu-latest
     needs: create-draft-release
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        
-      - name: Workhorse
-        uses: ./.github/workflows/verify-devices.yml
-        with:
-          version: ${{ inputs.version }}
-          upload-url: ${{ needs.create-draft-release.outputs.release-url }}
+    uses: ./.github/workflows/verify-devices.yml
+    with:
+      version: ${{ inputs.version }}
+      upload-url: ${{ needs.create-draft-release.outputs.release-url }}
  
   publish-draft:
     name: Publish Draft Release

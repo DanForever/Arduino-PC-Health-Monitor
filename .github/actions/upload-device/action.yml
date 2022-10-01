@@ -32,6 +32,7 @@ runs:
         mv "${{ inputs.binary-path }}" ".${{ inputs.target-filename }}"
     
     - name: Zip up binary
+      shell: bash
       run: |
         zip -j ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip .${{ inputs.target-filename }}
         

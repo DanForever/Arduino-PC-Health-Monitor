@@ -47,6 +47,7 @@ jobs:
           microcontroller: teensy32
           screen-define: ${{ matrix.screen-driver }}
           binary-path: ${{ steps.build-teensy32.outputs.binary-path }}
+          secret-github-token: ${{ secrets.GITHUB_TOKEN }}
 
   Teensy40:
     runs-on: ubuntu-latest
@@ -80,6 +81,7 @@ jobs:
           microcontroller: teensy40
           screen-define: ${{ matrix.screen-driver }}
           binary-path: ${{ steps.build-teensy40.outputs.binary-path }}
+          secret-github-token: ${{ secrets.GITHUB_TOKEN }}
 
   Xiao2040:
     runs-on: ubuntu-latest
@@ -112,3 +114,4 @@ jobs:
           microcontroller: xiao2040
           screen-define: ${{ matrix.screen-driver }}
           binary-path: ${{ steps.build-xiao2040.outputs.binary-path }}
+          secret-github-token: ${{ secrets.GITHUB_TOKEN }}

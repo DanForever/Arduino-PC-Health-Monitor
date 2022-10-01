@@ -16,6 +16,8 @@ inputs:
   target-filename:
     type: string
     default: "binary.bin"
+  secret-github-token:
+    required: true
 
 runs:
   using: composite
@@ -39,7 +41,7 @@ runs:
     - name: Upload
       uses: actions/upload-release-asset@v1.0.1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.secret-github-token }}
       with:
         upload_url: ${{ inputs.upload-url }}
         asset_path: ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip

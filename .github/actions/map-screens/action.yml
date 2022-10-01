@@ -1,0 +1,20 @@
+name: Map screen define to name
+
+inputs:
+  define:
+    type: string
+    required: true
+
+outputs:
+  name:
+    value: ${{ steps.convert-screen-value.outputs.screen-name }}
+
+runs:
+  using: composite
+  steps:
+    - name: Convert screen value
+      id: convert-screen-value
+      shell: bash
+      run: |
+        chmod +x .github/scripts/screen-map.sh
+        .github/scripts/screen-map.sh ${{ inputs.define }}

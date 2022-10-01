@@ -16,6 +16,14 @@ inputs:
   gfx-library-version:
     type: string
     default: 1.2.8
+  version:
+    type: string
+    default: 0.0.1
+    
+outputs:
+  binary-path:
+    description: The path to the binary file that was built by this action
+    value: ${{ steps.convert-elf-to-hex.outputs.hex-path }}
 
 runs:
   using: composite
@@ -37,6 +45,11 @@ runs:
       run: |
         sed -i 's/?MICROCONTROLLER?/${{ inputs.preprocessor-define }}/g' ${{ steps.build-env.outputs.arduino-folder-path }}/hardware/teensy/avr/platform.local.txt
         sed -i 's/?DISPLAYDRIVER?/${{ inputs.screen-driver }}/g' ${{ steps.build-env.outputs.arduino-folder-path }}/hardware/teensy/avr/platform.local.txt
+        
+    - name: Apply version
+      uses: ./.github/actions/apply-version-device
+      with:
+        version: ${{ inputs.version }}
         
     - shell: bash
       name: Compile

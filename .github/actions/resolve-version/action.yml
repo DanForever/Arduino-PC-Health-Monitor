@@ -1,0 +1,20 @@
+name: Sets a default value for version if none was found
+description: This exists to create a default value for "version" across different github action event types
+
+inputs:
+  version:
+    type: string
+
+outputs:
+  version:
+    value: ${{ steps.resolve.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve
+      id: resolve
+      shell: bash
+      run: |
+        chmod +x .github/scripts/resolve-version.sh
+        .github/scripts/resolve-version.sh ${{ inputs.version }}

@@ -1,0 +1,36 @@
+name: Apply version to device
+
+inputs:
+  version:
+    type: string
+    required: true
+
+outputs:
+  version-major:
+    value: ${{ steps.parsed-version.outputs.version-major }}
+  version-minor:
+    value: ${{ steps.parsed-version.outputs.version-minor }}
+  version-patch:
+    value: ${{ steps.parsed-version.outputs.version-patch }}
+
+runs:
+  using: composite
+  steps:
+    - name: Break down version input
+      shell: bash
+      id: parsed-version
+      run: |
+        dev_ver='${{ inputs.version }}'
+        [[ $dev_ver =~ ([0-9]*)\.([0-9]*)\.([0-9]*) ]]
+        echo "::set-output name=version-major::$(echo ${BASH_REMATCH[1]})"
+        echo "::set-output name=version-minor::$(echo ${BASH_REMATCH[2]})"
+        echo "::set-output name=version-patch::$(echo ${BASH_REMATCH[3]})"
+        
+    - name: Write version number to version header
+      shell: bash
+      run: |
+        echo ::notice title=Parsed version number::${{ steps.parsed-version.outputs.version-major }}.${{ steps.parsed-version.outputs.version-minor }}.${{ steps.parsed-version.outputs.version-patch }}
+        sed -i 's/#define VERSION_MAJOR 0/#define VERSION_MAJOR ${{ steps.parsed-version.outputs.version-major }}/g' ./Device/src/Version.h
+        sed -i 's/#define VERSION_MINOR 0/#define VERSION_MINOR ${{ steps.parsed-version.outputs.version-minor }}/g' ./Device/src/Version.h
+        sed -i 's/#define VERSION_PATCH 1/#define VERSION_PATCH ${{ steps.parsed-version.outputs.version-patch }}/g' ./Device/src/Version.h
+          

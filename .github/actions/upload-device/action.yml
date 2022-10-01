@@ -1,0 +1,46 @@
+name: Upload device to draft
+
+inputs:
+  upload-url:
+    required: true
+    type: string
+  microcontroller:
+    required: true
+    type: string
+  screen-define:
+    required: true
+    type: string
+  binary-path:
+    required: true
+    type: string
+  target-filename:
+    type: string
+    default: "binary.bin"
+
+runs:
+  using: composite
+  steps:
+    - name: Convert screen define to name
+      id: convert-screen
+      uses: ./.github/actions/map-screens
+      with: 
+        define: ${{ inputs.screen-define }}
+          
+    - name: Rename binary
+      shell: bash
+      run: |
+        mv "${{ inputs.binary-path }}" ".${{ inputs.target-filename }}"
+    
+    - name: Zip up binary
+      run: |
+        zip -j ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip .${{ inputs.target-filename }}
+        
+    - name: Upload
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ inputs.upload-url }}
+        asset_path: ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip
+        asset_name: ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip
+        asset_content_type: application/zip

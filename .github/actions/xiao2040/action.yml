@@ -22,6 +22,9 @@ inputs:
     default: -DPIN_SPI0_SCK=8 -DPIN_SPI0_MOSI=10 -DPIN_SPI0_MISO=9
   screen-driver:
     required: true
+  version:
+    type: string
+    default: 0.0.1
     
 runs:
   using: composite
@@ -36,3 +39,4 @@ runs:
         board-id: ${{ inputs.board-id }}
         additional-compile-flags: ${{ inputs.additional-compile-flags }}
         expected-binary-filename: ${{ inputs.expected-binary-filename }}
+        version: ${{ inputs.version }}

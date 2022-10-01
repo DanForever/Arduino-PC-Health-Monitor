@@ -10,6 +10,9 @@ inputs:
     default: "teensy:avr:teensy40:usb=serial,speed=600,opt=o2std,keys=en-us"
   screen-driver:
     required: true
+  version:
+    type: string
+    default: 0.0.1
     
 runs:
   using: composite
@@ -20,3 +23,4 @@ runs:
         preprocessor-define: ${{ inputs.preprocessor-define }}
         fqbn: ${{ inputs.fqbn }}
         screen-driver: ${{ inputs.screen-driver }}
+        version: ${{ inputs.version }}

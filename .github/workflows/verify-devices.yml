@@ -25,9 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - run: |
-          echo "Github Event name: ${{ github.event_name }}"
-
       - name: Version
         id: version
         uses: ./.github/actions/resolve-version
@@ -43,7 +40,7 @@ jobs:
 
       - name: Upload
         id: upload
-        if: ${{ github.event_name == 'workflow_call' }}
+        if: inputs.upload-url != ''
         uses: ./.github/actions/upload-device
         with:
           upload-url: ${{ inputs.upload-url }}
@@ -76,7 +73,7 @@ jobs:
 
       - name: Upload
         id: upload
-        if: ${{ github.event_name == 'workflow_call' }}
+        if: inputs.upload-url != ''
         uses: ./.github/actions/upload-device
         with:
           upload-url: ${{ inputs.upload-url }}
@@ -108,7 +105,7 @@ jobs:
 
       - name: Upload
         id: upload
-        if: ${{ github.event_name == 'workflow_call' }}
+        if: inputs.upload-url != ''
         uses: ./.github/actions/upload-device
         with:
           upload-url: ${{ inputs.upload-url }}

@@ -36,7 +36,7 @@ runs:
     - name: Zip up binary
       shell: bash
       run: |
-        zip -j ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip .${{ inputs.target-filename }}
+        zip -j ${{ inputs.microcontroller }}-${{ steps.convert-screen.outputs.name }}.zip ${{ inputs.target-filename }}
         
     - name: Upload
       uses: actions/upload-release-asset@v1.0.1

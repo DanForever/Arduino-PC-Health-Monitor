@@ -15,7 +15,7 @@ inputs:
     type: string
   target-filename:
     type: string
-    default: "binary.bin"
+    default: "device.bin"
   secret-github-token:
     required: true
 
@@ -31,7 +31,7 @@ runs:
     - name: Rename binary
       shell: bash
       run: |
-        mv "${{ inputs.binary-path }}" ".${{ inputs.target-filename }}"
+        mv "${{ inputs.binary-path }}" "${{ inputs.target-filename }}"
     
     - name: Zip up binary
       shell: bash

@@ -30,7 +30,7 @@ inputs:
 
 outputs:
   binary-path:
-    value: ./Build/${{ inputs.expected-binary-filename }}
+    value: ./build/${{ inputs.expected-binary-filename }}
 
 runs:
   using: composite

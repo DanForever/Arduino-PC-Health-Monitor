@@ -26,8 +26,6 @@ namespace HardwareMonitor.Testing
 	{
 		static async Task<int> Main(string[] args)
 		{
-			string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-
 			Console.WriteLine("Dan's hardware monitor");
 
 			// Instanticate the class that will perform the main body of work for us

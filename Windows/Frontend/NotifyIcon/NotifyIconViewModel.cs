@@ -121,7 +121,7 @@ namespace HardwareMonitor.NotifyIcon
 			td.Principal.RunLevel = TS.TaskRunLevel.Highest;
 
 			TS.LogonTrigger lt = new();
-			lt.UserId = Environment.UserName;
+			lt.UserId = System.Environment.UserName;
 			td.Triggers.Add(lt);
 
 			// Add an action that will launch Notepad whenever the trigger fires

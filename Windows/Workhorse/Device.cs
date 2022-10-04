@@ -29,9 +29,17 @@ namespace HardwareMonitor
 {
 	public enum eMicrocontroller
 	{
+		// PJRC Teensy 3.2
 		Teensy32,
+
+		// PJRC Teensy 4.0
 		Teensy40,
+
+		// Seeeduino Xiao SAMD21
 		SeeediunoXiao,
+
+		// Seeeduino Xiao RP2040
+		Xiao2040,
 
 		Unknown
 	}
@@ -81,6 +89,8 @@ namespace HardwareMonitor
 
 		private Version _version;
 
+		private System.Threading.SemaphoreSlim _semaphoreSlim = new(1, 1);
+
 		#endregion Private Fields
 
 		#region Public Properties
@@ -103,6 +113,7 @@ namespace HardwareMonitor
 
 		public Icon.Config Icons { get; set; }
 		public bool IsConnected => Connection is not null && Connection.IsOpen;
+		public bool DoNotRemove { get; set; }
 
 		public Layout.Config Layout => _layout;
 
@@ -112,6 +123,8 @@ namespace HardwareMonitor
 		public Orientation Orientation => Orientation.Vertical;
 
 		public Version Version => _version;
+
+		public System.Threading.SemaphoreSlim Lock => _semaphoreSlim;
 
 		#endregion Public Properties
 

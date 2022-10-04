@@ -67,7 +67,7 @@ namespace HardwareMonitor.Layout
 
 			Load(defaultConfigs);
 
-			string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			string appdataPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
 
 			// @todo: User layouts
 		}

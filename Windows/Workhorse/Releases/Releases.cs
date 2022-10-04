@@ -1,3 +1,22 @@
+/*
+ *   Arduino PC Health Monitor (PC Companion app)
+ *   Polls the hardware sensors for data and forwards them on to the arduino device
+ *   Copyright (C) 2022 Daniel Neve
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,6 +40,7 @@ namespace HardwareMonitor.Releases
 			Device
 		}
 
+		[DebuggerDisplay("{Name} ({Assets.Length} assets)")]
 		internal class Release
 		{
 			#region Public Properties (Populated from json data)
@@ -57,6 +77,7 @@ namespace HardwareMonitor.Releases
 			#endregion Public Properties (Parsed from other properties)
 		}
 
+		[DebuggerDisplay("{Name}")]
 		internal class Asset
 		{
 			#region Public Properties (Populated from json data)
@@ -97,87 +118,6 @@ namespace HardwareMonitor.Releases
 		{
 			internal static Release CompanionApp { get; set; }
 			internal static Release Devices { get; set; }
-		}
-
-		internal abstract class DeviceUpdater
-		{
-			public abstract bool Ready { get; }
-
-			public abstract void Update(string pathToDownloadedAsset);
-		}
-
-		internal class TeensyUpdater : DeviceUpdater
-		{
-			public eMicrocontroller Microcontroller { get; set; } = eMicrocontroller.Unknown;
-
-			public override bool Ready => FindPathToTeensyLoader() != null && GetMCUCode() != null;
-
-			public override void Update(string pathToDownloadedAsset)
-			{
-				string tempDirectory = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-				Directory.CreateDirectory(tempDirectory);
-
-				System.IO.Compression.ZipFile.ExtractToDirectory(pathToDownloadedAsset, tempDirectory);
-
-				string teensyLoaderPath = FindPathToTeensyLoader();
-				string hexBinaryPath = FindPathToHexBinary(tempDirectory);
-
-				if(hexBinaryPath == null)
-				{
-					Debug.WriteLine($"Couldn't find the correct binary file in '{tempDirectory}'");
-					return;
-				}
-
-				Process teensyLoaderProcess = new();
-
-				teensyLoaderProcess.StartInfo = new ProcessStartInfo(teensyLoaderPath)
-				{
-					Arguments = $"--mcu={GetMCUCode()} -w {hexBinaryPath}" 
-				};
-
-				teensyLoaderProcess.Start();
-			}
-
-			private string FindPathToTeensyLoader()
-			{
-				string installPath = "Tools/teensy_loader_cli.exe";
-				if (File.Exists(installPath))
-					return installPath;
-
-				string devPath = "../../External/teensy_loader_cli.exe";
-				if (File.Exists(devPath))
-					return devPath;
-
-				return null;
-			}
-
-			/// <summary>
-			/// There should only be a single file in the directory in which the downloaded file was unzipped
-			/// </summary>
-			private string FindPathToHexBinary(string directory)
-			{
-				string[] files = Directory.GetFiles(directory);
-
-				if (files.Length != 1)
-					return null;
-
-				return files[0];
-			}
-
-			private string GetMCUCode()
-			{
-				switch (Microcontroller)
-				{
-				case eMicrocontroller.Teensy32:
-					return "TEENSY32";
-
-				case eMicrocontroller.Teensy40:
-					return "TEENSY40";
-
-				default:
-					return null;
-				}
-			}
 		}
 
 		#endregion Internal Types
@@ -323,14 +263,6 @@ namespace HardwareMonitor.Releases
 				return;
 			}
 
-			DeviceUpdater deviceUpdater = CreateDeviceUpdater(device);
-
-			if(deviceUpdater == null || !deviceUpdater.Ready)
-			{
-				Debug.WriteLine($"Device of type '{device.Microcontroller}' does not have automatic update support yet");
-				return;
-			}
-
 			string downloadedPath = GenerateDownloadPath(asset.Name);
 
 			using (var client = new WebClient())
@@ -342,26 +274,12 @@ namespace HardwareMonitor.Releases
 				await client.DownloadFileTaskAsync(asset.DownloadUrl, downloadedPath);
 			}
 
-			deviceUpdater.Update(downloadedPath);
+			await DeviceUpdater.Update(device, downloadedPath);
 		}
 
 		#endregion Public Methods
 
 		#region Private Methods
-
-		private static DeviceUpdater CreateDeviceUpdater(Device device)
-		{
-
-			switch (device.Microcontroller)
-			{
-			case eMicrocontroller.Teensy32:
-			case eMicrocontroller.Teensy40:
-				return new TeensyUpdater() { Microcontroller = device.Microcontroller };
-
-			default:
-				return null;
-			}
-		}
 
 		private static string GenerateDownloadPath(string sourceFilename, int suffix)
 		{
@@ -390,7 +308,7 @@ namespace HardwareMonitor.Releases
 
 		private static Asset FindCorrectCompanionAppAsset(Release release)
 		{
-			string platformString = Environment.Is64BitProcess ? "x64" : "x86";
+			string platformString = System.Environment.Is64BitProcess ? "x64" : "x86";
 
 			foreach (Asset asset in release.Assets)
 			{

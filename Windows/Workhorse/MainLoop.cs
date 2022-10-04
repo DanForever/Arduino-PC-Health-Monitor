@@ -136,8 +136,19 @@ namespace HardwareMonitor
 
 		#region Private Methods
 
+		[Conditional("DEBUG")]
+		private void DebugPrintEnvironment()
+		{
+			Debug.WriteLine($"Roaming appdata folder: {Environment.RoamingAppdata}");
+			Debug.WriteLine($"Local appdata folder: {Environment.LocalAppdata}");
+			Debug.WriteLine($"Executable Path: {Environment.ExecutablePath}");
+			Debug.WriteLine($"Executable Folder: {Environment.ExecutableFolder}");
+		}
+
 		private async void Initialize()
 		{
+			DebugPrintEnvironment();
+
 			_sensorConfig = Monitor.Config.Computer.Load("Data/sensors.xml");
 			_pluginConfig = Plugin.Config.Config.Load("Data/plugins.xml");
 			_iconConfig = Icon.Config.Load("Data/icons.xml");
@@ -146,6 +157,7 @@ namespace HardwareMonitor
 
 			_layoutManager.Load();
 
+			await Releases.DeviceUpdater.Initialise();
 			await Releases.Releases.UpdateLatestReleases();
 		}
 
@@ -162,7 +174,7 @@ namespace HardwareMonitor
 
 		private bool ShouldRemoveDevice(Device device)
 		{
-			if (!device.IsConnected)
+			if (!device.IsConnected && !device.DoNotRemove)
 			{
 				Feedback?.Invoke($"Device disconnected: {device.Connection.Name}");
 				DeviceDisconnected?.Invoke(device);
@@ -224,6 +236,7 @@ namespace HardwareMonitor
 				"Teensy 3.2",
 				"Teensy 4.0",
 				"Seeeduino Xiao",
+				"Seeeduino Xiao RP2040"
 			};
 
 			string[] ScreenStrings = new string[]
@@ -253,19 +266,23 @@ namespace HardwareMonitor
 
 			foreach (Device device in _devices)
 			{
-				if (!device.IsConnected)
-					continue;
-
-				if(device.Layout == null)
+				await device.Lock.WaitAsync();
 				{
-					Layout.Config layout = _layoutManager.GetLayout(device.Resolution, device.Orientation);
-					if (layout != null)
-						await device.SetLayout(layout);
-					else
+					if (!device.IsConnected)
 						continue;
-				}
 
-				await device.Update(snapshot);
+					if (device.Layout == null)
+					{
+						Layout.Config layout = _layoutManager.GetLayout(device.Resolution, device.Orientation);
+						if (layout != null)
+							await device.SetLayout(layout);
+						else
+							continue;
+					}
+
+					await device.Update(snapshot);
+				}
+				device.Lock.Release();
 			}
 		}
 

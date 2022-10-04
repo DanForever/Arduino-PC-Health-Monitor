@@ -56,6 +56,11 @@ runs:
         ./arduino-cli lib update-index
         ./arduino-cli lib install  "GFX Library for Arduino"@1.2.8
         
+    - name: Apply version
+      uses: ./.github/actions/apply-version-device
+      with:
+        version: ${{ inputs.version }}
+        
     - name: Compile
       shell: bash
       run: |

@@ -8,3 +8,6 @@ act.exe
 Device/arduino-cli.exe
 Windows/UpgradeLog.htm
 Device/addlicense.exe
+acli/*
+arduino-cli.exe
+config.yml

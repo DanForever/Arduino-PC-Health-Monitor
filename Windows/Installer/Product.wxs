@@ -20,8 +20,8 @@
 			<!-- The actual binaries and associated files are automatically gathered using "heat", found in the "publishandharvest" targets file -->
 			<ComponentGroupRef Id="HarvestedFiles" />
 
-			<?ifdef TeensyLoaderCli ?>
-				<ComponentGroupRef Id="TeensyLoaderCli" />
+			<?ifdef ArduinoCli ?>
+				<ComponentGroupRef Id="ArduinoCli" />
 			<?endif?>
 			
 			<ComponentRef Id="ApplicationShortcut" />
@@ -81,20 +81,20 @@
 	</Fragment>
 
 	<!-- Teensy Loader CLI (External tool) -->
-	<?ifdef TeensyLoaderCli ?>
-	<?warning Teensy loader detected ?>
+	<?ifdef ArduinoCli ?>
+	<?warning Arduino CLI detected ?>
 		<Fragment>
 			<DirectoryRef Id="APPLICATIONROOTDIRECTORY">
 				<Directory Id="ExternalTools" Name="Tools" />
 			</DirectoryRef>
 
-			<ComponentGroup Id="TeensyLoaderCli">
-				<Component Id="teensy_loader_cli.exe" Directory="ExternalTools" Guid="{CEE21A5B-7EAF-4DB4-A24B-0F9C8068F298}">
-					<File Id="teensy_loader_cli.exe" KeyPath="yes" Source="$(var.TeensyLoaderCli)" />
+			<ComponentGroup Id="ArduinoCli">
+				<Component Id="arduino_cli.exe" Directory="ExternalTools" Guid="{CEE21A5B-7EAF-4DB4-A24B-0F9C8068F298}">
+					<File Id="arduino_cli.exe" KeyPath="yes" Source="$(var.ArduinoCli)" />
 				</Component>
 			</ComponentGroup>
 		</Fragment>
 	<?else?>
-		<?warning Teensy loader not found ?>
+		<?warning Arduino CLI not found ?>
 	<?endif?>
 </Wix>

@@ -20,8 +20,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Publish|x64' ">
     <CompilerAdditionalOptions>-arch x64</CompilerAdditionalOptions>
   </PropertyGroup>
-  <PropertyGroup Condition="Exists('$(SolutionDir)External\teensy_loader_cli.exe')">
-    <DefineConstants>TeensyLoaderCli=$(SolutionDir)External\teensy_loader_cli.exe</DefineConstants>
+  <PropertyGroup Condition="Exists('$(SolutionDir)External\arduino-cli.exe')">
+    <DefineConstants>ArduinoCli=$(SolutionDir)External\arduino-cli.exe</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Product.wxs" />

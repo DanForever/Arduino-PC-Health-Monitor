@@ -17,6 +17,8 @@ env:
   BUILD_CONFIGURATION: Publish
 
   INSTALLER_FILENAME: Hardware-monitor-installer
+  
+  ARDUINO_CLI_VERSION: 0.27.1
 
 jobs:
   create-draft-release:
@@ -40,19 +42,24 @@ jobs:
   build-tools:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build Teensy Loader CLI
-        id: build-step
-        uses: ./.github/workflows/build-teensy-loader-cli
+      - name: Download Arduino-cli
+        run: |
+          wget -O arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x86.zip https://github.com/arduino/arduino-cli/releases/download/0.27.1/arduino-cli_0.27.1_Windows_32bit.zip
+          wget -O arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x64.zip https://github.com/arduino/arduino-cli/releases/download/0.27.1/arduino-cli_0.27.1_Windows_64bit.zip
+
+      - name: Store arduino-cli binary as asset x86
+        uses: actions/upload-artifact@v3
         with:
-          token: ${{ secrets.TEENSY_LOADER_CLI_SOURCE_PAT }}
-      - name: Store Teensy loader cli binary as asset
-        uses: actions/upload-artifact@v2
+          name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x86.zip
+          path: arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x86.zip
+          retention-days: 30
+          
+      - name: Store arduino-cli binary as asset x64
+        uses: actions/upload-artifact@v3
         with:
-          name: teensy-loader-cli
-          path: ${{ steps.build-step.outputs.binary-path }}
-          retention-days: 1
+          name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x64.zip
+          path: arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x64.zip
+          retention-days: 30
 
   build-and-upload:
     runs-on: windows-2019
@@ -62,7 +69,7 @@ jobs:
         build-platform: ["x86", "x64"]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install MSBuild
       uses: microsoft/setup-msbuild@v1.1
@@ -100,11 +107,16 @@ jobs:
       shell: bash
       run: sed -i 's/<?define MyProductVersion = "0\.0\.1" ?>/<?define MyProductVersion = "${{ github.event.inputs.version }}" ?>/g' ./Windows/Installer/product.wxs
 
-    - name: Insert Teensy loader cli into installer
-      uses: actions/download-artifact@v2
+    - name: Download Arduino CLI artifact
+      uses: actions/download-artifact@v3
       with:
-        name: teensy-loader-cli
+        name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip
         path: ./Windows/External
+        
+    - name: Unpack Arduino CLI executable and remove downloaded artifact
+      run: |
+        unzip ./Windows/External/arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip -d ./Windows/External
+        rm ./Windows/External/arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip
 
     - name: Build
       working-directory: ${{env.GITHUB_WORKSPACE}}
@@ -121,7 +133,7 @@ jobs:
         asset_path: ./Windows/bin/Installer/Installer.msi
         asset_name: ${{env.INSTALLER_FILENAME}}.${{ matrix.build-platform }}.msi
         asset_content_type: application/x-msi
-          
+
   publish-draft:
     name: Publish Draft Release
     runs-on: ubuntu-latest

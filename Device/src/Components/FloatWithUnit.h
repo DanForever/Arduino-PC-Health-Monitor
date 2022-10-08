@@ -47,11 +47,11 @@ public:
 private:
 	int m_precision;
 
+	Printer m_printer;
+
 	Position m_position;
 	uint8_t m_textSize;
 	uint8_t m_unitTextSize;
-
-	Printer m_printer;
 
 	char m_value[MAX_VALUE_LENGTH];
 	char m_unit[MAX_UNIT_LENGTH];

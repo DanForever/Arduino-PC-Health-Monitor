@@ -21,6 +21,7 @@
 #define __COMPONENT_TEXT_H_
 
 #include "Component.h"
+#include "../Screen/PrintUtils.h"
 
 //------------------------------------------------------------------------------------------------------
 class Text : public Component
@@ -42,12 +43,10 @@ public:
 	virtual void HandleUpdateMessage(Screen* screen, Message& message) override;
 
 private:
-	uint16_t m_textWidth;
-	uint16_t m_textHeight;
+	Printer m_printer;
 
 	Position m_position;
 	uint8_t m_textSize;
-	uint8_t m_longestLength;
 	char m_text[MAX_LENGTH];
 };
 

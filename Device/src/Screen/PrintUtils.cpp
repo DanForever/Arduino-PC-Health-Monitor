@@ -19,7 +19,8 @@
 
 void Printer::Print(const char* text, int16_t x, int16_t y, Screen* screen, const Settings& settings)
 {
-	Dimensions old = m_previousTextDimensions;
+	const Dimensions old = m_previousTextDimensions;
+	const bool previousDimensionsAreValid = old.Width > 0;
 
 	// Alias the variable for better readability
 	Dimensions& current = m_previousTextDimensions;
@@ -27,7 +28,7 @@ void Printer::Print(const char* text, int16_t x, int16_t y, Screen* screen, cons
 	current.Position.X = x;
 	current.Position.Y = y;
 
-	if (m_previousIsInitialized)
+	if (previousDimensionsAreValid)
 	{
 		if (current.Width < old.Width)
 		{
@@ -59,13 +60,12 @@ void Printer::Print(const char* text, int16_t x, int16_t y, Screen* screen, cons
 	screen->SetTextColour(settings.Foreground, settings.Background);
 	screen->SetCursor(current.Position.X + current.Offset.X, current.Position.Y + current.Offset.Y);
 	screen->Print(text);
-
-	m_previousIsInitialized = true;
 }
 
 void Printer::Print(const char* text, const char* unit, int16_t x, int16_t y, Screen* screen, const Settings& settings)
 {
-	Dimensions old = m_previousTextDimensions;
+	const Dimensions old = m_previousTextDimensions;
+	const bool previousDimensionsAreValid = old.Width > 0;
 
 	// Alias the variable for better readability
 	Dimensions& current = m_previousTextDimensions;
@@ -74,7 +74,7 @@ void Printer::Print(const char* text, const char* unit, int16_t x, int16_t y, Sc
 	current.Position.X = x;
 	current.Position.Y = y;
 
-	if (m_previousIsInitialized)
+	if (previousDimensionsAreValid)
 	{
 		if (current.Width < old.Width)
 		{
@@ -120,8 +120,6 @@ void Printer::Print(const char* text, const char* unit, int16_t x, int16_t y, Sc
 
 	screen->SetTextSize(settings.UnitTextSize);
 	screen->Print(unit);
-
-	m_previousIsInitialized = true;
 }
 
 void Printer::Dimensions::Calculate(const char* text, const Settings& settings, Screen* screen)

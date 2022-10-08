@@ -108,7 +108,6 @@ jobs:
       run: sed -i 's/<?define MyProductVersion = "0\.0\.1" ?>/<?define MyProductVersion = "${{ github.event.inputs.version }}" ?>/g' ./Windows/Installer/product.wxs
 
     - name: Download Arduino CLI artifact
-      id: download-arduino-cli-artifact
       uses: actions/download-artifact@v3
       with:
         name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip
@@ -116,7 +115,7 @@ jobs:
 
     - name: Unpack Arduino CLI executable and remove downloaded artifact
       run: |
-        unzip ${{ steps.download-arduino-cli-artifact.outputs.download-path }} -d ./Windows/External
+        unzip ./Windows/External/arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip -d ./Windows/External
         rm ./Windows/External/arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip
 
     - name: Build

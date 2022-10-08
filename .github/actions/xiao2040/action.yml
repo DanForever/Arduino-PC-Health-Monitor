@@ -7,19 +7,19 @@ inputs:
     default: "IDENTITY_M_SEEEDUINO_XAIO_RP2040"
   fqbn:
     description: "Fully qualified board name"
-    default: "Seeeduino:rp2040:Seeed_XIAO_RP2040"
+    default: "rp2040:rp2040:seeed_xiao_rp2040"
   board-provider-uri:
     type: string
-    default: https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
+    default: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
   board-id:
     type: string
-    default: Seeeduino:rp2040@1.12.0
+    default: rp2040:rp2040@2.5.4
   expected-binary-filename:
     type: string
     default: Device.ino.uf2
   additional-compile-flags:
     type: string
-    default: -DPIN_SPI0_SCK=8 -DPIN_SPI0_MOSI=10 -DPIN_SPI0_MISO=9
+    default: -DARDUINO_RASPBERRY_PI_PICO
   screen-driver:
     required: true
   version:

@@ -44,21 +44,21 @@ jobs:
     steps:
       - name: Download Arduino-cli
         run: |
-          wget -O arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x86.zip https://github.com/arduino/arduino-cli/releases/download/0.27.1/arduino-cli_0.27.1_Windows_32bit.zip
-          wget -O arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x64.zip https://github.com/arduino/arduino-cli/releases/download/0.27.1/arduino-cli_0.27.1_Windows_64bit.zip
+          wget -O arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x86.zip https://github.com/arduino/arduino-cli/releases/download/${{ env.ARDUINO_CLI_VERSION }}/arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_Windows_32bit.zip
+          wget -O arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x64.zip https://github.com/arduino/arduino-cli/releases/download/${{ env.ARDUINO_CLI_VERSION }}/arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_Windows_64bit.zip
 
       - name: Store arduino-cli binary as asset x86
         uses: actions/upload-artifact@v3
         with:
           name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x86.zip
-          path: arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x86.zip
+          path: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x86.zip
           retention-days: 30
           
       - name: Store arduino-cli binary as asset x64
         uses: actions/upload-artifact@v3
         with:
           name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x64.zip
-          path: arduino-cli_${{ env.ARDUINO_CLI_VERSION }}_x64.zip
+          path: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-x64.zip
           retention-days: 30
 
   build-and-upload:
@@ -113,11 +113,7 @@ jobs:
       with:
         name: arduino-cli-${{ env.ARDUINO_CLI_VERSION }}-${{matrix.build-platform}}.zip
         path: ./Windows/External
-        
-    - name: TEST
-      run: |
-        dir ./Windows/External
-        
+
     - name: Unpack Arduino CLI executable and remove downloaded artifact
       run: |
         unzip ${{ steps.download-arduino-cli-artifact.outputs.download-path }} -d ./Windows/External

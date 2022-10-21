@@ -17,5 +17,8 @@
 		<Program ProcessName="Docker" />
 		<Program ProcessName="Microsoft.Photos" />
 		<Program ProcessName="EpicGamesLauncher" />
+		<Program ProcessName="EpicWebHelper" />
+		<Program ProcessName="Lumina" />
+		<Program ProcessName="OpenVPNConnect" />
 	</Blacklist>
 </FramerateMetrics>
